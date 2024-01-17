@@ -1,0 +1,64 @@
+<%- include('../layouts/header.ejs') -%>
+
+  <style>
+    body {
+      overflow-y: hidden;
+      margin-top: -40px;
+    }
+  </style>
+
+  <header id="header">
+    <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a class="active" href="/login">Login</a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
+    </div>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
+    </div>
+  </header>
+
+  <section id="forms">
+    <div id="wrapper">
+      <div class="title">
+        <span>Login</span>
+      </div>
+      <% if( locals.message ){ %>
+        <div class="detials" id="hide">
+          <%=message%>
+        </div>
+        <% } %>
+          <% if( locals.message1 ){ %>
+            <div style="color: green;" class="detials" id="hide">
+              <%=message1%>
+            </div>
+            <% } %>
+              <form action="/login" method="post">
+                <div class="row">
+                  <i class="fas fa-user"></i>
+                  <input type="text" name="email" placeholder="Email">
+                </div>
+                <div class="row">
+                  <i class="fas fa-lock"></i>
+                  <input type="password" name="password" placeholder="Password">
+                </div>
+                <div class="pass"><a href="/forget">Forgot password</a></div>
+                <div class="row button">
+                  <input type="submit" value="Login">
+                </div>
+                <div class="signup-link">Don't have an account? <a href="/signup">Sign Up</a></div>
+              </form>
+    </div>
+  </section>
+
+  <script src="/javaScript/script.js"></script>
+
+  <%- include('../layouts/footer.ejs') -%>

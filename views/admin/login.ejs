@@ -1,0 +1,24 @@
+<%- include('../layouts/header.ejs') -%>
+
+  <div id="forms">
+    <div id="wrapper">
+      <div class="title">
+        <span>Admin Login</span>
+      </div>
+      <form action="/admin/login" method="post">
+        <div class="row">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" placeholder="Username">
+        </div>
+        <div class="row">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" placeholder="Password">
+        </div>
+        <div class="row button">
+          <input type="submit" value="Login">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%- include('../layouts/footer.ejs') -%>

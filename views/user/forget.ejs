@@ -1,0 +1,55 @@
+<%- include('../layouts/header.ejs') -%>
+
+
+<style>
+  body{
+    overflow-y: hidden;
+    margin-top: -40px;
+  }
+</style>
+
+  <header id="header">
+    <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a class="active" href="/login">Login</a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
+    </div>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
+    </div>
+  </header>
+
+  <section id="forms">
+    <div id="wrapper">
+      <div class="title">
+        <span>Forget Password</span>
+      </div>
+      <% if( locals.message ){ %>
+        <div class="detials" id="hide">
+          <%=message%>
+        </div>
+        <% } %>
+      <form action="/forget" method="post">
+        <div class="row">
+          <i class="fas fa-user"></i>
+          <input type="text" name="email" placeholder="Email" required>
+        </div>
+        <div class="row button">
+          <input type="submit" value="Send OTP">
+        </div>
+      </form>
+    </div>
+  </section>
+
+
+  <script src="/javaScript/script.js"></script>
+
+  <%- include('../layouts/footer.ejs') -%>
