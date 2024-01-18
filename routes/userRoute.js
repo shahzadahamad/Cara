@@ -49,4 +49,11 @@ userRouter.get('/cart',userController.loadCart);
 // singleProduct
 userRouter.get('/sproduct',userController.loadSingleProduct);
 
+// profile
+userRouter.get('/profile',userController.loadProfile);
+
+// logout
+userRouter.get('/logout',userController.userLogout);
+
+
 module.exports = userRouter;

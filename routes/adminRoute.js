@@ -16,6 +16,9 @@ adminRouter.post('/login',adminController.verifyLogin);
 // dashboard
 adminRouter.get('/dashboard',adminController.loadDashboard);
 
+// userDetials
+adminRouter.get('/user-detials',adminController.loadUserDetials);
+
 
 
 module.exports = adminRouter;

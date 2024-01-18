@@ -9,7 +9,7 @@
       <li><a class="active" href="/shop">Shop</a></li>
       <li><a href="/about">About</a></li>
       <li><a href="/contact">Contact</a></li>
-      <li><a href="/login">Login</a></li>
+      <li><a href="<%= locals.login ? '/profile' : '/login' %>" > <%= locals.login ? 'Profile' : 'Login' %></a></li>
       <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
       <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
     </ul>

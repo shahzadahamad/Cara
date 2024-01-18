@@ -51,9 +51,18 @@ const verifyLogin = async (req,res) => {
 };
 
 // loadDashboard
-const loadDashboard = (req,res) =>{
+const loadDashboard = (req,res) => {
   try{
     res.render('dashboard');
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// loadUserDetials
+const loadUserDetials = (req,res) => {
+  try{
+    res.render('user-detials');
   }catch(error){
     console.log(error.message);
   }
@@ -65,4 +74,5 @@ module.exports = {
   loadLogin,
   verifyLogin,
   loadDashboard,
+  loadUserDetials,
 }
