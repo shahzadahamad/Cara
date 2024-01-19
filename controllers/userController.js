@@ -47,23 +47,37 @@ const sendOtpVerifyMail = async (name, email, otp) => {
 };
 
 // generateVerificationCode
-const generateVerificationCode = () => {
-  const verificationCode = Math.floor(1000 + Math.random() * 9000);
-  return verificationCode;
+const generateVerificationCode = async (userData) => {
+  const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+  const expirationTime = new Date(Date.now() + 60000);
+  const sOtp = await securePassword(verificationCode);
+
+  const addOTP = new userOTPVerification({
+    userId: userData._id,
+    otp: sOtp,
+    createdAt: new Date(),
+    expiresAt: expirationTime,
+  });
+
+  await userOTPVerification.insertMany(addOTP);
+  scheduleDocumentDeletion(userData._id, expirationTime, addOTP._id);
+  sendOtpVerifyMail(userData.fullname, userData.email, verificationCode);
 };
 
 // scheduleDocumentDeletion
-const scheduleDocumentDeletion = async (userId, expirationTime) => {
-  const currentTime = new Date()
+const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
+  const currentTime = new Date();
   const timeUntilExpiration = expirationTime - currentTime;
-  setTimeout( async () => {
-    try{
-      await userOTPVerification.deleteOne({ userId: userId});
-    }catch(error){
+  setTimeout(async () => {
+    try {
+      console.log('hello');
+      await userOTPVerification.deleteOne({_id:otpId, userId:userId});
+    } catch (error) {
       console.log(error.message);
     }
   }, timeUntilExpiration);
-}
+};
 
 // loadHome
 const loadPage = (req, res) => {
@@ -170,81 +184,17 @@ const verifySignUp = async (req, res) => {
       const cpassword = req.body.cpassword;
       if (addUser.password === cpassword) {
         const spassword = await securePassword(req.body.password);
-
         addUser.password = spassword;
+
         req.session.userData = addUser;
 
-        // genarating otp ,insert and sendMail
-        const expirationTime = new Date(Date.now() + 60000);
-        const otp = generateVerificationCode().toString();
-        const sOtp = await securePassword(otp);
-
-
-        const addOTP = new userOTPVerification({
-          userId: addUser._id,
-          otp: sOtp,
-          createdAt: new Date(),
-          expiresAt: expirationTime,
-        });
-
-
-        await userOTPVerification.insertMany(addOTP);
-
-        scheduleDocumentDeletion(addUser._id, expirationTime);
-
-        sendOtpVerifyMail(addUser.fullname, addUser.email, otp);
+        generateVerificationCode(addUser);
 
         res.redirect("/otp");
       } else {
         req.session.cPassError = true;
         res.redirect("/signup");
       }
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// loadOtp
-const loadOtp = async (req, res) => {
-  try {
-    if (req.session.otpError) {
-      req.session.otpError = false;
-      res.render("otp", { message: "Invalied otp" });
-    } else if (req.session.otpExpries) {
-      req.session.otpExpries = false;
-      res.render("otp", { message: "otp expired please resend" });
-    } else {
-      res.render("otp");
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// verifyOtp
-const verifyOtp = async (req, res) => {
-  try {
-    const otpData = await userOTPVerification.findOne({
-      userId: req.session.userData._id,
-    });
-
-    if (!otpData) {
-      req.session.otpExpries = true;
-      res.redirect("/otp");
-      return;
-    };
-
-    const otp = req.body.otp.join("");
-    const isOtpMatch = await bcrypt.compare(otp, otpData.otp);
-
-    if (isOtpMatch) {
-      await userOTPVerification.deleteOne({ userId: req.session.userData._id });
-      await user.insertMany(req.session.userData);
-      res.redirect("/");
-    } else {
-      req.session.otpError = true;
-      res.redirect("/otp");
     }
   } catch (error) {
     console.log(error.message);
@@ -273,8 +223,10 @@ const verifyForgetPassword = async (req, res) => {
     const email = req.body.email;
     const userData = await user.findOne({ email: email });
     if (userData) {
-      req.session.resetEmail = userData.email;
-      req.session.resetPassword = true;
+      req.session.resetEmail = userData;
+
+      generateVerificationCode(userData);
+
       res.redirect("/otp");
     } else {
       req.session.existingUser = true;
@@ -290,7 +242,7 @@ const loadResetPassword = async (req, res) => {
   try {
     if (req.session.cpassError) {
       req.session.cpassError = false;
-      res.render("/resetPassword", { message: "Passwords are not same" });
+      res.render("resetPassword", { message: "Passwords are not same" });
     } else {
       res.render("resetPassword");
     }
@@ -302,12 +254,17 @@ const loadResetPassword = async (req, res) => {
 // verifyResetPassword
 const verifyResetPassword = async (req, res) => {
   try {
-    const email = req.session.resetEmail;
+
+    const email = req.session.resetEmail.email;
     const userData = await user.findOne({ email: email });
+
+
     if (userData) {
+
       const password = req.body.password;
       const cpassword = req.body.password;
       if (password === cpassword) {
+
         const spassword = await securePassword(password);
         await user.updateOne(
           { email: userData.email },
@@ -325,10 +282,80 @@ const verifyResetPassword = async (req, res) => {
   }
 };
 
+// loadOtp
+const loadOtp = async (req, res) => {
+  try {
+    if (req.session.otpError) {
+      req.session.otpError = false;
+      res.render("otp", { message: "Invalied otp" });
+    } else if (req.session.otpExpries) {
+      req.session.otpExpries = false;
+      res.render("otp", { message: "otp expired please resend" });
+    } else {
+      res.render("otp");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyOtp
+const verifyOtp = async (req, res) => {
+  try {
+    if (req.session.userData) {
+      const otpDataAdd = await userOTPVerification.findOne({
+        userId: req.session.userData._id,
+      });
+      if (!otpDataAdd) {
+        req.session.otpExpries = true;
+        res.redirect("/otp");
+        return;
+      }
+      const otp = req.body.otp.join("");
+      const isOtpMatch = await bcrypt.compare(otp, otpDataAdd.otp);
+      if (isOtpMatch) {
+        await userOTPVerification.deleteOne({
+          userId: req.session.userData._id,
+        });
+        await user.insertMany(req.session.userData);
+        req.session.user = req.session.userData._id;
+        res.redirect("/");
+      } else {
+        req.session.otpError = true;
+        res.redirect("/otp");
+      }
+    } else if (req.session.resetEmail) {
+      const otpDataChangePass = await userOTPVerification.findOne({
+        userId: req.session.resetEmail._id,
+      });
+
+      if (!otpDataChangePass) {
+        req.session.otpExpries = true;
+        res.redirect("/otp");
+        return;
+      }
+      const otp = req.body.otp.join("");
+      const isOtpMatch = await bcrypt.compare(otp, otpDataChangePass.otp);
+
+      if (isOtpMatch) {
+        await userOTPVerification.deleteOne({
+          userId: req.session.resetEmail._id,
+        });
+        res.redirect("/resetPassword");
+      } else {
+        req.session.otpError = true;
+        res.redirect("/otp");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadHome
 const loadHome = (req, res) => {
   try {
-    res.render("home",{login:req.session.user});
+    res.render("home", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -337,7 +364,7 @@ const loadHome = (req, res) => {
 // loadShop
 const loadShop = (req, res) => {
   try {
-    res.render("shop",{login:req.session.user});
+    res.render("shop", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -346,7 +373,7 @@ const loadShop = (req, res) => {
 // loadAbout
 const loadAbout = (req, res) => {
   try {
-    res.render("about",{login:req.session.user});
+    res.render("about", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -355,7 +382,7 @@ const loadAbout = (req, res) => {
 // loadContact
 const loadContact = (req, res) => {
   try {
-    res.render("contact",{login:req.session.user});
+    res.render("contact", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -364,7 +391,7 @@ const loadContact = (req, res) => {
 // loadCart
 const loadCart = (req, res) => {
   try {
-    res.render("cart",{login:req.session.user});
+    res.render("cart", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -373,7 +400,7 @@ const loadCart = (req, res) => {
 // loadSingleProduct
 const loadSingleProduct = (req, res) => {
   try {
-    res.render("sproduct",{login:req.session.user});
+    res.render("sproduct", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -382,7 +409,7 @@ const loadSingleProduct = (req, res) => {
 // loadProfile
 const loadProfile = (req, res) => {
   try {
-    res.render("profile",{login:req.session.user});
+    res.render("profile", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -392,12 +419,11 @@ const loadProfile = (req, res) => {
 const userLogout = (req, res) => {
   try {
     req.session.destroy();
-    res.redirect('/');
+    res.redirect("/");
   } catch (error) {
     console.log(error.message);
   }
 };
-
 
 module.exports = {
   loadPage,

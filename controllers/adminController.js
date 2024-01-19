@@ -62,12 +62,11 @@ const loadDashboard = (req,res) => {
 // loadUserDetials
 const loadUserDetials = (req,res) => {
   try{
-    res.render('user-detials');
+    res.render('userDetials');
   }catch(error){
     console.log(error.message);
   }
 };
-
 
 module.exports = {
   loadPage,
