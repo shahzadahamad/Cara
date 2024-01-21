@@ -5,6 +5,11 @@
       <div class="title">
         <span>Admin Login</span>
       </div>
+      <% if( locals.message ){ %>
+        <div class="detials" id="hide">
+          <%=message%>
+        </div>
+        <% } %>
       <form action="/admin/login" method="post">
         <div class="row">
           <i class="fas fa-user"></i>

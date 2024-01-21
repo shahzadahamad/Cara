@@ -25,6 +25,10 @@ setTimeout(() => {
 // otp
 const otpInputs = document.querySelectorAll(".input-field input");
 
+window.onload = function() {
+  otpInputs[0].focus();
+};
+
 otpInputs.forEach((input, index) => {
   input.addEventListener("input", (e) => {
     const currentInput = input;

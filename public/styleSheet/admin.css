@@ -22,7 +22,7 @@ body {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 106px;
+  width: 112px;
   height: 100vh;
   padding: 0 1.7rem;
   color: #fff;
@@ -273,6 +273,7 @@ thead {
   /* background-color: rgba(113, 99, 186, 255); */
   background-color: #1abc9c;
   color: #fff;
+  text-align: center;
 }
 
 th {
@@ -282,10 +283,11 @@ th {
 
 tbody {
   background: #f2f2f2;
+  text-align: center;
 }
 
 td {
-  padding: 15px;
+  padding: 6px;
   font-size: 14px;
   color: #333;
 }
@@ -307,7 +309,6 @@ tfoot td {
 }
 
 .table--container button {
-  color: green;
-  background: none;
-  cursor: pointer;
+  padding: 3px 10px;
 }
+

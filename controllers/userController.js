@@ -1,5 +1,6 @@
 const user = require("../models/userModel");
 const userOTPVerification = require("../models/userOTPVerification");
+const product = require('../models/productsModel');
 const bcrypt = require("bcrypt");
 const { render } = require("ejs");
 const express = require("express");
@@ -71,7 +72,6 @@ const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
   const timeUntilExpiration = expirationTime - currentTime;
   setTimeout(async () => {
     try {
-      console.log('hello');
       await userOTPVerification.deleteOne({_id:otpId, userId:userId});
     } catch (error) {
       console.log(error.message);
@@ -353,9 +353,13 @@ const verifyOtp = async (req, res) => {
 };
 
 // loadHome
-const loadHome = (req, res) => {
+const loadHome = async (req, res) => {
   try {
-    res.render("home", { login: req.session.user });
+
+    const productData = await product.find();
+    const latestProducts = await product.find().sort({_id:-1}).limit(8);
+    res.render("home", { login: req.session.user, product:productData, latestProducts:latestProducts });
+    
   } catch (error) {
     console.log(error.message);
   }
