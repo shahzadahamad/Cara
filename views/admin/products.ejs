@@ -33,25 +33,13 @@
         </a>
       </li>
       <li>
-        <a href="#">
-          <i class="fa-solid fa-users"></i>
-          <span>Users</span>
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <i class="fa-solid fa-users"></i>
-          <span>Users</span>
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <i class="fa-solid fa-users"></i>
-          <span>Users</span>
+        <a href="/admin/category">
+          <i class="fa-solid fa-list"></i>
+          <span>Category</span>
         </a>
       </li>
       <li class="logout">
-        <a href="#">
+        <a href="/admin/logout">
           <i class="fas fa-sign-out-alt"></i>
           <span>Logout</span>
         </a>
@@ -104,9 +92,9 @@
             <tr>
               <td><%= product[i].name %></td>
               <td><%= product[i].brand %></td>
-              <td><%= product[i].category %></td>
+              <td><%= product[i].categoryId.name %></td>
               <td><%= product[i].rating %></td>
-              <th><%= product[i].price %></th>
+              <th>$<%= product[i].price %></th>
               <td><%= product[i].quantity %></td>
               <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image %>" alt=""></td>
               <td><a class="btn btn-outline-primary" href="">Edit</a>&nbsp;&nbsp;<a class="btn btn-outline-danger" href="">Delete</a></td>
@@ -114,13 +102,13 @@
             <% } %>
             <% } else { %>
               <tr>
-                <td colspan="7">User Not Found</td>
+                <td colspan="7">Products Not Found</td>
               </tr>
               <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="8">Total Products: 4 </td>
+              <td colspan="8">Total Products: <%= product.length %> </td>
             </tr>
           </tfoot>
         </table>

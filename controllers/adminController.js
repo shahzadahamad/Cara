@@ -1,6 +1,7 @@
 const admin = require("../models/adminModel");
 const user = require('../models/userModel');
 const product = require('../models/productsModel');
+const category = require('../models/categoryModel');
 const bcrypt = require("bcrypt");
 
 // hashPassword
@@ -86,23 +87,11 @@ const loadUserDetials = async (req,res) => {
   }
 };
 
-// loadEditUser
-const loadEditUser = async (req,res) => {
-  try{
-    const adminData = await admin.findById({_id:req.session.admin_id});
-    const id = req.query.id;
-    const userData = await user.findById({_id:id});
-    res.render('editUser',{admins:adminData,user:userData});
-  }catch(error){
-    console.log(error.message);
-  }
-};
-
 // loadProducts
 const loadProducts = async (req,res) => {
   try{
     const adminData = await admin.findById({_id:req.session.admin_id});
-    const products = await product.find();
+    const products = await product.find().populate('categoryId');
     res.render('products',{admins:adminData,product:products});
   }catch(error){
     console.log(error.message);
@@ -113,11 +102,12 @@ const loadProducts = async (req,res) => {
 const loadAddProducts = async (req,res) => {
   try{
     const adminData = await admin.findById({_id:req.session.admin_id});
+    const categorys = await category.find();
     if(req.session.addProduct){
       req.session.addProduct=false;
-      res.render('addProducts',{admins:adminData,message:"Product Added"});
+      res.render('addProducts',{admins:adminData,message:"Product Added",category:categorys});
     }else{
-      res.render('addProducts',{admins:adminData});
+      res.render('addProducts',{admins:adminData,category:categorys});
     }
   }catch(error){
     console.log(error.message);
@@ -127,14 +117,16 @@ const loadAddProducts = async (req,res) => {
 // verifyAddProducts
 const verifyAddProducts = async (req,res) => {
   try{
+    const categorys = await category.findOne({name:req.body.category});
     const addProduct = new product({
       name: req.body.name,
       brand: req.body.brand,
-      category: req.body.category,
+      categoryId: categorys._id,
       rating: req.body.rating,
       price: req.body.price,
       quantity: req.body.quantity,
       image: req.file.filename,
+      description: req.body.description,
     });
 
     await product.insertMany(addProduct);
@@ -144,8 +136,49 @@ const verifyAddProducts = async (req,res) => {
   }catch(error){
     console.log(error.message);
   }
-}
+};
 
+// loadCategory
+const loadCategory = async (req,res) => {
+  try{
+    const adminData = await admin.findById({_id:req.session.admin_id});
+    const categorys = await category.find();
+    res.render('category',{admins:adminData,category:categorys});
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// loadAddCategory
+const loadAddCategory = async (req,res) => {
+  try{
+    const adminData = await admin.findById({_id:req.session.admin_id});
+    if(req.session.addCategory){
+      req.session.addCategory=false;
+      res.render('addCategory',{admins:adminData,message:"Category Added"});
+    }else{
+      res.render('addCategory',{admins:adminData});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// verifyAddCategory
+const verifyAddCategory = async (req,res) => {
+  try{
+    const addCategory = new category({
+      name: req.body.name,
+    });
+
+    await category.insertMany(addCategory);
+
+    req.session.addCategory=true;
+    res.redirect('/admin/add-category');
+  }catch(error){
+    console.log(error.message);
+  }
+};
 
 module.exports = {
   loadPage,
@@ -153,8 +186,10 @@ module.exports = {
   verifyLogin,
   loadDashboard,
   loadUserDetials,
-  loadEditUser,
   loadProducts,
   loadAddProducts,
   verifyAddProducts,
+  loadCategory,
+  loadAddCategory,
+  verifyAddCategory,
 }

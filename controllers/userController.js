@@ -1,9 +1,7 @@
 const user = require("../models/userModel");
-const userOTPVerification = require("../models/userOTPVerification");
+const userOTPVerification = require("../models/userOTPVerificationModel");
 const product = require('../models/productsModel');
 const bcrypt = require("bcrypt");
-const { render } = require("ejs");
-const express = require("express");
 const nodeMailer = require("nodemailer");
 
 // hashPassword
@@ -51,7 +49,7 @@ const sendOtpVerifyMail = async (name, email, otp) => {
 const generateVerificationCode = async (userData) => {
   const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-  const expirationTime = new Date(Date.now() + 60000);
+  const expirationTime = new Date(Date.now() + 120000);
   const sOtp = await securePassword(verificationCode);
 
   const addOTP = new userOTPVerification({

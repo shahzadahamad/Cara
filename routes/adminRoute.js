@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
   filename:function(req,file,cb){
     const name = Date.now()+"-"+file.originalname;
     cb(null,name);
-  }
+  },
 });
 
 const upload = multer({storage:storage});
@@ -34,14 +34,18 @@ adminRouter.get('/dashboard',adminController.loadDashboard);
 // userDetials
 adminRouter.get('/user-detials',adminController.loadUserDetials);
 
-// editUser
-adminRouter.get('/edit-user',adminController.loadEditUser);
-
 // products
 adminRouter.get('/products',adminController.loadProducts);
 
 // addProducts
 adminRouter.get('/add-products',adminController.loadAddProducts);
 adminRouter.post('/add-products',upload.single('img'),adminController.verifyAddProducts);
+
+// category
+adminRouter.get('/category',adminController.loadCategory);
+
+// addCategory
+adminRouter.get('/add-category',adminController.loadAddCategory);
+adminRouter.post('/add-category',adminController.verifyAddCategory);
 
 module.exports = adminRouter;

@@ -9,8 +9,9 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  category: {
-    type: String,
+  categoryId: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'category',
     required: true,
   },
   rating: {
@@ -26,6 +27,10 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   image: {
+    type: String,
+    required: true,
+  },
+  description: {
     type: String,
     required: true,
   }

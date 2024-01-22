@@ -12,37 +12,37 @@ const nodemon = require("nodemon");
 const dotEnv = require('dotenv');
 dotEnv.config();
 
-// userSession
-app.use(
-  "/",
-  session({
-    name: "userSession",
-    secret: uuidv4(),
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-// adminSession
-app.use(
-  "/admin",
-  session({
-    name: "adminSession",
-    secret: uuidv4(),
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-// session
+// // userSession
 // app.use(
+//   "/",
 //   session({
+//     name: "userSession",
 //     secret: uuidv4(),
 //     resave: false,
 //     saveUninitialized: true,
-//     cookie: { maxAge: 1000*80000000 },
 //   })
 // );
+
+// // adminSession
+// app.use(
+//   "/admin",
+//   session({
+//     name: "adminSession",
+//     secret: uuidv4(),
+//     resave: false,
+//     saveUninitialized: true,
+//   })
+// );
+
+// session
+app.use(
+  session({
+    secret: uuidv4(),
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000*80000000 },
+  })
+);
 
 // json
 app.use(express.json());
