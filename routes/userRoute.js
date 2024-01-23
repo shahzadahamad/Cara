@@ -44,9 +44,6 @@ userRouter.get('/shop',userController.loadShop);
 // about
 userRouter.get('/about',userController.loadAbout);
 
-// contact
-userRouter.get('/contact',userController.loadContact);
-
 // cart
 userRouter.get('/cart',userController.loadCart);
 

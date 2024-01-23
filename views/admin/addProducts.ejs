@@ -75,6 +75,11 @@
             <%=message%>
           </div>
           <% } %>
+        <% if( locals.message1 ){ %>
+          <div style="color: red; text-align: center;" class="detials" id="hide">
+            <%=message1%>
+          </div>
+          <% } %>
         <form action="/admin/add-products" method="post" enctype="multipart/form-data">
           <div class="row">
             <i class="fa-solid fa-signature"></i>

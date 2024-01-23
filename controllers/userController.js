@@ -1,6 +1,7 @@
 const user = require("../models/userModel");
 const userOTPVerification = require("../models/userOTPVerificationModel");
 const product = require("../models/productsModel");
+const category = require("../models/categoryModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
 
@@ -241,7 +242,7 @@ const verifyForgetPassword = async (req, res) => {
 const loadResetPassword = async (req, res) => {
   try {
     if (req.session.reset) {
-      req.session.reset=false;
+      req.session.reset = false;
       if (req.session.cpassError) {
         req.session.cpassError = false;
         res.render("resetPassword", { message: "Passwords are not same" });
@@ -249,7 +250,7 @@ const loadResetPassword = async (req, res) => {
         res.render("resetPassword");
       }
     } else {
-      res.redirect('/');
+      res.redirect("/");
     }
   } catch (error) {
     console.log(error.message);
@@ -287,7 +288,6 @@ const verifyResetPassword = async (req, res) => {
 const loadOtp = async (req, res) => {
   try {
     if (req.session.otp) {
-      req.session.otp = false;
       if (req.session.otpError) {
         req.session.otpError = false;
         res.render("otp", { message: "Invalied otp" });
@@ -364,11 +364,13 @@ const verifyResubmit = async (req, res) => {
   try {
     if (req.session.userData) {
       await userOTPVerification.deleteOne({ userId: req.session.userData._id });
+      req.session.otp=false;
       res.redirect("/signup");
     } else if (req.session.resetEmail) {
       await userOTPVerification.deleteOne({
         userId: req.session.resetEmail._id,
       });
+      req.session.otp=false;
       res.redirect("/login");
     } else {
       res.redirect("/signup");
@@ -394,9 +396,11 @@ const loadHome = async (req, res) => {
 };
 
 // loadShop
-const loadShop = (req, res) => {
+const loadShop = async (req, res) => {
   try {
-    res.render("shop", { login: req.session.user });
+    const productData = await product.find();
+    const categorys = await category.find();
+    res.render("shop", { login: req.session.user, product:productData, category:categorys });
   } catch (error) {
     console.log(error.message);
   }
@@ -406,15 +410,6 @@ const loadShop = (req, res) => {
 const loadAbout = (req, res) => {
   try {
     res.render("about", { login: req.session.user });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// loadContact
-const loadContact = (req, res) => {
-  try {
-    res.render("contact", { login: req.session.user });
   } catch (error) {
     console.log(error.message);
   }
@@ -472,7 +467,6 @@ module.exports = {
   loadHome,
   loadShop,
   loadAbout,
-  loadContact,
   loadCart,
   loadSingleProduct,
   loadProfile,

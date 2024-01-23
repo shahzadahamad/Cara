@@ -97,6 +97,9 @@ const loadAddProducts = async (req,res) => {
     if(req.session.addProduct){
       req.session.addProduct=false;
       res.render('addProducts',{admins:adminData,message:"Product Added",category:categorys});
+    }else if(req.session.exitProduct){
+      req.session.exitProduct=false;
+      res.render('addProducts',{admins:adminData,message1:"Product Already Exist",category:categorys});
     }else{
       res.render('addProducts',{admins:adminData,category:categorys});
     }
@@ -120,10 +123,17 @@ const verifyAddProducts = async (req,res) => {
       description: req.body.description,
     });
 
-    await product.insertMany(addProduct);
+    const existingProduct = await product.findOne({name:addProduct.name});
 
-    req.session.addProduct=true;
-    res.redirect('/admin/add-products');
+    if(existingProduct){
+      req.session.exitProduct=true;
+      res.redirect('/admin/add-products');
+    }else{
+      await product.insertMany(addProduct);
+
+      req.session.addProduct=true;
+      res.redirect('/admin/add-products');
+    }
   }catch(error){
     console.log(error.message);
   }
@@ -147,9 +157,13 @@ const loadAddCategory = async (req,res) => {
     if(req.session.addCategory){
       req.session.addCategory=false;
       res.render('addCategory',{admins:adminData,message:"Category Added"});
+    }else if(req.session.exitCategory){
+      req.session.exitCategory=false;
+      res.render('addCategory',{admins:adminData,message1:"Category Already Exist"});
     }else{
       res.render('addCategory',{admins:adminData});
     }
+
   }catch(error){
     console.log(error.message);
   }
@@ -162,10 +176,17 @@ const verifyAddCategory = async (req,res) => {
       name: req.body.name,
     });
 
-    await category.insertMany(addCategory);
+    const existingCategory = await category.findOne({name:addCategory.name});
+    if(existingCategory){
+      req.session.exitCategory=true;
+      res.redirect('/admin/add-category');
+    }else{
+      await category.insertMany(addCategory);
 
-    req.session.addCategory=true;
-    res.redirect('/admin/add-category');
+      req.session.addCategory=true;
+      res.redirect('/admin/add-category');
+    }
+
   }catch(error){
     console.log(error.message);
   }

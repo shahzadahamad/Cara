@@ -1,425 +1,203 @@
 <%- include('../layouts/header.ejs') -%>
 
-<header id="header">
-  <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+<style>
 
-  <div>
-    <ul id="navbar">
-      <li><a href="/home">Home</a></li>
-      <li><a class="active" href="/shop">Shop</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/contact">Contact</a></li>
-      <li><a href="<%= locals.login ? '/profile' : '/login' %>" > <%= locals.login ? 'Profile' : 'Login' %></a></li>
-      <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
-      <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
-    </ul>
-  </div>
-  <div id="mobile">
-    <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
-    <i id="bar" class="fas fa-outdent"></i>
-  </div>
-</header>
+@import url("https://fonts.googleapis.com/css2?family=Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
-<section id="page-header">
-  <h2>#stayhome</h2>
-  <p>Save more with coupons & up to 70% off!</p>
-</section>
+  .user--info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tabular--wrapper {
+  background: #fff;
+  margin-top: 1rem;
+  border-radius: 10px;
+  padding: 2rem;
+}
+.search--box {
+  background: rgb(237, 237, 237);
+  border-radius: 15px;
+  /* color: rgba(113, 99, 186, 255); */
+  color: #1abc9c;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+}
+.search--box input {
+  background-color: transparent;
+  padding: 10px;
+  border: 0;
+  outline: 0;
+}
 
-<section id="product1" class="section-p1">
-  <div class="pro-container">
-    <div class="pro" onclick="window.location.href='/sproduct'">
-      <img src="images/products/f1.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="/shop"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f2.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f3.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f4.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f5.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f6.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f7.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/f8.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n1.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n2.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n3.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n4.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n5.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n6.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n7.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n8.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="img1/shop/23.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="img1/shop/24.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="img1/shop/25.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="img1/shop/26.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-  </div>
-</section>
+.search--box i {
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+}
 
-<section id="pagination" class="section-p1">
-  <a href="#">1</a>
-  <a href="#">2</a>
-  <a href="#"><i class="fa-solid fa-arrow-right"></i></i></a>
-</section> 
+.search--box i:hover {
+  transform: scale(1.2);
+}
 
-<section id="newsletter" class="section-p1 section-m1" >
-  <div class="newstext">
-    <h4>Sign Up For Newsletters</h4>
-    <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
-  </div>
-  <div class="form">
-    <input type="text" placeholder="Your email address">
-    <button class="normal">Sign Up</button>
-  </div>
-</section>
+.dropdown{
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
 
-<footer class="section-p1">
-  <div class="col">
-    <img class="logo" src="images/logo.png" alt="">
-    <h4>Contact</h4>
-    <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
-    <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
-    <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
-    <div class="follow">
-      <h4>Follow us</h4>
-      <div class="icon">
-        <i class="fab fa-facebook-f"></i>
-        <i class="fab fa-twitter"></i>
-        <i class="fab fa-instagram"></i>
-        <i class="fab fa-pinterest-p"></i>
-        <i class="fab fa-youtube"></i>
+</style>
+
+  <header id="header">
+    <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a class="active" href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="<%= locals.login ? '/profile' : '/login' %>">
+            <%= locals.login ? 'Profile' : 'Login' %>
+          </a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
+    </div>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
+    </div>
+  </header>
+
+  <section id="page-header">
+    <h2>#stayhome</h2>
+    <p>Save more with coupons & up to 70% off!</p>
+  </section>
+
+  <section id="category">
+        <div class="tabular--wrapper">
+          <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
+            <select class="dropdown" style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
+              <option>All Category</option>
+              <% if(category.length > 0){ %>
+              <% for(let i=0; i< category.length; i++){ %>
+              <option><%= category[i].name %></option>
+              <% } %>
+              <% } else { %>
+                <option>No Category</option>
+                <% } %> 
+            </select>
+            <div class="search--box">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" placeholder="Search"/>
+            </div>
+          </div>
+        </div>
+  </section>
+
+  <section style="padding: 0px 40px;" id="product1" class="section-p1">
+    <h4 class="h4-category">All Category</h4>
+    <div class="pro-container">
+      <% if(product.length>0){%>
+        <% for(let i=0;i< product.length ;i++){ %>
+
+          <div class="pro" onclick="window.location.href='/sproduct'">
+            <img src="images/productImages/<%= product[i].image %>" alt="">
+            <div class="des">
+              <span>
+                <%= product[i].brand %>
+              </span>
+              <h5>
+                <%= product[i].name %>
+              </h5>
+              <div class="star">
+                <% for(let j=0;j< product[i].rating; j++){ %>
+                  <i class="ri-star-fill"></i>
+                  <% } %>
+              </div>
+              <h4>
+                $<%= product[i].price %>
+              </h4>
+            </div>
+            <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
+          </div>
+          <% } %>
+            <% } else { %>
+              <h2>Products Not Found</h2>
+              <% } %>
+    </div>
+  </section>
+
+  <section id="pagination" class="section-p1">
+    <a href="#">1</a>
+    <a href="#">2</a>
+    <a href="#"><i class="fa-solid fa-arrow-right"></i></i></a>
+  </section>
+
+  <section id="newsletter" class="section-p1 section-m1">
+    <div class="newstext">
+      <h4>Sign Up For Newsletters</h4>
+      <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
+    </div>
+    <div class="form">
+      <input type="text" placeholder="Your email address">
+      <button class="normal">Sign Up</button>
+    </div>
+  </section>
+
+  <footer class="section-p1">
+    <div class="col">
+      <img class="logo" src="images/logo.png" alt="">
+      <h4>Contact</h4>
+      <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
+      <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
+      <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
+      <div class="follow">
+        <h4>Follow us</h4>
+        <div class="icon">
+          <i class="fab fa-facebook-f"></i>
+          <i class="fab fa-twitter"></i>
+          <i class="fab fa-instagram"></i>
+          <i class="fab fa-pinterest-p"></i>
+          <i class="fab fa-youtube"></i>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="col">
-    <h4>About</h4>
-    <a href="#">About us</a>
-    <a href="#">Delivery Information</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Terms & Conditions</a>
-    <a href="#">Contact Us</a>
-  </div>
-
-  <div class="col">
-    <h4>My Account</h4>
-    <a href="#">Sign In</a>
-    <a href="#">View Cart</a>
-    <a href="#">My Wishlist</a>
-    <a href="#">Track My Order</a>
-    <a href="#">Help</a>
-  </div>
-
-  <div class="col install">
-    <h4>Install App</h4>
-    <p>From App Store or Google Play</p>
-    <div class="row">
-      <img src="images/pay/app.jpg" alt="">
-      <img src="images/pay/play.jpg" alt="">
+    <div class="col">
+      <h4>About</h4>
+      <a href="#">About us</a>
+      <a href="#">Delivery Information</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Contact Us</a>
     </div>
-    <p>Secured Payment Gateways</p>
-    <img src="images/pay/pay.png" alt="">
-  </div>
 
-  <div class="copyright">
-    <p>© 2024, Tech2 etc - Ecommerce Website</p>
-  </div>
-</footer>
+    <div class="col">
+      <h4>My Account</h4>
+      <a href="#">Sign In</a>
+      <a href="#">View Cart</a>
+      <a href="#">My Wishlist</a>
+      <a href="#">Track My Order</a>
+      <a href="#">Help</a>
+    </div>
 
-<script src="/javaScript/script.js"></script>
+    <div class="col install">
+      <h4>Install App</h4>
+      <p>From App Store or Google Play</p>
+      <div class="row">
+        <img src="images/pay/app.jpg" alt="">
+        <img src="images/pay/play.jpg" alt="">
+      </div>
+      <p>Secured Payment Gateways</p>
+      <img src="images/pay/pay.png" alt="">
+    </div>
 
-<%- include('../layouts/footer.ejs') -%>
+    <div class="copyright">
+      <p>© 2024, Tech2 etc - Ecommerce Website</p>
+    </div>
+  </footer>
+
+  <script src="/javaScript/script.js"></script>
+
+  <%- include('../layouts/footer.ejs') -%>

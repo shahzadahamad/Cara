@@ -68,6 +68,11 @@
             <%=message%>
           </div>
           <% } %>
+        <% if( locals.message1 ){ %>
+          <div style="color: red;" class="detials" id="hide">
+            <%=message1%>
+          </div>
+          <% } %>
         <form action="/admin/add-category" method="post">
           <div class="row">
             <i class="fa-solid fa-signature"></i>

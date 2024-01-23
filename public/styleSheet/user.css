@@ -584,6 +584,14 @@ footer .copyright {
   margin-top: 20px;
 }
 
+#category{
+  padding: 0px 20px;
+}
+
+.h4-category {
+  font-size: 40px;
+}
+
 #prodetails .single-pro-image {
   width: 40%;
   margin-right: 50px;
@@ -1240,5 +1248,13 @@ footer .copyright {
   #subtotal {
     width: 100%;
     padding: 20px;
+  }
+
+  #category {
+    padding: 0px;
+  }
+
+  .h4-category {
+    font-size: 25px;
   }
 }
