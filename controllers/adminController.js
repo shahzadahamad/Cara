@@ -14,15 +14,6 @@ const securePassword = async (password) => {
   }
 };
 
-// loadPage
-const loadPage = (req, res) => {
-  try{
-    res.redirect('/admin/dashboard');
-  }catch(error){
-    console.log(error.message);
-  }
-};
-
 // loadLogin
 const loadLogin = (req, res) => {
   try{
@@ -55,11 +46,11 @@ const verifyLogin = async (req,res) => {
         res.redirect('/admin/dashboard');
       }else{
         req.session.passErr=true;
-        res.redirect('/admin/login');
+        res.redirect('/admin');
       }
     }else{
       req.session.err=true;
-      res.redirect('/admin/login');
+      res.redirect('/admin');
     }
   }catch(error){
     console.log(error.message);
@@ -180,8 +171,33 @@ const verifyAddCategory = async (req,res) => {
   }
 };
 
+// verifyBlockUser
+const verifyBlockUser = async (req,res) => {
+  try{
+    const id=req.query.id;
+    const userData = await user.findById({_id:id});
+    if(userData.isBlocked){
+      await user.updateOne({_id:id},{$set:{isBlocked:false}});
+    }else{
+      await user.updateOne({_id:id},{$set:{isBlocked:true}});
+    }
+    res.redirect('/admin/user-detials');
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// adminLogout
+const adminLogout = async (req,res) => {
+  try{
+    delete req.session.admin_id
+    res.redirect('/admin');
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
 module.exports = {
-  loadPage,
   loadLogin,
   verifyLogin,
   loadDashboard,
@@ -192,4 +208,6 @@ module.exports = {
   loadCategory,
   loadAddCategory,
   verifyAddCategory,
+  verifyBlockUser,
+  adminLogout,
 }

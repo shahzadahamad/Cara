@@ -1,5 +1,6 @@
 <%- include('../layouts/header.ejs') -%>
 
+
 <style>
   body{
     overflow-y: hidden;
@@ -41,7 +42,7 @@
             <p>We have sent a 4 digit verification code to your email address</p>
           </div>
 
-          <form action="/otp" method="post">
+          <form style="padding: 30px 25px 0px 25px;" action="/otp" method="post">
             <div class="input-field">
               <input type="number" name="otp" required> 
               <input type="number" name="otp" required>
@@ -52,6 +53,9 @@
               <input type="submit" value="Verify OTP">
             </div>
           </form>
+          <form style="padding: 0px 0px 20px 0px;" action="/resubmit" method="post">
+          <div style="margin: 0; text-align: center;" class="pass"><button type="submit" style="border:0; background-color: transparent;"><a>Resubmit</a></button></div>
+        </form>
         </div>
       </section>
 

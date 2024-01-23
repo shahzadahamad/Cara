@@ -1,6 +1,5 @@
 // database
-const database = require('./config/config');
-
+const database = require("./config/config");
 
 const express = require("express");
 const app = express();
@@ -9,30 +8,8 @@ const path = require("path");
 const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
 const nodemon = require("nodemon");
-const dotEnv = require('dotenv');
+const dotEnv = require("dotenv");
 dotEnv.config();
-
-// // userSession
-// app.use(
-//   "/",
-//   session({
-//     name: "userSession",
-//     secret: uuidv4(),
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
-
-// // adminSession
-// app.use(
-//   "/admin",
-//   session({
-//     name: "adminSession",
-//     secret: uuidv4(),
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
 
 // session
 app.use(
@@ -40,7 +17,7 @@ app.use(
     secret: uuidv4(),
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000*80000000 },
+    cookie: { maxAge:2 * 30 * 24 * 60 * 60 * 1000  },
   })
 );
 
@@ -67,4 +44,3 @@ const port = process.env.port || 3000;
 app.listen(port, () => {
   console.log("Server running on 3000 : http://localhost:3000");
 });
-

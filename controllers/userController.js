@@ -1,6 +1,6 @@
 const user = require("../models/userModel");
 const userOTPVerification = require("../models/userOTPVerificationModel");
-const product = require('../models/productsModel');
+const product = require("../models/productsModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
 
@@ -70,7 +70,7 @@ const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
   const timeUntilExpiration = expirationTime - currentTime;
   setTimeout(async () => {
     try {
-      await userOTPVerification.deleteOne({_id:otpId, userId:userId});
+      await userOTPVerification.deleteOne({ _id: otpId, userId: userId });
     } catch (error) {
       console.log(error.message);
     }
@@ -186,6 +186,7 @@ const verifySignUp = async (req, res) => {
 
         req.session.userData = addUser;
 
+        req.session.otp = true;
         generateVerificationCode(addUser);
 
         res.redirect("/otp");
@@ -223,6 +224,7 @@ const verifyForgetPassword = async (req, res) => {
     if (userData) {
       req.session.resetEmail = userData;
 
+      req.session.otp = true;
       generateVerificationCode(userData);
 
       res.redirect("/otp");
@@ -238,11 +240,16 @@ const verifyForgetPassword = async (req, res) => {
 // loadResetPassword
 const loadResetPassword = async (req, res) => {
   try {
-    if (req.session.cpassError) {
-      req.session.cpassError = false;
-      res.render("resetPassword", { message: "Passwords are not same" });
+    if (req.session.reset) {
+      req.session.reset=false;
+      if (req.session.cpassError) {
+        req.session.cpassError = false;
+        res.render("resetPassword", { message: "Passwords are not same" });
+      } else {
+        res.render("resetPassword");
+      }
     } else {
-      res.render("resetPassword");
+      res.redirect('/');
     }
   } catch (error) {
     console.log(error.message);
@@ -252,17 +259,13 @@ const loadResetPassword = async (req, res) => {
 // verifyResetPassword
 const verifyResetPassword = async (req, res) => {
   try {
-
     const email = req.session.resetEmail.email;
     const userData = await user.findOne({ email: email });
 
-
     if (userData) {
-
       const password = req.body.password;
       const cpassword = req.body.password;
       if (password === cpassword) {
-
         const spassword = await securePassword(password);
         await user.updateOne(
           { email: userData.email },
@@ -283,14 +286,19 @@ const verifyResetPassword = async (req, res) => {
 // loadOtp
 const loadOtp = async (req, res) => {
   try {
-    if (req.session.otpError) {
-      req.session.otpError = false;
-      res.render("otp", { message: "Invalied otp" });
-    } else if (req.session.otpExpries) {
-      req.session.otpExpries = false;
-      res.render("otp", { message: "otp expired please resend" });
+    if (req.session.otp) {
+      req.session.otp = false;
+      if (req.session.otpError) {
+        req.session.otpError = false;
+        res.render("otp", { message: "Invalied otp" });
+      } else if (req.session.otpExpries) {
+        req.session.otpExpries = false;
+        res.render("otp", { message: "otp expired please resend" });
+      } else {
+        res.render("otp");
+      }
     } else {
-      res.render("otp");
+      res.redirect("/");
     }
   } catch (error) {
     console.log(error.message);
@@ -339,6 +347,7 @@ const verifyOtp = async (req, res) => {
         await userOTPVerification.deleteOne({
           userId: req.session.resetEmail._id,
         });
+        req.session.reset = true;
         res.redirect("/resetPassword");
       } else {
         req.session.otpError = true;
@@ -350,14 +359,35 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+// resumit
+const verifyResubmit = async (req, res) => {
+  try {
+    if (req.session.userData) {
+      await userOTPVerification.deleteOne({ userId: req.session.userData._id });
+      res.redirect("/signup");
+    } else if (req.session.resetEmail) {
+      await userOTPVerification.deleteOne({
+        userId: req.session.resetEmail._id,
+      });
+      res.redirect("/login");
+    } else {
+      res.redirect("/signup");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadHome
 const loadHome = async (req, res) => {
   try {
-
-    const productData = await product.find();
-    const latestProducts = await product.find().sort({_id:-1}).limit(8);
-    res.render("home", { login: req.session.user, product:productData, latestProducts:latestProducts });
-    
+    const productData = await product.find().limit(8);
+    const latestProducts = await product.find().sort({ _id: -1 }).limit(8);
+    res.render("home", {
+      login: req.session.user,
+      product: productData,
+      latestProducts: latestProducts,
+    });
   } catch (error) {
     console.log(error.message);
   }
@@ -420,7 +450,7 @@ const loadProfile = (req, res) => {
 // userLogout
 const userLogout = (req, res) => {
   try {
-    req.session.destroy();
+    delete req.session.user;
     res.redirect("/");
   } catch (error) {
     console.log(error.message);
@@ -447,4 +477,5 @@ module.exports = {
   loadSingleProduct,
   loadProfile,
   userLogout,
+  verifyResubmit,
 };

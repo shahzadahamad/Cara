@@ -3,6 +3,7 @@ const adminRouter = express();
 const multer = require('multer');
 const path = require('path');
 const adminController = require('../controllers/adminController');
+const auth = require('../middleware/adminAuth');
 
 // viewEngine
 adminRouter.set('view engine','ejs');
@@ -18,34 +19,36 @@ const storage = multer.diskStorage({
     cb(null,name);
   },
 });
-
 const upload = multer({storage:storage});
 
-// loadPage
-adminRouter.get('/',adminController.loadPage);
-
 // login
-adminRouter.get('/login',adminController.loadLogin);
-adminRouter.post('/login',adminController.verifyLogin);
+adminRouter.get('/',auth.isLogout,adminController.loadLogin);
+adminRouter.post('/login',auth.isLogout,adminController.verifyLogin);
 
 // dashboard
-adminRouter.get('/dashboard',adminController.loadDashboard);
+adminRouter.get('/dashboard',auth.isLogin,adminController.loadDashboard);
 
 // userDetials
-adminRouter.get('/user-detials',adminController.loadUserDetials);
+adminRouter.get('/user-detials',auth.isLogin,adminController.loadUserDetials);
 
 // products
-adminRouter.get('/products',adminController.loadProducts);
+adminRouter.get('/products',auth.isLogin,adminController.loadProducts);
 
 // addProducts
-adminRouter.get('/add-products',adminController.loadAddProducts);
+adminRouter.get('/add-products',auth.isLogin,adminController.loadAddProducts);
 adminRouter.post('/add-products',upload.single('img'),adminController.verifyAddProducts);
 
 // category
-adminRouter.get('/category',adminController.loadCategory);
+adminRouter.get('/category',auth.isLogin,adminController.loadCategory);
 
 // addCategory
-adminRouter.get('/add-category',adminController.loadAddCategory);
+adminRouter.get('/add-category',auth.isLogin,adminController.loadAddCategory);
 adminRouter.post('/add-category',adminController.verifyAddCategory);
+
+// block
+adminRouter.get('/block-user',auth.isLogin,adminController.verifyBlockUser);
+
+// logout
+adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);
 
 module.exports = adminRouter;

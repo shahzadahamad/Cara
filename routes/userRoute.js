@@ -1,6 +1,7 @@
 const express = require('express');
 const userRouter = express();
-const userController = require('../controllers/userController')
+const userController = require('../controllers/userController');
+const auth = require('../middleware/userAuth');
 
 // viewEngine
 userRouter.set('view engine','ejs');
@@ -9,27 +10,30 @@ userRouter.set('views','./views/user');
 // <--------------routes-------------->
 
 // loadPage
-userRouter.get('/',userController.loadPage);
+userRouter.get('/',auth.isLogout,userController.loadPage);
 
 // login
-userRouter.get('/login',userController.loadLogin);
+userRouter.get('/login',auth.isLogout,userController.loadLogin);
 userRouter.post('/login',userController.verifyLogin);
 
 // signup
-userRouter.get('/signup',userController.loadSignup);
+userRouter.get('/signup',auth.isLogout,userController.loadSignup);
 userRouter.post('/signup',userController.verifySignUp);
 
 // otpVerification
-userRouter.get('/otp',userController.loadOtp);
+userRouter.get('/otp',auth.isLogout,userController.loadOtp);
 userRouter.post('/otp',userController.verifyOtp);
 
 // forgetPassword
-userRouter.get('/forget',userController.loadForgetPassword);
+userRouter.get('/forget',auth.isLogout,userController.loadForgetPassword);
 userRouter.post('/forget',userController.verifyForgetPassword);
 
 // resetPassword
-userRouter.get('/resetPassword',userController.loadResetPassword);
+userRouter.get('/resetPassword',auth.isLogout,userController.loadResetPassword);
 userRouter.post('/resetPassword',userController.verifyResetPassword);
+
+// resubmit
+userRouter.post('/resubmit',userController.verifyResubmit);
 
 // home
 userRouter.get('/home',userController.loadHome);
@@ -50,10 +54,10 @@ userRouter.get('/cart',userController.loadCart);
 userRouter.get('/sproduct',userController.loadSingleProduct);
 
 // profile
-userRouter.get('/profile',userController.loadProfile);
+userRouter.get('/profile',auth.isLogin,userController.loadProfile);
 
 // logout
-userRouter.get('/logout',userController.userLogout);
+userRouter.get('/logout',auth.isLogin,userController.userLogout);
 
 
 module.exports = userRouter;
