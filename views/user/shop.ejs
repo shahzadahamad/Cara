@@ -101,8 +101,8 @@
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
 
-          <div class="pro" onclick="window.location.href='/sproduct'">
-            <img src="images/productImages/<%= product[i].image %>" alt="">
+          <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
+            <img src="images/productImages/<%= product[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= product[i].brand %>

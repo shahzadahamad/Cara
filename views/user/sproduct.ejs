@@ -21,27 +21,20 @@
 
 <section id="prodetails" class="section-p1">
   <div class="single-pro-image">
-    <img src="images/products/f1.jpg" width="100%" id="MainImg" alt="">
+    <img src="images/productImages/<%= sproduct.image[0] %>" width="100%" id="MainImg" alt="">
     <div class="small-img-group">
+    <%  for(let i=0; i< sproduct.image.length; i++) { %>
       <div class="small-img-col">
-        <img src="images/products/f1.jpg" width="100%" class="small-img" alt="">
+        <img src="images/productImages/<%= sproduct.image[i] %>" width="100%" class="small-img" alt="">
       </div>
-      <div class="small-img-col">
-        <img src="images/products/f2.jpg" width="100%" class="small-img" alt="">
-      </div>
-      <div class="small-img-col">
-        <img src="images/products/f3.jpg" width="100%" class="small-img" alt="">
-      </div>
-      <div class="small-img-col">
-        <img src="images/products/f4.jpg" width="100%" class="small-img" alt="">
-      </div>
+      <% } %>
     </div>
   </div>
 
   <div class="single-pro-details">
-    <h6>Home / T-Shirt</h6>
-    <h4>Men's Fashion T Shirt</h4>
-    <h2>$139.00</h2>
+    <h6>Brand: <%= sproduct.brand.charAt(0).toUpperCase() + sproduct.brand.slice(1) %></h6>
+    <h4 style="padding: 32px 0 20px 0;"><%= sproduct.name %></h4>
+    <h2>$<%= sproduct.price %></h2>
     <select>
       <option>Select Size</option>
       <option>XL</option>
@@ -49,85 +42,49 @@
       <option>Small</option>
       <option>Large</option>
     </select>
+    <div style="margin-bottom: 10px;" class="star">
+      <% for(let j=0;j< sproduct.rating; j++){ %>
+        <i style="color: rgb(243, 181, 25); font-size: 15px;" class="ri-star-fill"></i>
+        <% } %>
+    </div>
     <input type="number" value="1">
     <button class="normal">Add To Cart</button>
     <h4>Product Details</h4>
-    <span>The Gildan Ultra Cotton T-shirt is made from a substantial 6.0 oz. per
-      sq. yd. fabric constructed from 100% cotton, this classic fit preshrunk jersey
-      knit provides unmatched comfort with each wear. Featuring a taped neck and
-      shoulder, and a seamless double-needle collar, and available in a range of
-      colors, it offers it all in the untimate head-turning package.</span>
+    <span><%= sproduct.description %></span>
   </div>
 </section>
 
 <section id="product1" class="section-p1">
-  <h2>Featured Products</h2>
+  <h2>Related Products</h2>
   <p>Summer Collection New Morden Design</p>
   <div class="pro-container">
-    <div class="pro">
-      <img src="images/products/n1.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
+    <% if(related.length>0){%>
+      <% for(let i=0;i< related.length ;i++){ %>
+
+        <div class="pro" onclick="window.location.href='/sproduct?id=<%= related[i]._id %>'">
+          <img src="images/productImages/<%= related[i].image[0] %>" alt="">
+          <div class="des">
+            <span>
+              <%= related[i].brand %>
+            </span>
+            <h5>
+              <%= related[i].name %>
+            </h5>
+            <div class="star">
+              <% for(let j=0;j< related[i].rating; j++){ %>
+                <i class="ri-star-fill"></i>
+                <% } %>
+            </div>
+            <h4>
+              $<%= related[i].price %>
+            </h4>
+          </div>
+          <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
         </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n2.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n3.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
-    <div class="pro">
-      <img src="images/products/n4.jpg" alt="">
-      <div class="des">
-        <span>adidas</span>
-        <h5>Cartoon Astronaut T-Shirts</h5>
-        <div class="star">
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-          <i class="ri-star-fill"></i>
-        </div>
-        <h4>$78</h4>
-      </div>
-      <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
-    </div>
+        <% } %>
+          <% } else { %>
+            <h2>Products Not Found</h2>
+            <% } %>
   </div>
 </section>
 

@@ -26,7 +26,7 @@
     <h2>Super value deals</h2>
     <h1>On all products</h1>
     <p>Save more with coupons & up to 70% off!</p>
-    <button onclick="window.location.href='shop.html'">Shop Now</button>
+    <button onclick="window.location.href='/shop'">Shop Now</button>
   </section>
 
   <section id="feature" class="section-p1">
@@ -62,8 +62,8 @@
     <div class="pro-container">
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
-          <div class="pro">
-            <img src="images/productImages/<%= product[i].image %>" alt="">
+          <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
+            <img src="images/productImages/<%= product[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= product[i].brand %>
@@ -101,8 +101,8 @@
     <div class="pro-container">
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
-          <div class="pro">
-            <img src="images/productImages/<%= latestProducts[i].image %>" alt="">
+          <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
+            <img src="images/productImages/<%= latestProducts[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= latestProducts[i].brand %>

@@ -95,11 +95,10 @@
                   <td>
                     <%= users[i].createdDate.toString().split(' ').slice(0,5) %>
                   </td>
-                  <td><% if(users[i].isBlocked) { %>  
-                    <a href="/admin/block-user?id=<%= users[i]._id %>" class="btn btn-outline-danger">UnBlock</a>
-                    <% } else { %>
-                    <a href="/admin/block-user?id=<%= users[i]._id %>" class="btn btn-outline-success">Block</a>
-                      <% } %>
+                  <td>
+                    <button id="block<%= i %>" onclick="blockUser('<%= users[i]._id %>','<%= i %>')" class=" btn <%= users[i].isBlocked ?  'btn-outline-danger' :  'btn-outline-success' %>">
+                      <%= users[i].isBlocked ? 'UnBlock' : 'Block' %>
+                    </button>
                   </td>
                 </tr>
                 <% } %>
@@ -119,6 +118,34 @@
       </div>
     </div>
   </div>
+
+
+  <script>
+    function blockUser(id,i){
+
+      const block = document.getElementById(`block${i}`);
+
+      fetch(`/admin/block-user?id=${id}`,{
+        method: "PUT",
+        headers: {
+          "Content-Type":"application/json",
+        },
+        body: JSON.stringify({id:id})
+      }).then((res) => res.json())
+        .then((data) => {
+          if(data.isBlocked){
+            block.classList.remove('btn-outline-danger');
+            block.classList.add('btn-outline-success');
+            block.innerHTML='Block'
+          }else{
+            block.classList.remove('btn-outline-success');
+            block.classList.add('btn-outline-danger');
+            block.innerHTML='Unblock'
+          }
+        })
+        .catch((error) => console.log(error.message));
+    };
+  </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

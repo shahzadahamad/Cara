@@ -48,19 +48,22 @@
   </div>
 
   <div class="main--content">
-    
+
     <div class="header--wrapper">
       <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
       <div class="user--info">
         <img src="/images/admin.png" alt="">
-        <h4><%= admins.username %></h4>
+        <h4>
+          <%= admins.username %>
+        </h4>
       </div>
     </div>
 
     <div class="tabular--wrapper">
 
       <div class="d-flex flex-wrap: wrap; pb-3 justify-content-end">
-        <a class="btn btn-outline-dark" href="/admin/add-products"><i class="fa-solid fa-circle-plus"></i> Add Products</a>
+        <a class="btn btn-outline-dark" href="/admin/add-products"><i class="fa-solid fa-circle-plus"></i> Add
+          Products</a>
       </div>
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
@@ -89,26 +92,39 @@
           <tbody>
             <% if(product.length>0){%>
               <% for(let i=0; i< product.length;i++){ %>
-            <tr>
-              <td><%= product[i].name %></td>
-              <td><%= product[i].brand %></td>
-              <td><%= product[i].categoryId.name %></td>
-              <td><%= product[i].rating %></td>
-              <th>$<%= product[i].price %></th>
-              <td><%= product[i].quantity %></td>
-              <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image %>" alt=""></td>
-              <td><a class="btn btn-outline-primary" href="">Edit</a>&nbsp;&nbsp;<a class="btn btn-outline-danger" href="">Delete</a></td>
-            </tr> 
-            <% } %>
-            <% } else { %>
-              <tr>
-                <td colspan="7">Products Not Found</td>
-              </tr>
-              <% } %>
+                <tr id="row<%=i%>">
+                  <td>
+                    <%= product[i].name %>
+                  </td>
+                  <td>
+                    <%= product[i].brand %>
+                  </td>
+                  <td>
+                    <%= product[i].categoryId.name %>
+                  </td>
+                  <td>
+                    <%= product[i].rating %>
+                  </td>
+                  <th>$<%= product[i].price %>
+                  </th>
+                  <td>
+                    <%= product[i].quantity %>
+                  </td>
+                  <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
+                  <td><a class="btn btn-outline-primary" href="">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick="deleteProduct('<%= product[i]._id %>','<%=i%>')">Delete</button>
+                  </td>
+                </tr>
+                <% } %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="7">Products Not Found</td>
+                    </tr>
+                    <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="8">Total Products: <%= product.length %> </td>
+              <td colspan="8">Total Products: <%= product.length %>
+              </td>
             </tr>
           </tfoot>
         </table>
@@ -116,6 +132,25 @@
     </div>
 
   </div>
+
+  <script>
+
+    function deleteProduct(id,i) {
+    const row = document.getElementById(`row${i}`)
+      fetch(`/admin/delete-product?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id:id })
+      }).then((res) => res.json())
+        .then((data) => {
+        row.remove();
+        })
+        .catch((error)=>console.log(error.message));
+    };
+
+  </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

@@ -242,7 +242,6 @@ const verifyForgetPassword = async (req, res) => {
 const loadResetPassword = async (req, res) => {
   try {
     if (req.session.reset) {
-      req.session.reset = false;
       if (req.session.cpassError) {
         req.session.cpassError = false;
         res.render("resetPassword", { message: "Passwords are not same" });
@@ -273,6 +272,7 @@ const verifyResetPassword = async (req, res) => {
           { $set: { password: spassword } }
         );
         req.session.PassReset = true;
+        req.session.reset = false;
         res.redirect("/login");
       } else {
         req.session.cpassError = true;
@@ -425,9 +425,12 @@ const loadCart = (req, res) => {
 };
 
 // loadSingleProduct
-const loadSingleProduct = (req, res) => {
+const loadSingleProduct = async (req, res) => {
   try {
-    res.render("sproduct", { login: req.session.user });
+    const id=req.query.id;
+    const sproduct  = await product.findById({_id:id});
+    const relatedProduct = await product.find({categoryId:sproduct.categoryId,brand:sproduct.brand});
+    res.render("sproduct", { login: req.session.user, sproduct:sproduct, related:relatedProduct });
   } catch (error) {
     console.log(error.message);
   }
