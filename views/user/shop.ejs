@@ -1,52 +1,53 @@
 <%- include('../layouts/header.ejs') -%>
 
-<style>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
-@import url("https://fonts.googleapis.com/css2?family=Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap");
+    .user--info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
 
-  .user--info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.tabular--wrapper {
-  background: #fff;
-  margin-top: 1rem;
-  border-radius: 10px;
-  padding: 2rem;
-}
-.search--box {
-  background: rgb(237, 237, 237);
-  border-radius: 15px;
-  /* color: rgba(113, 99, 186, 255); */
-  color: #1abc9c;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
-}
-.search--box input {
-  background-color: transparent;
-  padding: 10px;
-  border: 0;
-  outline: 0;
-}
+    .tabular--wrapper {
+      background: #fff;
+      margin-top: 1rem;
+      border-radius: 10px;
+      padding: 2rem;
+    }
 
-.search--box i {
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.5s ease-out;
-}
+    .search--box {
+      background: rgb(237, 237, 237);
+      border-radius: 15px;
+      /* color: rgba(113, 99, 186, 255); */
+      color: #1abc9c;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+    }
 
-.search--box i:hover {
-  transform: scale(1.2);
-}
+    .search--box input {
+      background-color: transparent;
+      padding: 10px;
+      border: 0;
+      outline: 0;
+    }
 
-.dropdown{
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-}
+    .search--box i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.5s ease-out;
+    }
 
-</style>
+    .search--box i:hover {
+      transform: scale(1.2);
+    }
+
+    .dropdown {
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+  </style>
 
   <header id="header">
     <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
@@ -75,24 +76,27 @@
   </section>
 
   <section id="category">
-        <div class="tabular--wrapper">
-          <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
-            <select class="dropdown" style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
-              <option>All Category</option>
-              <% if(category.length > 0){ %>
-              <% for(let i=0; i< category.length; i++){ %>
-              <option><%= category[i].name %></option>
+    <div class="tabular--wrapper">
+      <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
+        <select class="dropdown"
+          style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
+          <option>All Category</option>
+          <% if(category.length> 0){ %>
+            <% for(let i=0; i< category.length; i++){ %>
+              <option value="<%= category[i]._id %>">
+                <%= category[i].name %>
+              </option>
               <% } %>
-              <% } else { %>
-                <option>No Category</option>
-                <% } %> 
-            </select>
-            <div class="search--box">
-              <i class="fa-solid fa-search"></i>
-              <input type="text" placeholder="Search"/>
-            </div>
-          </div>
+                <% } else { %>
+                  <option>No Category</option>
+                  <% } %>
+        </select>
+        <div class="search--box">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" placeholder="Search" />
         </div>
+      </div>
+    </div>
   </section>
 
   <section style="padding: 0px 40px;" id="product1" class="section-p1">
@@ -102,7 +106,7 @@
         <% for(let i=0;i< product.length ;i++){ %>
 
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-            <img src="images/productImages/<%= product[i].image[0] %>" alt="">
+            <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= product[i].brand %>

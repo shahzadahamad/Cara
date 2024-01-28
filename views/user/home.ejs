@@ -63,7 +63,7 @@
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-            <img src="images/productImages/<%= product[i].image[0] %>" alt="">
+            <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= product[i].brand %>
@@ -102,7 +102,7 @@
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
-            <img src="images/productImages/<%= latestProducts[i].image[0] %>" alt="">
+            <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>" alt="">
             <div class="des">
               <span>
                 <%= latestProducts[i].brand %>

@@ -308,6 +308,9 @@ const loadOtp = async (req, res) => {
 // verifyOtp
 const verifyOtp = async (req, res) => {
   try {
+
+
+
     if (req.session.userData) {
       const otpDataAdd = await userOTPVerification.findOne({
         userId: req.session.userData._id,
@@ -330,6 +333,11 @@ const verifyOtp = async (req, res) => {
         req.session.otpError = true;
         res.redirect("/otp");
       }
+
+
+
+
+
     } else if (req.session.resetEmail) {
       const otpDataChangePass = await userOTPVerification.findOne({
         userId: req.session.resetEmail._id,
@@ -353,7 +361,13 @@ const verifyOtp = async (req, res) => {
         req.session.otpError = true;
         res.redirect("/otp");
       }
+    }else{
+      res.redirect('/otp');
     }
+
+
+
+
   } catch (error) {
     console.log(error.message);
   }
@@ -401,12 +415,13 @@ const loadShop = async (req, res) => {
     const productData = await product.find();
     const categorys = await category.find();
     res.render("shop", { login: req.session.user, product:productData, category:categorys });
+
   } catch (error) {
     console.log(error.message);
   }
 };
 
-// loadAbout
+// loadAboutv
 const loadAbout = (req, res) => {
   try {
     res.render("about", { login: req.session.user });

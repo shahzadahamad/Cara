@@ -126,7 +126,7 @@
       const block = document.getElementById(`block${i}`);
 
       fetch(`/admin/block-user?id=${id}`,{
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type":"application/json",
         },

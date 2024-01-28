@@ -18,16 +18,21 @@ if (close) {
 // forms
 const hide = document.getElementById("hide");
 
-setTimeout(() => {
-  hide.style.opacity=0;
-}, 5000);
+if(hide){
+  setTimeout(() => {
+    hide.style.opacity=0;
+  }, 5000);
+}
 
 // otp
 const otpInputs = document.querySelectorAll(".input-field input");
 
-window.onload = function() {
-  otpInputs[0].focus();
-};
+if(otpInputs.length>0){
+  window.onload = function() {
+    otpInputs[0].focus();
+  };
+}
+
 
 otpInputs.forEach((input, index) => {
   input.addEventListener("input", (e) => {

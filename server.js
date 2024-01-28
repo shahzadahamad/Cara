@@ -17,7 +17,7 @@ app.use(
     secret: uuidv4(),
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge:2 * 30 * 24 * 60 * 60 * 1000  },
+    cookie: { maxAge: 2 * 30 * 24 * 60 * 60 * 1000  },
   })
 );
 

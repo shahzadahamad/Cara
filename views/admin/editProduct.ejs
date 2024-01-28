@@ -1,0 +1,143 @@
+<%- include('../layouts/header.ejs') -%>
+
+  <link rel="stylesheet" href="/styleSheet/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <style>
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
+    </style>
+
+  <div class="sidebar">
+    <div class="logo"></div>
+    <ul class="menu">
+      <li>
+        <a href="/admin/dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/user-detials">
+          <i class="fa-solid fa-users"></i>
+          <span>Users</span>
+        </a>
+      </li>
+      <li class="active">
+        <a href="/admin/products">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span>Products</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/category">
+          <i class="fa-solid fa-list"></i>
+          <span>Category</span>
+        </a>
+      </li>
+      <li class="logout">
+        <a href="/admin/category">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="main--content">
+
+    <div class="header--wrapper">
+      <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
+      <div class="user--info">
+        <img src="/images/admin.png" alt="">
+        <h4>
+          <%= admins.username %>
+        </h4>
+      </div>
+    </div>
+
+    <section style="border-radius: 10px; height: 1000px;" id="forms">
+      <div style="width: 80%;" id="wrapper">
+        <div class="title">
+          <span>Edit Product</span>
+        </div>
+        <% if( locals.message ){ %>
+          <div style="color: green; text-align: center;" class="detials" id="hide">
+            <%=message%>
+          </div>
+          <% } %>
+        <form action="/admin/edit-products?id=<%= product._id %>" method="post" enctype="multipart/form-data">
+          <div class="row">
+            <i class="fa-solid fa-signature"></i>
+            <input type="text" name="name" placeholder="Name" value="<%= product.name %>" required>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-b"></i>
+            <input type="text" name="brand" placeholder="Brand" value="<%= product.brand %>" required>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-list"></i>
+            <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category" required>
+              <option><%= product.categoryId.name %></option>
+              <% if(category.length > 0){ %>
+              <% for(let i=0; i< category.length; i++){ %>
+              <option><%= category[i].name %></option>
+              <% } %>
+              <% } else { %>
+                <option>No Category</option>
+                <% } %> 
+            </select>  
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <input type="number" name="price" placeholder="Price" value="<%= product.price %>" required>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-star"></i>
+            <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating" required>
+              <option><%= product.rating %></option>
+              <% for(let i=1; i<= 5; i++){ %>
+              <option><%= i %></option>
+                <% } %>
+            </select>  
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-c"></i>
+            <input type="number" name="quantity" placeholder="Quantity" value="<%= product.quantity %>" required>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-image"></i>
+            <input style="font-size: 20px; color: #787978;" type="file" class="form-control" name="img" multiple accept="image/*">
+          </div>
+          <div class="row-des">
+            <label for="">Description</label>
+            <textarea name="description" id="" aria-valuenow="<%= product.description %>" cols="30" rows="5"><%= product.description %></textarea>
+          </div>
+          <div class="row button">
+            <input type="submit" value="Edit">
+          </div>
+          <div class="signup-link"> <a href="/admin/products">Go Back</a></div>
+        </form>
+      </div>
+    </section>
+
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+    <script src="/javaScript/script.js"></script>
+
+
+  <%- include('../layouts/footer.ejs') -%>

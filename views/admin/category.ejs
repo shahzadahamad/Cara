@@ -85,7 +85,7 @@
               <% for(let i=0; i< category.length;i++){ %>
             <tr id="row<%=i%>">
               <td><%= category[i].name %></td>
-              <td><a class="btn btn-outline-primary" href="">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick="deleteCategory('<%= category[i]._id %>','<%=i%>')">Delete</button>
+              <td><a class="btn btn-outline-primary" href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick="deleteCategory('<%= category[i]._id %>','<%=i%>')">Delete</button>
             </tr> 
             <% } %>
             <% } else { %>
@@ -96,7 +96,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="8">Total Products: 4 </td>
+              <td colspan="8">Total Products: <%= category.length %></td>
             </tr>
           </tfoot>
         </table>

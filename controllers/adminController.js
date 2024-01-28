@@ -82,6 +82,24 @@ const loadUserDetials = async (req, res) => {
   }
 };
 
+// verifyBlockUser
+const verifyBlockUser = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const userData = await user.findById({ _id: id });
+    if (userData) {
+      res.send(userData);
+      if (userData.isBlocked) {
+        await user.updateOne({ _id: id }, { $set: { isBlocked: false } });
+      } else {
+        await user.updateOne({ _id: id }, { $set: { isBlocked: true } });
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadProducts
 const loadProducts = async (req, res) => {
   try {
@@ -159,6 +177,59 @@ const verifyAddProducts = async (req, res) => {
   }
 };
 
+// loadEditProduct
+const loadEditProduct = async (req,res) => {
+  try{
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    const categorys = await category.find();
+    const id = req.query.id;
+    const productId = await product.findById({_id:id}).populate('categoryId');
+    if(req.session.editProduct){
+      req.session.editProduct=false;
+    res.render('editProduct',{admins:adminData,message:'Product Edited',category:categorys,product:productId});
+    }else{
+      res.render('editProduct',{admins:adminData,category:categorys,product:productId});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// verifyEditProduct
+const verifyEditProduct = async (req,res) => {
+  try{
+    const categorys = await category.findOne({name:req.body.category});
+    const id = req.query.id;
+    const update = {
+      name: req.body.name,
+      brand: req.body.brand,
+      categoryId: categorys._id,
+      rating: req.body.rating,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      description: req.body.description,
+    }
+    await product.findByIdAndUpdate({_id:id},{$set:update});
+    req.session.editProduct=true;
+    res.redirect(`/admin/edit-products?id=${id}`);
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+// deleteProduct
+const verifyDeleteProduct = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const deleteProduct = await product.deleteOne({ _id: id });
+    if (deleteProduct) {
+      res.send({ deleteProduct });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadCategory
 const loadCategory = async (req, res) => {
   try {
@@ -216,18 +287,45 @@ const verifyAddCategory = async (req, res) => {
   }
 };
 
-// verifyBlockUser
-const verifyBlockUser = async (req, res) => {
+// loadEditCategory
+const loadEditCategory = async (req,res) => {
+  try{
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    const id = req.query.id;
+    const categoryId = await category.findById({_id:id});
+    if(req.session.editCategory){
+      req.session.editCategory=false;
+      res.render('editCategory',{admins:adminData,category:categoryId,message:'Edit Category'});
+    }else{
+      res.render('editCategory',{admins:adminData,category:categoryId});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// verifyEditCategory
+const verifyEditCategory = async (req,res) => {
+  try{
+    const id = req.query.id;
+    const update = {
+      name: req.body.name,
+    };
+    await category.findByIdAndUpdate({_id:id},{$set:update});
+    req.session.editCategory=true;
+    res.redirect(`/admin/edit-categorys?id=${id}`);
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+// deleteCategory
+const deleteCategory = async (req, res) => {
   try {
     const id = req.query.id;
-    const userData = await user.findById({ _id: id });
-    if (userData) {
-      res.send(userData);
-      if (userData.isBlocked) {
-        await user.updateOne({ _id: id }, { $set: { isBlocked: false } });
-      } else {
-        await user.updateOne({ _id: id }, { $set: { isBlocked: true } });
-      }
+    const deleteCategory = await category.deleteOne({ _id: id });
+    if(deleteCategory){ 
+      res.send({ deleteCategory });
     }
   } catch (error) {
     console.log(error.message);
@@ -239,32 +337,6 @@ const adminLogout = async (req, res) => {
   try {
     delete req.session.admin_id;
     res.redirect("/admin");
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// deleteProduct
-const verifyDeleteProduct = async (req, res) => {
-  try {
-    const id = req.query.id;
-    const deleteProduct = await product.deleteOne({ _id: id });
-    if (deleteProduct) {
-      res.send({ deleteProduct });
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// deleteCategory
-const deleteCategory = async (req, res) => {
-  try {
-    const id = req.query.id;
-    const deleteCategory = await category.deleteOne({ _id: id });
-    if(deleteCategory){ 
-      res.send({ deleteCategory });
-    }
   } catch (error) {
     console.log(error.message);
   }
@@ -285,4 +357,8 @@ module.exports = {
   adminLogout,
   verifyDeleteProduct,
   deleteCategory,
+  loadEditProduct,
+  verifyEditProduct,
+  loadEditCategory,
+  verifyEditCategory,
 };

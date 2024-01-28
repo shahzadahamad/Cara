@@ -25,6 +25,10 @@ adminRouter.get('/products',auth.isLogin,adminController.loadProducts);
 adminRouter.get('/add-products',auth.isLogin,adminController.loadAddProducts);
 adminRouter.post('/add-products',upload.array('img',4),adminController.verifyAddProducts);
 
+// editProduct
+adminRouter.get('/edit-products',auth.isLogin,adminController.loadEditProduct);
+adminRouter.post('/edit-products',upload.array('img',4),adminController.verifyEditProduct);
+
 // deleteProduct
 adminRouter.delete('/delete-product',adminController.verifyDeleteProduct);
 
@@ -35,11 +39,15 @@ adminRouter.get('/category',auth.isLogin,adminController.loadCategory);
 adminRouter.get('/add-category',auth.isLogin,adminController.loadAddCategory);
 adminRouter.post('/add-category',adminController.verifyAddCategory);
 
+// editCategoy
+adminRouter.get('/edit-categorys',auth.isLogin,adminController.loadEditCategory);
+adminRouter.post('/edit-categorys',adminController.verifyEditCategory);
+
 // deleteCategory
 adminRouter.delete('/delete-category',adminController.deleteCategory);
 
 // block
-adminRouter.put('/block-user',auth.isLogin,adminController.verifyBlockUser);
+adminRouter.patch('/block-user',auth.isLogin,adminController.verifyBlockUser);
 
 // logout
 adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);

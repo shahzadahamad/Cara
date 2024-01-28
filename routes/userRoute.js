@@ -56,5 +56,4 @@ userRouter.get('/profile',auth.isLogin,userController.loadProfile);
 // logout
 userRouter.get('/logout',auth.isLogin,userController.userLogout);
 
-
 module.exports = userRouter;
