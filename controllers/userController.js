@@ -2,8 +2,10 @@ const user = require("../models/userModel");
 const userOTPVerification = require("../models/userOTPVerificationModel");
 const product = require("../models/productsModel");
 const category = require("../models/categoryModel");
+const cart = require('../models/cartModel');
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
+const { render } = require("ejs");
 
 // hashPassword
 const securePassword = async (password) => {
@@ -99,8 +101,7 @@ const loadLogin = (req, res) => {
     } else if (req.session.notFound) {
       req.session.notFound = false;
       res.render("login", {
-        message: "You are not registered with us. Please sign up.",
-      });
+        message: "You are not registered with us. Please sign up."});
     } else if (req.session.PassReset) {
       req.session.PassReset = false;
       res.render("login", { message1: "Password Reset Successfully" });
@@ -127,7 +128,7 @@ const verifyLogin = async (req, res) => {
           req.session.block = true;
           res.redirect("/login");
         } else {
-          req.session.user = userData._id;
+          req.session.user = userData;
           res.redirect("/");
         }
       } else {
@@ -327,7 +328,7 @@ const verifyOtp = async (req, res) => {
           userId: req.session.userData._id,
         });
         await user.insertMany(req.session.userData);
-        req.session.user = req.session.userData._id;
+        req.session.user = req.session.userData;
         res.redirect("/");
       } else {
         req.session.otpError = true;
@@ -397,13 +398,13 @@ const verifyResubmit = async (req, res) => {
 // loadHome
 const loadHome = async (req, res) => {
   try {
-    const productData = await product.find().limit(8);
-    const latestProducts = await product.find().sort({ _id: -1 }).limit(8);
-    res.render("home", {
-      login: req.session.user,
-      product: productData,
-      latestProducts: latestProducts,
-    });
+      const productData = await product.find().limit(8);
+      const latestProducts = await product.find().sort({ _id: -1 }).limit(8);
+      res.render("home", {
+        login: req.session.user,
+        product: productData,
+        latestProducts: latestProducts,
+      });
   } catch (error) {
     console.log(error.message);
   }
@@ -431,10 +432,31 @@ const loadAbout = (req, res) => {
 };
 
 // loadCart
-const loadCart = (req, res) => {
+const loadCart = async (req, res) => {
   try {
-    res.render("cart", { login: req.session.user });
+    if(req.session.user){
+      const products = await cart.findOne({userId:req.session.user._id}).populate('products.productId');
+      res.render("cart", { login: req.session.user,product:products.products.productId});
+    }else{
+      res.redirect('/login');
+    }
   } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyCart
+const verifyAddToCart = async (req,res) => {
+  try{
+    res.send({status: 'received'});
+    if(req.session.user){
+      const id = req.query.id;
+      const productId = await product.findOne({_id:id});
+      await cart.updateOne({userId:req.session.user._id},{$addToSet:{'products.productId':productId._id},$set:{'products.quantity':1}},{upsert: true});
+    }else{
+      res.redirect('/login');
+    }
+  }catch(error){
     console.log(error.message);
   }
 };
@@ -490,4 +512,5 @@ module.exports = {
   loadProfile,
   userLogout,
   verifyResubmit,
+  verifyAddToCart,
 };

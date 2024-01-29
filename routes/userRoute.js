@@ -53,6 +53,9 @@ userRouter.get('/sproduct',userController.loadSingleProduct);
 // profile
 userRouter.get('/profile',auth.isLogin,userController.loadProfile);
 
+// cart 
+userRouter.post('/add-to-cart',userController.verifyAddToCart);
+
 // logout
 userRouter.get('/logout',auth.isLogin,userController.userLogout);
 

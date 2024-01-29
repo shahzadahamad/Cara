@@ -85,7 +85,7 @@
               <% for(let i=0; i< category.length;i++){ %>
             <tr id="row<%=i%>">
               <td><%= category[i].name %></td>
-              <td><a class="btn btn-outline-primary" href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick="deleteCategory('<%= category[i]._id %>','<%=i%>')">Delete</button>
+              <td><a class="btn btn-outline-primary" href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick=" if(confirm('Did you want to delete product <%= category[i].name %>')){deleteCategory('<%= category[i]._id %>','<%=i%>')}">Delete</button>
             </tr> 
             <% } %>
             <% } else { %>

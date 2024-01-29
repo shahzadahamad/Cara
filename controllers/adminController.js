@@ -198,6 +198,14 @@ const loadEditProduct = async (req,res) => {
 // verifyEditProduct
 const verifyEditProduct = async (req,res) => {
   try{
+
+    const images = [];
+    const files = req.files;
+
+    files.forEach((files) => {
+      images.push(files.filename);
+    });
+
     const categorys = await category.findOne({name:req.body.category});
     const id = req.query.id;
     const update = {
@@ -207,6 +215,7 @@ const verifyEditProduct = async (req,res) => {
       rating: req.body.rating,
       price: req.body.price,
       quantity: req.body.quantity,
+      image: images,
       description: req.body.description,
     }
     await product.findByIdAndUpdate({_id:id},{$set:update});

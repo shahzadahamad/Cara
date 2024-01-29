@@ -111,7 +111,7 @@
                     <%= product[i].quantity %>
                   </td>
                   <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
-                  <td><a class="btn btn-outline-primary" href="/admin/edit-products?id=<%= product[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick="deleteProduct('<%= product[i]._id %>','<%=i%>')">Delete</button>
+                  <td><a class="btn btn-outline-primary" href="/admin/edit-products?id=<%= product[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger"onclick="if(confirm('Did you want to delete product <%= product[i].name %>')){deleteProduct('<%= product[i]._id %>','<%=i%>')}">Delete</button>
                   </td>
                 </tr>
                 <% } %>

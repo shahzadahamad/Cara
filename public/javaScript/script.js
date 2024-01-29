@@ -18,21 +18,20 @@ if (close) {
 // forms
 const hide = document.getElementById("hide");
 
-if(hide){
+if (hide) {
   setTimeout(() => {
-    hide.style.opacity=0;
+    hide.style.opacity = 0;
   }, 5000);
 }
 
 // otp
 const otpInputs = document.querySelectorAll(".input-field input");
 
-if(otpInputs.length>0){
-  window.onload = function() {
+if (otpInputs.length > 0) {
+  window.onload = function () {
     otpInputs[0].focus();
   };
 }
-
 
 otpInputs.forEach((input, index) => {
   input.addEventListener("input", (e) => {
@@ -60,9 +59,23 @@ otpInputs.forEach((input, index) => {
   input.addEventListener("keydown", (e) => {
     prevInput = otpInputs[index - 1];
     if (e.key === "Backspace" && index > 0) {
-       if(!input.value){
+      if (!input.value) {
         prevInput.focus();
-       }
+      }
     }
   });
 });
+
+// Add to cart
+function addToCart(id) {
+  event.stopPropagation();
+  fetch(`/add-to-cart?id=${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id : id }),
+  }).then((res) => res.json())
+    .then((data) => {})
+    .catch((error) => console.log(error.message));
+};
