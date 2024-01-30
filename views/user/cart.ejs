@@ -38,16 +38,22 @@
       </tr>
     </thead>
     <tbody>
-      <% for(let i=0;i< product.length; i++) { %>
-      <tr>
-        <td><a href="#"><i class="far fa-times-circle"></i></a></td>
-        <td><img src="images/productImages/<%= product[i].image[0] %>" alt=""></td>
-        <td><%= product[i].name %></td>
-        <td>$<%= product[i].price %></td>
-        <td><input type="number" value="1"></td>
-        <td>$118.19</td>
+      <% if(product.length>0){%>
+      <% for(let i=0;i< product.length ; i++) { %>
+      <tr id="row<%= i %>">
+        <td><a onclick="removeProduct('<%= product[i]._id %>','<%= i %>')"><i class="far fa-times-circle"></i></a></td>
+        <td><img src="images/productImages/<%= product[i].productId.image[0] %>" alt=""></td>
+        <td><%= product[i].productId.name %></td>
+        <td>$<%= product[i].productId.price %></td>
+        <td><input type="number" id="inputTag<%= i %>" oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>')" value="<%= product[i].quantity %>" min="1"></td>
+        <td id="subTotal<%=i%>">$<%= product[i].productId.price * product[i].quantity %></td>
       </tr>
       <% } %>
+      <% } else { %>
+          <tr>
+            <td colspan="7">Add Products To Cart</td>
+          </tr>
+        <% } %>
     </tbody>
   </table>
 </section>
@@ -65,7 +71,7 @@
     <table>
       <tr>
         <td>Cart Subtotal</td>
-        <td>$ 335</td>
+        <td>$335</td>
       </tr>
       <tr>
         <td>Shipping</td>
@@ -73,7 +79,7 @@
       </tr>
       <tr>
         <td><strong>Total</strong></td>
-        <td><strong>$ 335</strong></td>
+        <td><strong>$335</strong></td>
       </tr>
     </table>
     <button class="normal">Proceed to checkout</button>
@@ -133,6 +139,47 @@
   </div>
 </footer>
 
+<script>
+
+
+  function removeProduct(id,i){
+    const row = document.getElementById(`row${i}`)
+    fetch(`/remove-product?id=${id}`,{
+      method: "PATCH",
+      headers: {
+        'Content-Type':"application/json",
+      },
+      body: JSON.stringify({id:id})
+    }).then((res)=> res => res.json())
+      .then((data) => {
+        row.remove()
+      })
+      .catch((error)=> console.log(error.message));
+  }
+
+  function countOfQuantity(id,price,i){
+    const input = document.getElementById(`inputTag${i}`);
+    const subTotalRow = document.getElementById(`subTotal${i}`)
+    fetch(`/cart-detials?id=${id}&quantity=${input.value}`,{
+      method: "PATCH",
+      headers: {
+        "content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        id:id,
+        quantity:input.value,
+      })
+    }).then((res)=>res.json())
+      .then((data)=>{
+        subTotalRow.innerHTML='$'+price*input.value;
+      })
+      .catch((error)=> console.log(error.message));
+  }
+
+
+
+  
+</script>
 
 <script src="/javaScript/script.js"></script>
 

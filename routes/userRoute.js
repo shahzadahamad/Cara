@@ -45,7 +45,7 @@ userRouter.get('/shop',userController.loadShop);
 userRouter.get('/about',userController.loadAbout);
 
 // cart
-userRouter.get('/cart',userController.loadCart);
+userRouter.get('/cart',auth.isLoginCart,userController.loadCart);
 
 // singleProduct
 userRouter.get('/sproduct',userController.loadSingleProduct);
@@ -55,6 +55,12 @@ userRouter.get('/profile',auth.isLogin,userController.loadProfile);
 
 // cart 
 userRouter.post('/add-to-cart',userController.verifyAddToCart);
+
+// Remove cart products
+userRouter.patch('/remove-product',userController.verifyRemoveCart);
+
+// cart products detials
+userRouter.patch('/cart-detials',userController.verifyCartDetials);
 
 // logout
 userRouter.get('/logout',auth.isLogin,userController.userLogout);

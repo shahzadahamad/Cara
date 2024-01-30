@@ -434,12 +434,10 @@ const loadAbout = (req, res) => {
 // loadCart
 const loadCart = async (req, res) => {
   try {
-    if(req.session.user){
-      const products = await cart.findOne({userId:req.session.user._id}).populate('products.productId');
-      res.render("cart", { login: req.session.user,product:products.products.productId});
-    }else{
-      res.redirect('/login');
-    }
+
+    const products = await cart.findOne({userId:req.session.user._id}).populate('products.productId');
+    res.render("cart", { login: req.session.user,product:products.products});
+
   } catch (error) {
     console.log(error.message);
   }
@@ -448,13 +446,46 @@ const loadCart = async (req, res) => {
 // verifyCart
 const verifyAddToCart = async (req,res) => {
   try{
-    res.send({status: 'received'});
     if(req.session.user){
       const id = req.query.id;
-      const productId = await product.findOne({_id:id});
-      await cart.updateOne({userId:req.session.user._id},{$addToSet:{'products.productId':productId._id},$set:{'products.quantity':1}},{upsert: true});
+      const existingProduct = await cart.findOne({userId:req.session.user._id,products:{$elemMatch:{productId:id}}});
+      if(existingProduct){
+        await cart.updateOne({userId:req.session.user._id,'products.productId':id},{$inc:{'products.$.quantity':1}});
+        res.send({status: 'received'});
+      }else{
+        await cart.updateOne({userId:req.session.user._id},{$addToSet:{products:{productId:id,quantity:1}}},{upsert: true});
+        res.send({status: 'received'});
+      }
     }else{
-      res.redirect('/login');
+      res.send({status: "falied"});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// Remove cart products
+const verifyRemoveCart = async (req,res) => {
+  try{
+    const id = req.query.id;
+    const removeProduct = await cart.updateOne({userId:req.session.user._id},{$pull:{products:{_id:id}}});
+    if(removeProduct){
+      res.send({removeProduct});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// cart products detials
+const verifyCartDetials = async (req,res) => {
+  try{
+    const id = req.query.id;
+    const quantity = req.query.quantity
+    const quantityUpdate = await cart.updateOne({userId:req.session.user._id,'products.productId':id},{$set:{'products.$.quantity':parseInt(quantity)}});
+    console.log(quantityUpdate)
+    if(quantityUpdate){
+      res.send({quantityUpdate})
     }
   }catch(error){
     console.log(error.message);
@@ -513,4 +544,6 @@ module.exports = {
   userLogout,
   verifyResubmit,
   verifyAddToCart,
+  verifyRemoveCart,
+  verifyCartDetials,
 };
