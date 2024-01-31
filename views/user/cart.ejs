@@ -28,6 +28,7 @@
 <section id="cart" class="section-p1">
   <table width="100%">
     <thead>
+      <% if(locals.product){%>
       <tr>
         <td>Remove</td>
         <td>Image</td>
@@ -45,16 +46,19 @@
         <td><img src="images/productImages/<%= product[i].productId.image[0] %>" alt=""></td>
         <td><%= product[i].productId.name %></td>
         <td>$<%= product[i].productId.price %></td>
-        <td><input type="number" id="inputTag<%= i %>" oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>')" value="<%= product[i].quantity %>" min="1"></td>
+        <td><input type="number" id="inputTag<%= i %>" oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>')" value="<%= product[i].quantity %>" min="1" max="<%= product[i].productId.quantity %>"></td>
         <td id="subTotal<%=i%>">$<%= product[i].productId.price * product[i].quantity %></td>
       </tr>
       <% } %>
       <% } else { %>
           <tr>
-            <td colspan="7">Add Products To Cart</td>
+            <td id="foot" colspan="7">Add Products To Cart</td>
           </tr>
         <% } %>
     </tbody>
+    <% } else { %>
+      <td id="foot" colspan="7">Add Products To Cart</td>
+      <% } %>
   </table>
 </section>
 
@@ -71,15 +75,27 @@
     <table>
       <tr>
         <td>Cart Subtotal</td>
-        <td>$335</td>
+      <% if(locals.total) {%>
+        <td id="cartSubtotal">$<%= total ? total : 0 %></td>
+        <% } else { %>
+        <td id="cartSubtotal">$0</td>
+          <% } %>
       </tr>
       <tr>
         <td>Shipping</td>
-        <td>Free</td>
+      <% if(locals.total) {%>
+        <td id="shipping"><%= total< 500 ? '$40' : 'Free' %> </td>
+        <% } else { %>
+        <td id="shipping">Free</td>
+          <% } %>
       </tr>
       <tr>
         <td><strong>Total</strong></td>
-        <td><strong>$335</strong></td>
+      <% if(locals.total) {%>
+        <td><strong id="total">$<%= total < 500 ? total+40 : total %></strong></td>
+        <% } else { %>
+        <td><strong id="total">$0</strong></td>
+          <% } %>
       </tr>
     </table>
     <button class="normal">Proceed to checkout</button>
@@ -143,23 +159,40 @@
 
 
   function removeProduct(id,i){
-    const row = document.getElementById(`row${i}`)
+    const row = document.getElementById(`row${i}`);
+    const subTotalRow = document.getElementById(`subTotal${i}`);
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const total = document.getElementById('total');
+    const shipping = document.getElementById('shipping');
     fetch(`/remove-product?id=${id}`,{
       method: "PATCH",
       headers: {
         'Content-Type':"application/json",
       },
       body: JSON.stringify({id:id})
-    }).then((res)=> res => res.json())
+    }).then((res)=> res.json())
       .then((data) => {
-        row.remove()
+        const value = subTotalRow.innerHTML.replace('$','');
+        const lastOne = data.cartDelete.deletedCount;
+        row.remove();
+        cartSubtotal.innerHTML='$'+Number(data.totalCart[0].total-value);
+        if(data.totalCart[0].total<500){
+          shipping.innerHTML= lastOne ? 'Free' : '$'+40
+          total.innerHTML= lastOne ? '$'+0 : '$'+Number(data.totalCart[0].total+40-value);
+        }else{
+          shipping.innerHTML='Free';
+          total.innerHTML='$'+Number(data.totalCart[0].total-value);
+        }
       })
       .catch((error)=> console.log(error.message));
   }
 
   function countOfQuantity(id,price,i){
     const input = document.getElementById(`inputTag${i}`);
-    const subTotalRow = document.getElementById(`subTotal${i}`)
+    const subTotalRow = document.getElementById(`subTotal${i}`);
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const total = document.getElementById('total');
+    const shipping = document.getElementById('shipping');
     fetch(`/cart-detials?id=${id}&quantity=${input.value}`,{
       method: "PATCH",
       headers: {
@@ -172,6 +205,14 @@
     }).then((res)=>res.json())
       .then((data)=>{
         subTotalRow.innerHTML='$'+price*input.value;
+        cartSubtotal.innerHTML='$'+data.totalCart[0].total;
+        if(data.totalCart[0].total<500){
+          shipping.innerHTML='$'+40;
+          total.innerHTML='$'+Number(data.totalCart[0].total+40)
+        }else{
+          shipping.innerHTML='Free';
+          total.innerHTML='$'+Number(data.totalCart[0].total);
+        }
       })
       .catch((error)=> console.log(error.message));
   }

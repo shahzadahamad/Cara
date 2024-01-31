@@ -80,7 +80,7 @@
                 $<%= product[i].price %>
               </h4>
             </div>
-            <a onclick="addToCart('<%= product[i]._id %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
+            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -119,7 +119,7 @@
                 $<%= latestProducts[i].price %>
               </h4>
             </div>
-            <a href="#"><i class="ri-shopping-cart-2-line cart"></i></a>
+            <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -222,7 +222,12 @@
     </div>
   </footer>
 
+  
+ 
 
+  <script src="/javaScript/script.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/javaScript/script.js"></script>
 
   <%- include('../layouts/footer.ejs') -%>

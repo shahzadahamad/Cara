@@ -67,7 +67,27 @@ otpInputs.forEach((input, index) => {
 });
 
 // Add to cart
-function addToCart(id) {
+function addToCart(id,isLogin) {
+  
+// alert cart sweet akert 
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 1000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
+  if(isLogin){
+    Toast.fire({
+      icon: "success",
+      title: "Product Added To Cart"
+    });
+  }
   event.stopPropagation();
   fetch(`/add-to-cart?id=${id}`, {
     method: "POST",
@@ -76,6 +96,10 @@ function addToCart(id) {
     },
     body: JSON.stringify({ id : id }),
   }).then((res) => res.json())
-    .then((data) => {})
+    .then((data) => {
+      if(!data.status){
+        window.location.href='/login';
+      }
+    })
     .catch((error) => console.log(error.message));
 };
