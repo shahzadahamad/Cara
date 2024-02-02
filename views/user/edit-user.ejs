@@ -121,10 +121,39 @@
     }
 
     #user-detials #user-detials-container {
-      padding: 70px;
+      padding: 50px 70px;
       border: 1px solid #042331;
       border-radius: 10px;
       background: rgb(226, 240, 229);
+    }
+
+    #user-detials-container h2 {
+      margin-bottom: 10px;
+    }
+
+    #edit-user-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #edit-user-container input {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+    }
+
+    .normal {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #000;
+      background-color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
     }
 
     @media (max-width:699px) {
@@ -184,24 +213,26 @@
     <p>Customize your identity with a personalized one!</p>
   </section>
 
-  <% if( locals.message ){ %>
-    <div style="color: green; text-align: center; margin-top: 20px;"  id="hide">
-      <%=message%>
-    </div>
-    <% } %>
-
   <section id="user-detials">
     <div id="user-detials-container">
       <h2>
-        <%= user.fullname %>
+        Edit Details
       </h2>
-      <p>Email: <%= user.email %>
-      </p>
-      <p>Phone: <%= user.mobile %>
-      </p>
-        <div>
-          <button onclick="window.location.href='/edit-user'" style="background-color: #088178; color: #fff;" class="normal edit-btn">Edit</button>
+      <form action="/edit-user" method="post">
+        <div id="edit-user-container">
+          <label for="">Name</label>
+          <input type="text" name="name" placeholder="Fullname" value="<%= user.fullname %>" required>
+          <label for="">Email</label>
+          <input type="email" name="email" placeholder="Email" value="<%= user.email %>" required>
+          <label for="">Mobile</label>
+          <input type="number" name="mobile" placeholder="Phone Number" value="<%= user.mobile %>" required>
         </div>
+        <div>
+          <button style="background-color: #088178; color: #fff;" type="submit" id="alert" class="normal">Edit</button>
+          <a style="background-color: red; color: #fff;" class="normal" href="/profile">Cancel</a>
+        </div>
+
+      </form>
     </div>
   </section>
 
@@ -269,7 +300,6 @@
     </div>
   </footer>
 
-
   <script>
     const logout = document.getElementById('logout');
     logout.addEventListener('click', () => {
@@ -286,6 +316,24 @@
         }
       });
     })
+    // const alert = document.getElementById('alert');
+    // alert.addEventListener('click', () => {
+    //   const Toast = Swal.mixin({
+    //     toast: true,
+    //     position: "center",
+    //     showConfirmButton: false,
+    //     timer: 1000,
+    //     timerProgressBar: true,
+    //     didOpen: (toast) => {
+    //       toast.onmouseenter = Swal.stopTimer;
+    //       toast.onmouseleave = Swal.resumeTimer;
+    //     }
+    //   });
+    //   Toast.fire({
+    //     icon: "success",
+    //     title: "Editing Details",
+    //   });
+    // });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

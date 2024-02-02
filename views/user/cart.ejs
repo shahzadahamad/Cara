@@ -180,7 +180,7 @@
           shipping.innerHTML= lastOne ? 'Free' : '$'+40
           total.innerHTML= lastOne ? '$'+0 : '$'+Number(data.totalCart[0].total+40-value);
         }else{
-          shipping.innerHTML='Free';
+          shipping.innerHTML=lastOne ? 'Free' : '$'+40
           total.innerHTML='$'+Number(data.totalCart[0].total-value);
         }
       })

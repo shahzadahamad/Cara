@@ -1,8 +1,7 @@
-const user = require("../models/userModel");
-const userOTPVerification = require("../models/userOTPVerificationModel");
-const product = require("../models/productsModel");
-const category = require("../models/categoryModel");
-const cart = require("../models/cartModel");
+const user = require("../../models/userModel");
+const userOTPVerification = require("../../models/userOTPVerificationModel");
+const product = require("../../models/productsModel");
+const category = require("../../models/categoryModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
 const { render } = require("ejs");
@@ -205,15 +204,18 @@ const verifySignUp = async (req, res) => {
 };
 
 // loadForgetPassword
-const loadForgetPassword = (req, res) => {
+const loadForgetPassword = async (req, res) => {
   try {
+    // const userData = await user.findOne({_id:req.session.user._id});
     if (req.session.existingUser) {
       req.session.existingUser = false;
       res.render("forget", {
+        user: req.session.user,
         message: "You are not registered with us. Please sign up.",
       });
     } else {
-      res.render("forget");
+      const message = req.flash("message");
+      res.render("forget", { user: req.session.user, message });
     }
   } catch (error) {
     console.log(error.message);
@@ -223,18 +225,28 @@ const loadForgetPassword = (req, res) => {
 // verifyForgetPassword
 const verifyForgetPassword = async (req, res) => {
   try {
-    const email = req.body.email;
-    const userData = await user.findOne({ email: email });
-    if (userData) {
-      req.session.resetEmail = userData;
-
-      req.session.otp = true;
-      generateVerificationCode(userData);
-
-      res.redirect("/otp");
+    if (req.session.user) {
+      if (req.body.email === req.session.user.email) {
+        const userData = await user.findOne({ email: req.session.user.email });
+        req.session.resetEmail = userData;
+        req.session.otp = true;
+        generateVerificationCode(userData);
+        res.redirect("/otp");
+      } else {
+        req.flash("message", "Please enter your email");
+        res.redirect("/forget");
+      }
     } else {
-      req.session.existingUser = true;
-      res.redirect("/forget");
+      const userData = await user.findOne({ email: req.body.email });
+      if (userData) {
+        req.session.resetEmail = userData;
+        req.session.otp = true;
+        generateVerificationCode(userData);
+        res.redirect("/otp");
+      } else {
+        req.session.existingUser = true;
+        res.redirect("/forget");
+      }
     }
   } catch (error) {
     console.log(error.message);
@@ -274,9 +286,14 @@ const verifyResetPassword = async (req, res) => {
           { email: userData.email },
           { $set: { password: spassword } }
         );
-        req.session.PassReset = true;
         req.session.reset = false;
-        res.redirect("/login");
+        if (req.session.user) {
+          req.flash("message", "Password Reset Successfully");
+          res.redirect("/profile");
+        } else {
+          req.session.PassReset = true;
+          res.redirect("/login");
+        }
       } else {
         req.session.cpassError = true;
         res.redirect("/resetPassword");
@@ -364,27 +381,6 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-// resumit
-const verifyResubmit = async (req, res) => {
-  try {
-    if (req.session.userData) {
-      await userOTPVerification.deleteOne({ userId: req.session.userData._id });
-      req.session.otp = false;
-      res.redirect("/signup");
-    } else if (req.session.resetEmail) {
-      await userOTPVerification.deleteOne({
-        userId: req.session.resetEmail._id,
-      });
-      req.session.otp = false;
-      res.redirect("/login");
-    } else {
-      res.redirect("/signup");
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
 // loadHome
 const loadHome = async (req, res) => {
   try {
@@ -415,228 +411,10 @@ const loadShop = async (req, res) => {
   }
 };
 
-// loadAboutv
+// loadAbout
 const loadAbout = (req, res) => {
   try {
     res.render("about", { login: req.session.user });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// loadCart
-const loadCart = async (req, res) => {
-  try {
-    const products = await cart
-      .findOne({ userId: req.session.user._id })
-      .populate("products.productId");
-
-    if (products) {
-      const totalCart = await cart.aggregate([
-        {
-          $match: {
-            userId: new mongoose.Types.ObjectId(req.session.user._id),
-          },
-        },
-        {
-          $unwind: "$products",
-        },
-        {
-          $lookup: {
-            from: "products",
-            localField: "products.productId",
-            foreignField: "_id",
-            as: "total",
-          },
-        },
-        {
-          $unwind: "$total",
-        },
-        {
-          $project: {
-            "products.quantity": 1,
-            "total.price": 1,
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            total: {
-              $sum: {
-                $multiply: ["$products.quantity", "$total.price"],
-              },
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-          },
-        },
-      ]);
-
-      res.render("cart", {
-        login: req.session.user,
-        product: products.products,
-        total: totalCart[0].total,
-      });
-    } else {
-      res.render("cart", { login: req.session.user });
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// verifyCart
-const verifyAddToCart = async (req, res) => {
-  try {
-    if (req.session.user) {
-      const id = req.query.id;
-      const existingProduct = await cart.findOne({
-        userId: req.session.user._id,
-        products: { $elemMatch: { productId: id } },
-      });
-      if (existingProduct) {
-        await cart.updateOne(
-          { userId: req.session.user._id, "products.productId": id },
-          { $inc: { "products.$.quantity": 1 } }
-        );
-        res.send({ status: "received" });
-      } else {
-        await cart.updateOne(
-          { userId: req.session.user._id },
-          { $addToSet: { products: { productId: id, quantity: 1 } } },
-          { upsert: true }
-        );
-        res.send({ status: "received" });
-      }
-    } else {
-      res.send({ status: false });
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// Remove cart products
-const verifyRemoveCart = async (req, res) => {
-  try {
-    const id = req.query.id;
-    const totalCart = await cart.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(req.session.user._id),
-        },
-      },
-      {
-        $unwind: "$products",
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "total",
-        },
-      },
-      {
-        $unwind: "$total",
-      },
-      {
-        $project: {
-          "products.quantity": 1,
-          "total.price": 1,
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          total: {
-            $sum: {
-              $multiply: ["$products.quantity", "$total.price"],
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-        },
-      },
-    ]);
-    const removeProduct = await cart.updateOne(
-      { userId: req.session.user._id },
-      { $pull: { products: { _id: id } } }
-    );
-    const cartDelete = await cart.deleteOne({
-      userId: req.session.user._id,
-      products: { $eq: [] },
-    });
-    if (removeProduct) {
-      res.send({ totalCart,cartDelete });
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-// cart products detials
-const verifyCartDetials = async (req, res) => {
-  try {
-    const id = req.query.id;
-    const quantity = req.query.quantity;
-    const quantityUpdate = await cart.updateOne(
-      { userId: req.session.user._id, "products.productId": id },
-      { $set: { "products.$.quantity": parseInt(quantity) } }
-    );
-    const totalCart = await cart.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(req.session.user._id),
-        },
-      },
-      {
-        $unwind: "$products",
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "total",
-        },
-      },
-      {
-        $unwind: "$total",
-      },
-      {
-        $project: {
-          "products.quantity": 1,
-          "total.price": 1,
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          total: {
-            $sum: {
-              $multiply: ["$products.quantity", "$total.price"],
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-        },
-      },
-    ]);
-    if (totalCart) {
-      res.send({ totalCart });
-    } else {
-      res.send({ status: "feild" });
-    }
   } catch (error) {
     console.log(error.message);
   }
@@ -662,9 +440,43 @@ const loadSingleProduct = async (req, res) => {
 };
 
 // loadProfile
-const loadProfile = (req, res) => {
+const loadProfile = async (req, res) => {
   try {
-    res.render("profile", { login: req.session.user });
+    const userData = await user.findOne({ _id: req.session.user._id });
+    const message = req.flash("message");
+    res.render("profile", { user: userData, message });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// Edit user
+const loadEditUser = async (req, res) => {
+  try {
+    const userData = await user.findOne({ _id: req.session.user._id });
+    res.render("edit-user", { user: userData });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verify edituser page
+const verifyEditUser = async (req, res) => {
+  try {
+    const { name, email, mobile } = req.body;
+    const update = {
+      fullname: name,
+      email: email,
+      mobile: mobile,
+    };
+    const updateUser = await user.updateOne(
+      { _id: req.session.user._id },
+      { $set: update }
+    );
+
+    req.flash('message','Profile edited')
+      res.redirect("/profile");
+
   } catch (error) {
     console.log(error.message);
   }
@@ -695,12 +507,9 @@ module.exports = {
   loadHome,
   loadShop,
   loadAbout,
-  loadCart,
   loadSingleProduct,
   loadProfile,
   userLogout,
-  verifyResubmit,
-  verifyAddToCart,
-  verifyRemoveCart,
-  verifyCartDetials,
+  loadEditUser,
+  verifyEditUser,
 };

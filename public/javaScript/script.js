@@ -103,3 +103,4 @@ const Toast = Swal.mixin({
     })
     .catch((error) => console.log(error.message));
 };
+

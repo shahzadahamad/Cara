@@ -12,7 +12,7 @@ const isLogin = (req,res,next) => {
 
 const isLogout = (req,res,next) => {
   try{
-    if(req.session.user){
+    if(req.session.user && !req.session.otp){
       res.redirect('/home');
     }else{
       next();
@@ -32,7 +32,7 @@ const isLoginCart = (req,res,next) => {
   }catch(error){
     console.log(error.message)
   }
-}
+};
 
 module.exports = {
   isLogin,

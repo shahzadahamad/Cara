@@ -1,6 +1,6 @@
 const express = require('express');
 const adminRouter = express();
-const adminController = require('../controllers/adminController');
+const adminController = require('../controllers/admin/adminController');
 const auth = require('../middleware/adminAuth');
 const upload = require('../middleware/multer');
 

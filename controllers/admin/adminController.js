@@ -1,8 +1,8 @@
-const admin = require("../models/adminModel");
-const multer = require("../middleware/multer");
-const user = require("../models/userModel");
-const product = require("../models/productsModel");
-const category = require("../models/categoryModel");
+const admin = require("../../models/adminModel");
+const multer = require("../../middleware/multer");
+const user = require("../../models/userModel");
+const product = require("../../models/productsModel");
+const category = require("../../models/categoryModel");
 const bcrypt = require("bcrypt");
 
 // hashPassword

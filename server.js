@@ -8,6 +8,7 @@ const path = require("path");
 const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
 const nodemon = require("nodemon");
+const flash = require('connect-flash');
 const dotEnv = require("dotenv");
 dotEnv.config();
 
@@ -20,6 +21,9 @@ app.use(
     cookie: { maxAge: 2 * 30 * 24 * 60 * 60 * 1000  },
   })
 );
+
+// flash 
+app.use(flash());
 
 // json
 app.use(express.json());
