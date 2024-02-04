@@ -4,6 +4,24 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
+  <style>
+    .normal {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #000;
+      background-color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+    }
+    table td {
+      font-weight: 700;
+      color: #000;
+    }
+  </style>
 
   <div class="sidebar">
     <div class="logo"></div>
@@ -20,13 +38,13 @@
           <span>Profile</span>
         </a>
       </li>
-      <li class="active">
+      <li>
         <a href="/admin/user-detials">
           <i class="fa-solid fa-users"></i>
           <span>Users</span>
         </a>
       </li>
-      <li>
+      <li class="active">
         <a href="/admin/order-detials">
           <i class="fa-solid fa-check"></i>
           <span>Order</span>
@@ -54,19 +72,21 @@
   </div>
 
   <div class="main--content">
-    
+
     <div class="header--wrapper">
       <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
       <div class="user--info">
         <img src="/images/admin.png" alt="">
-        <h4><%= admins.username %></h4>
+        <h4>
+          <%= admins.username %>
+        </h4>
       </div>
     </div>
 
     <div class="tabular--wrapper">
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
-          <h3 style="font-size: 30px;" class="main--title">Customers</h3>
+          <h3 style="font-size: 30px;" class="main--title">Orders Detials</h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
@@ -78,45 +98,69 @@
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Date Joined</th>
-              <th>Actions</th>
+              <th colspan="2">Detials</th>
             </tr>
           </thead>
           <tbody>
-            <% if(users.length>0){%>
-              <% for(let i=0; i< users.length;i++){ %>
+            <% if(locals.order){ %>
                 <tr>
+                  <th style="text-align: start;">Customer</th>
                   <td>
-                    <%= users[i].fullname %>
-                  </td>
-                  <td>
-                    <%= users[i].email %>
-                  </td>
-                  <td>
-                    <%= users[i].mobile %>
-                  </td>
-                  <td>
-                    <%= users[i].createdDate.toString().split(' ').slice(0,5) %>
-                  </td>
-                  <td>
-                    <button id="block<%= i %>" onclick="blockUser('<%= users[i]._id %>','<%= i %>')" class=" btn <%= users[i].isBlocked ?  'btn-outline-danger' :  'btn-outline-success' %>">
-                      <%= users[i].isBlocked ? 'UnBlock' : 'Block' %>
-                    </button>
+                    <%= order.userId.fullname %></td>
+                </tr>
+                <tr>
+                  <th style="text-align: start;">Amount</th>
+                  <td> $<%= order.orderAmount %>
                   </td>
                 </tr>
-                <% } %>
-                  <% } else { %>
-                    <tr>
-                      <td colspan="7">User Not Found</td>
-                    </tr>
-                    <% } %>
+                <tr>
+                  <th style="text-align: start;">Products</th>
+                  <td>
+                    <% for(let j=0;j<order.orderItems.length;j++) {%>
+
+                      <p style="color: #000;"> 
+                        <%= order.orderItems[j].productId.name %>&nbsp;
+                      <img  style="width: 100px;" src="/images/productImages/<%= order.orderItems[j].productId.image[0] %>" alt="">
+                    </p>
+
+                      <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <th style="text-align: start;">Address</th>
+                  <td>
+                    <p style="color: #000;"><%= order.deliveryAddress.name %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.email %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.mobile %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.address %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.pincode %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.city %></p>
+                    <p style="color: #000;"><%= order.deliveryAddress.status %></p>
+                  </td>
+                </tr>
+                <tr>
+                  <th style="text-align: start;">paymentMethod</th>
+                  <td>
+                    <%= order.paymentMethod %>
+                  </td>
+                </tr>
+                <tr>
+                  <th style="text-align: start;">Order Status</th>
+                  <td>
+                    <%= order.orderStatus %>
+                  </td>
+                </tr>
+                <tr>
+                  <th style="text-align: start;">Order Date</th>
+                  <td>
+                    <%= order.orderDate %>
+                  </td>
+                </tr>
+                  <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="7">Total Customers: <%= users.length %>
+              <td colspan="7" style="text-align: center;">-------------
               </td>
             </tr>
           </tfoot>
@@ -127,30 +171,6 @@
 
 
   <script>
-    function blockUser(id,i){
-
-      const block = document.getElementById(`block${i}`);
-
-      fetch(`/admin/block-user?id=${id}`,{
-        method: "PATCH",
-        headers: {
-          "Content-Type":"application/json",
-        },
-        body: JSON.stringify({id:id})
-      }).then((res) => res.json())
-        .then((data) => {
-          if(data.isBlocked){
-            block.classList.remove('btn-outline-danger');
-            block.classList.add('btn-outline-success');
-            block.innerHTML='Block'
-          }else{
-            block.classList.remove('btn-outline-success');
-            block.classList.add('btn-outline-danger');
-            block.innerHTML='UnBlock'
-          }
-        })
-        .catch((error) => console.log(error.message));
-    };
   </script>
 
 

@@ -219,7 +219,7 @@
       <h2>
         Add Address
       </h2>
-      <form style="display: flex; flex-direction: column;" action="/add-address" method="post">
+      <form style="display: flex; flex-direction: column;" action="<% if(locals.status){'/checkout-add-address'} else if(locals.change){'/change-add-address'}else{'/add-address'} %>" method="post">
         <div id="edit-user-container">
    
             <label for="">Name</label>

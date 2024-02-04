@@ -1,5 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const cart = require("../../models/cartModel");
+const Address = require('../../models/addressModel');
+const Order = require('../../models/orderModel');
 
 // totalCart price
 const totalCartPrice = async (id, req, res) => {
@@ -145,9 +147,82 @@ const verifyCartDetials = async (req, res) => {
   }
 };
 
+// checkout
+const loadCheckout = async (req,res) => {
+  try{
+    const address = await Address.findOne({userId:req.session.user._id});
+    const products = await cart
+    .findOne({ userId: req.session.user._id })
+    .populate("products.productId");
+    const totalCart = await totalCartPrice(req.session.user._id);
+
+   const message = req.flash('message');
+    res.render('checkout',{user:req.session.user,address:address,product:products,total:totalCart[0].total,message});
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// verifly checkout
+const verifyCheckout = async (req,res) => {
+  try{
+    const {selectedPaymentMethod,selectedAddress}= req.body;
+   const address = await Address.findOne({userId:req.session.user._id},{address:{$elemMatch:{_id:selectedAddress}}});
+   const totalCart = await totalCartPrice(req.session.user._id);
+   const cartPro = await cart.findOne({userId:req.session.user._id},{products:1});
+
+   if(!selectedAddress && !selectedPaymentMethod ){
+    req.flash('message','please select address and payment method');
+    return res.redirect('/checkout')
+   }
+
+   if(!selectedAddress){
+    req.flash('message','please select address');
+    return res.redirect('/checkout');
+   }
+
+   if(!selectedPaymentMethod){
+    req.flash('message','please select payment method');
+    return res.redirect('/checkout');
+   }
+    
+    const order = new Order({
+      userId:req.session.user._id,
+      orderAmount:totalCart[0].total <500 ? totalCart[0].total+40 : totalCart[0].total,
+      deliveryAddress: address.address[0],
+      paymentMethod: selectedPaymentMethod,
+      orderItems:cartPro.products,
+      orderStatus:selectedPaymentMethod === 'COD' ? 'Placed':'Pending',
+      orderDate: new Date,
+    });
+
+    await order.save();
+
+    await cart.deleteOne({userId:req.session.user._id});
+
+    res.redirect('/order-confirm');
+
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// loadOrder page
+const loadOrder = async (req,res)=>{
+  try{
+    res.render('order',{user:req.session.user});
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadCart,
   verifyAddToCart,
   verifyRemoveCart,
   verifyCartDetials,
+  loadCheckout,
+  loadCheckout,
+  loadOrder,
+  verifyCheckout,
 }

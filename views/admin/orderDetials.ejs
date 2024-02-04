@@ -4,6 +4,20 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
+    <style>
+          .normal {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #000;
+      background-color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+    }
+    </style>
 
   <div class="sidebar">
     <div class="logo"></div>
@@ -20,13 +34,13 @@
           <span>Profile</span>
         </a>
       </li>
-      <li>
+      <li >
         <a href="/admin/user-detials">
           <i class="fa-solid fa-users"></i>
           <span>Users</span>
         </a>
       </li>
-      <li>
+      <li class="active">
         <a href="/admin/order-detials">
           <i class="fa-solid fa-check"></i>
           <span>Order</span>
@@ -38,7 +52,7 @@
           <span>Products</span>
         </a>
       </li>
-      <li class="active">
+      <li>
         <a href="/admin/category">
           <i class="fa-solid fa-list"></i>
           <span>Category</span>
@@ -64,17 +78,13 @@
     </div>
 
     <div class="tabular--wrapper">
-
-      <div class="d-flex flex-wrap: wrap; pb-3 justify-content-end">
-        <a class="btn btn-outline-dark" href="/admin/add-category"><i class="fa-solid fa-circle-plus"></i> Add Category</a>
-      </div>
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
-          <h3 style="font-size: 30px;" class="main--title">Category</h3>
+          <h3 style="font-size: 30px;" class="main--title">Orders</h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" id="search" placeholder="Search" />
+          <input type="text" placeholder="Search" />
         </div>
       </div>
 
@@ -82,58 +92,65 @@
         <table>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Date</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <% if(category.length>0){%>
-              <% for(let i=0; i< category.length;i++){ %>
-            <tr id="row<%=i%>">
-              <td><%= category[i].name %></td>
-              <td><a class="btn btn-outline-primary" href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick=" if(confirm('Did you want to delete product <%= category[i].name %>')){deleteCategory('<%= category[i]._id %>','<%=i%>')}">Delete</button>
-            </tr> 
-            <% } %>
-            <% } else { %>
-              <tr>
-                <td colspan="7">Category Not Found</td>
-              </tr>
-              <% } %>
+            <% if(locals.order){%>
+              <% for(let i=0; i< order.length;i++){ %>
+                <tr>
+                  <td>
+                    <%= order[i].userId.fullname %>
+                  </td>
+                  <td>
+                    $<%= order[i].orderAmount %>
+                  </td>
+                  <td>
+                    <%= order[i].paymentMethod %>
+                  </td>
+                  <td>
+                    <%= order[i].orderDate.toString().split(' ').slice(0,4) %>
+                  </td>
+                  <td>
+                    <%= order[i].orderStatus %>
+                  </td>
+                  <td>
+                    <a class="btn btn-outline-success " href="/admin/order-full-detials?id=<%= order[i]._id %>">Detials</a>
+                  </td>
+                </tr>
+                <% } %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="7">No Order found</td>
+                    </tr>
+                    <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="8">Total Products: <%= category.length %></td>
+              <td colspan="7">Total Customers: <%= order.length   %>
+              </td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>
-
   </div>
 
 
   <script>
-    
-    function deleteCategory(id,i){
-      const row = document.getElementById(`row${i}`);
-      fetch(`/admin/delete-category?id=${id}`,{
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id:id })
-      }).then((res) => res.json())
-        .then((data) => {
-          row.remove();
-        })
-        .catch((error) => console.log(error.message));
-    };
-
   </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
+
+  <script src="/javaScript/script.js"></script>
+
 
   <%- include('../layouts/footer.ejs') -%>

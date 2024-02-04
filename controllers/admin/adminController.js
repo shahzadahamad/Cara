@@ -3,7 +3,9 @@ const multer = require("../../middleware/multer");
 const user = require("../../models/userModel");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
+const Order = require('../../models/orderModel');
 const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 
 // hashPassword
 const securePassword = async (password) => {
@@ -206,6 +208,7 @@ const verifyEditProduct = async (req,res) => {
       images.push(files.filename);
     });
 
+
     const categorys = await category.findOne({name:req.body.category});
     const id = req.query.id;
     const update = {
@@ -218,6 +221,9 @@ const verifyEditProduct = async (req,res) => {
       image: images,
       description: req.body.description,
     }
+
+
+
     await product.findByIdAndUpdate({_id:id},{$set:update});
     req.session.editProduct=true;
     res.redirect(`/admin/edit-products?id=${id}`);
@@ -341,6 +347,29 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+// Order detials 
+const loadOrderDetials = async (req, res) => {
+  try {
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    const order = await Order.find({}).populate('userId orderItems.productId deliveryAddress');
+    res.render('orderDetials',{admins:adminData,order:order});
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// order full detials
+const loadOrderFullDetials= async (req, res) => {
+  try {
+    const id = req.query.id;
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    const order = await Order.findOne({_id:id}).populate('userId orderItems.productId');
+    res.render('orderFullDetials',{admins:adminData,order:order});
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // adminLogout
 const adminLogout = async (req, res) => {
   try {
@@ -370,4 +399,6 @@ module.exports = {
   verifyEditProduct,
   loadEditCategory,
   verifyEditCategory,
+  loadOrderDetials,
+  loadOrderFullDetials
 };

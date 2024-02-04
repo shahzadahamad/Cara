@@ -1,5 +1,10 @@
 <%- include('../layouts/header.ejs') -%>
 
+<style>
+  #crusor{
+    cursor: pointer;
+  }
+</style>
 
 <header id="header">
   <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
@@ -52,16 +57,17 @@
       <% } %>
       <% } else { %>
           <tr>
-            <td id="foot" colspan="7">Add Products To Cart</td>
+            <td onclick="window.location.href='/shop'" id="foot" colspan="7">Add Products To Cart</td>
           </tr>
         <% } %>
     </tbody>
     <% } else { %>
-      <td id="foot" colspan="7">Add Products To Cart</td>
+      <td id="crusor" onclick="window.location.href='/shop'" id="foot" colspan="7">Add Products To Cart</td>
       <% } %>
   </table>
 </section>
 
+<% if(locals.product){%>
 <section id="cart-add" class="section-p1">
   <div id="coupon">
     <h3>Apply Coupon</h3>
@@ -98,9 +104,10 @@
           <% } %>
       </tr>
     </table>
-    <button class="normal">Proceed to checkout</button>
+    <button onclick="window.location.href='/checkout'" class="normal">Proceed to checkout</button>
   </div>
 </section>
+<% } %>
 
 <footer class="section-p1">
   <div class="col">
@@ -164,6 +171,7 @@
     const cartSubtotal = document.getElementById('cartSubtotal');
     const total = document.getElementById('total');
     const shipping = document.getElementById('shipping');
+    const checkout = document.getElementById('cart-add');
     fetch(`/remove-product?id=${id}`,{
       method: "PATCH",
       headers: {
@@ -175,6 +183,9 @@
         const value = subTotalRow.innerHTML.replace('$','');
         const lastOne = data.cartDelete.deletedCount;
         row.remove();
+        if(lastOne){
+          checkout.remove();
+        }
         cartSubtotal.innerHTML='$'+Number(data.totalCart[0].total-value);
         if(data.totalCart[0].total<500){
           shipping.innerHTML= lastOne ? 'Free' : '$'+40

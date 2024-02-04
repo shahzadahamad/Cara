@@ -49,6 +49,12 @@ adminRouter.delete('/delete-category',adminController.deleteCategory);
 // block
 adminRouter.patch('/block-user',auth.isLogin,adminController.verifyBlockUser);
 
+// order 
+adminRouter.get('/order-detials',auth.isLogin,adminController.loadOrderDetials);
+
+// order full detials 
+adminRouter.get('/order-full-detials',auth.isLogin,adminController.loadOrderFullDetials);
+
 // logout
 adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);
 

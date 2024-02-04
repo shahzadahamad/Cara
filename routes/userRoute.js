@@ -61,9 +61,9 @@ userRouter.post('/edit-user',userController.verifyEditUser);
 userRouter.get('/logout',auth.isLogin,userController.userLogout);
 
 
-// <--------------Cart Controller-------------->
+// <--------------Cart and Checkout Controller-------------->
 const cartController = require('../controllers/user/cartController');
-// <--------------Cart Controller-------------->
+// <--------------Cart and Checkout Controller-------------->
 
 
 // cart
@@ -78,6 +78,13 @@ userRouter.patch('/remove-product',cartController.verifyRemoveCart);
 // cart products detials
 userRouter.patch('/cart-detials',cartController.verifyCartDetials);
 
+// checkout page and verify checkout 
+userRouter.get('/checkout',auth.isLogin,cartController.loadCheckout);
+userRouter.post('/checkout',cartController.verifyCheckout);
+
+// user ordered page
+userRouter.get('/order-confirm',auth.isLogin,cartController.loadOrder);  
+
 
 // <--------------Address Controller-------------->
 const addressController = require('../controllers/user/addressController');
@@ -90,13 +97,32 @@ userRouter.get('/address',auth.isLogin,addressController.loadAddress);
 // user add address 
 userRouter.get('/add-address',auth.isLogin,addressController.loadAddAddress);
 userRouter.post('/add-address',addressController.verifyAddAddress);
+userRouter.get('/checkout-add-address',auth.isLogin,addressController.loadCheckoutAddAddress);
+userRouter.post('/checkout-add-address',addressController.verifyCheckoutAddAddress);
 
 // Edit address
 userRouter.get('/edit-address',auth.isLogin,addressController.loadEditAddress);
-userRouter.post('/edit-address',addressController.verifyEditAddress)
+userRouter.post('/edit-address',addressController.verifyEditAddress);
+
+// Change Address
+userRouter.get('/change-address',auth.isLogin,addressController.loadChangeAddress);
+userRouter.post('/change-address',addressController.verifyChangeAddress);
+
+// change add address
+userRouter.get('/change-add-address',auth.isLogin,addressController.loadChangeAddAddress);
+userRouter.post('/change-add-address',addressController.verifyChangeAddAddress);
 
 // delete address
 userRouter.patch('/remove-address',addressController.verifyDeleteAddress);
 
+// <--------------Order Controller-------------->
+const orderController = require('../controllers/user/orderController');
+// <--------------Order Controller-------------->
+
+userRouter.get('/order',auth.isLogin,orderController.loadOrder);
+userRouter.get('/order-detials',auth.isLogin,orderController.loadOrderDetials);
+
+userRouter.get('/cancel-order',auth.isLogin,orderController.loadCancelPage);
+userRouter.post('/cancel-order',orderController.verifyCancelPage);
 
 module.exports = userRouter;
