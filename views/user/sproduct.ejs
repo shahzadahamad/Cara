@@ -1,5 +1,17 @@
 <%- include('../layouts/header.ejs') -%>
 
+
+
+<style>
+  #zoomable-image {
+      transition: transform 0.3s ease-in-out;
+  }
+
+  #zoomable-image:hover {
+      transform: scale(1.1);
+  }
+</style>
+
 <header id="header">
   <a href="#"><img src="images/logo.png" class="logo" alt=""></a>
 
@@ -20,8 +32,10 @@
 </header>
 
 <section id="prodetails" class="section-p1">
-  <div class="single-pro-image">
+  <div  class="single-pro-image">
+ 
     <img src="images/productImages/<%= sproduct.image[0] %>" width="100%" id="MainImg" alt="">
+
     <div class="small-img-group">
     <%  for(let i=0; i< sproduct.image.length; i++) { %>
       <div class="small-img-col">
@@ -35,19 +49,19 @@
     <h6>Brand: <%= sproduct.brand.charAt(0).toUpperCase() + sproduct.brand.slice(1) %></h6>
     <h4 style="padding: 32px 0 20px 0;"><%= sproduct.name %></h4>
     <h2>$<%= sproduct.price %></h2>
-    <select>
+    <!-- <select>
       <option>Select Size</option>
       <option>XL</option>
       <option>XXL</option>
       <option>Small</option>
       <option>Large</option>
-    </select>
+    </select> -->
     <div style="margin-bottom: 10px;" class="star">
       <% for(let j=0;j< sproduct.rating; j++){ %>
         <i style="color: rgb(243, 181, 25); font-size: 15px;" class="ri-star-fill"></i>
         <% } %>
     </div>
-    <input type="number" value="1">
+    <input type="number" value="1" min="1" max="<%= sproduct.quantity %>">
     <button class="normal" type="submit" onclick="addToCart('<%= sproduct._id %>','<%= locals.login %>')">Add To Cart</button>
     <h4>Product Details</h4>
     <span><%= sproduct.description %></span>
@@ -171,8 +185,66 @@
     MainImg.src = smallimg[3].src;
   }
 
+ 
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('MainImg').addEventListener('mousemove', function (event) {
+        zoomImage(event, this);
+    });
+
+    function zoomImage(event, element) {
+        const rect = element.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        const percentX = (x / rect.width) * 100;
+        const percentY = (y / rect.height) * 100;
+
+        element.style.transformOrigin = `${percentX}% ${percentY}%`;
+        element.style.transition = 'transform 0.3s ease-in-out';
+        element.style.transform = 'scale(1.5)';
+    }
+
+    document.getElementById('MainImg').addEventListener('mouseleave', function () {
+        this.style.transition = 'transform 0.3s ease-in-out';
+        this.style.transform = 'scale(1)';
+    });
+
+    document.getElementById('MainImg2').addEventListener('mousemove', function (event) {
+        zoomImage(event, this);
+    });
+
+    document.getElementById('MainImg2').addEventListener('mouseleave', function () {
+        this.style.transition = 'transform 0.3s ease-in-out';
+        this.style.transform = 'scale(1)';
+    });
+
+    document.getElementById('MainImg3').addEventListener('mousemove', function (event) {
+        zoomImage(event, this);
+    });
+
+    document.getElementById('MainImg3').addEventListener('mouseleave', function () {
+        this.style.transition = 'transform 0.3s ease-in-out';
+        this.style.transform = 'scale(1)';
+    });
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
 
 </script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/javaScript/script.js"></script>

@@ -82,6 +82,9 @@ userRouter.patch('/cart-detials',cartController.verifyCartDetials);
 userRouter.get('/checkout',auth.isLogin,cartController.loadCheckout);
 userRouter.post('/checkout',cartController.verifyCheckout);
 
+// verify cart chekcout
+userRouter.post('/verify-cart-checkout',cartController.verifyCartCheckout)
+
 // user ordered page
 userRouter.get('/order-confirm',auth.isLogin,cartController.loadOrder);  
 

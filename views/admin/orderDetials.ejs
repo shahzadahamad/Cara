@@ -101,7 +101,7 @@
             </tr>
           </thead>
           <tbody>
-            <% if(locals.order){%>
+            <% if(locals.order.length>0){%>
               <% for(let i=0; i< order.length;i++){ %>
                 <tr>
                   <td>
@@ -126,13 +126,13 @@
                 <% } %>
                   <% } else { %>
                     <tr>
-                      <td colspan="7">No Order found</td>
+                      <th colspan="7">No Order found</th>
                     </tr>
                     <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="7">Total Customers: <%= order.length   %>
+              <td colspan="7">Total Order: <%= order.length   %>
               </td>
             </tr>
           </tfoot>
