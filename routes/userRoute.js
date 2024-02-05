@@ -6,6 +6,8 @@ const auth = require('../middleware/userAuth');
 userRouter.set('view engine','ejs');
 userRouter.set('views','./views/user');
 
+
+
 // <-------------- User routes-------------->
 
 // <--------------User Controller-------------->
@@ -16,26 +18,6 @@ const userController = require('../controllers/user/userController');
 // loadPage
 userRouter.get('/',auth.isLogout,userController.loadPage);
 
-// login
-userRouter.get('/login',auth.isLogout,userController.loadLogin);
-userRouter.post('/login',userController.verifyLogin);
-
-// signup
-userRouter.get('/signup',auth.isLogout,userController.loadSignup);
-userRouter.post('/signup',userController.verifySignUp);
-
-// otpVerification
-userRouter.get('/otp',auth.isLogout,userController.loadOtp);
-userRouter.post('/otp',userController.verifyOtp);
-
-// forgetPassword
-userRouter.get('/forget',userController.loadForgetPassword);
-userRouter.post('/forget',userController.verifyForgetPassword);
-
-// resetPassword
-userRouter.get('/resetPassword',auth.isLogout,userController.loadResetPassword);
-userRouter.post('/resetPassword',userController.verifyResetPassword);
-
 // home
 userRouter.get('/home',userController.loadHome);
 
@@ -44,8 +26,6 @@ userRouter.get('/shop',userController.loadShop);
 
 // about
 userRouter.get('/about',userController.loadAbout);
-
-
 
 // singleProduct
 userRouter.get('/sproduct',userController.loadSingleProduct);
@@ -57,8 +37,35 @@ userRouter.get('/profile',auth.isLogin,userController.loadProfile);
 userRouter.get('/edit-user',auth.isLogin,userController.loadEditUser);
 userRouter.post('/edit-user',userController.verifyEditUser);
 
+
+
+// <--------------User validation Controller-------------->
+const userValidationController = require('../controllers/user/userValidationController');
+// <--------------User validation Controller-------------->
+
+
+// login
+userRouter.get('/login',auth.isLogout,userValidationController.loadLogin);
+userRouter.post('/login',userValidationController.verifyLogin);
+
+// signup
+userRouter.get('/signup',auth.isLogout,userValidationController.loadSignup);
+userRouter.post('/signup',userValidationController.verifySignUp);
+
+// otpVerification
+userRouter.get('/otp',auth.isLogout,userValidationController.loadOtp);
+userRouter.post('/otp',userValidationController.verifyOtp);
+
+// forgetPassword
+userRouter.get('/forget',userValidationController.loadForgetPassword);
+userRouter.post('/forget',userValidationController.verifyForgetPassword);
+
+// resetPassword
+userRouter.get('/resetPassword',auth.isLogout,userValidationController.loadResetPassword);
+userRouter.post('/resetPassword',userValidationController.verifyResetPassword);
+
 // logout
-userRouter.get('/logout',auth.isLogin,userController.userLogout);
+userRouter.get('/logout',auth.isLogin,userValidationController.userLogout);
 
 
 // <--------------Cart and Checkout Controller-------------->

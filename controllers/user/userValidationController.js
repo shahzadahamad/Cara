@@ -1,0 +1,363 @@
+const user = require("../../models/userModel");
+const userOTPVerification = require("../../models/userOTPVerificationModel");
+const bcrypt = require("bcrypt");
+const nodeMailer = require("nodemailer");
+
+
+// hashPassword
+const securePassword = async (password) => {
+  try {
+    const hashPassword = await bcrypt.hash(password, 10);
+    return hashPassword;
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// nodeMailer
+const sendOtpVerifyMail = async (name, email, otp) => {
+  try {
+    const transporter = nodeMailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+    const mailOption = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "OTP verification for Cara Online Shopping site",
+      html: `<h2>Hello ${name}.This is your OTP verification code ${otp}.This verification is for signing up in Cara Online Shopping site.</h2>`,
+    };
+    transporter.sendMail(mailOption, (error, info) => {
+      if (error) {
+        console.log(error.message);
+      } else {
+        console.log("email has been sent:-" + info.response);
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// generateVerificationCode
+const generateVerificationCode = async (userData) => {
+  const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+  const expirationTime = new Date(Date.now() + 120000);
+  const sOtp = await securePassword(verificationCode);
+
+  const addOTP = new userOTPVerification({
+    userId: userData._id,
+    otp: sOtp,
+    createdAt: new Date(),
+    expiresAt: expirationTime,
+  });
+
+  await userOTPVerification.insertMany(addOTP);
+  scheduleDocumentDeletion(userData._id, expirationTime, addOTP._id);
+  sendOtpVerifyMail(userData.fullname, userData.email, verificationCode);
+};
+
+// scheduleDocumentDeletion
+const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
+  const currentTime = new Date();
+  const timeUntilExpiration = expirationTime - currentTime;
+  setTimeout(async () => {
+    try {
+      await userOTPVerification.deleteOne({ _id: otpId, userId: userId });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, timeUntilExpiration);
+};
+
+// loadLogin
+const loadLogin = (req, res) => {
+  try {
+    const message = req.flash("message");
+    const message1 = req.flash("message1");
+    res.render("login", { message, message1 });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyLogin
+const verifyLogin = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    const userData = await user.findOne({ email: email });
+
+    if (userData) {
+      const isPasswordMatch = await bcrypt.compare(password, userData.password);
+      if (isPasswordMatch) {
+        if (userData.isBlocked) {
+          req.flash("message", "Your accout as been blocked");
+          res.redirect("/login");
+        } else {
+          req.session.user = userData;
+          res.redirect("/");
+        }
+      } else {
+        req.flash("message", "Invalied Password");
+        res.redirect("/login");
+      }
+    } else {
+      req.flash("message", "You are not registered with us. Please sign up");
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.log(error.messages);
+  }
+};
+
+// loadSignUp
+const loadSignup = (req, res) => {
+  try {
+    const message = req.flash("message");
+    res.render("signup", { message });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifySignUp
+const verifySignUp = async (req, res) => {
+  try {
+    const { name, email, mobile, password, cpassword } = req.body;
+
+    const addUser = new user({
+      fullname: name,
+      email: email,
+      mobile: mobile,
+      password: password,
+      createdDate: new Date(),
+      isBlocked: false,
+    });
+
+    const existingUser = await user.findOne({ email: addUser.email });
+
+    if (existingUser) {
+      req.flash("message", "You are already registered. Please log in");
+      res.redirect("/signup");
+    } else {
+      if (addUser.password === cpassword) {
+        const spassword = await securePassword(password);
+        addUser.password = spassword;
+
+        req.session.userData = addUser;
+
+        req.session.otp = true;
+        generateVerificationCode(addUser);
+
+        res.redirect("/otp");
+      } else {
+        req.flash("message", "Passwords are not same");
+        res.redirect("/signup");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// loadForgetPassword
+const loadForgetPassword = async (req, res) => {
+  try {
+    const message = req.flash("message");
+    res.render("forget", { user: req.session.user, message });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyForgetPassword
+const verifyForgetPassword = async (req, res) => {
+  try {
+    if (req.session.user) {
+      if (req.body.email === req.session.user.email) {
+        const userData = await user.findOne({ email: req.session.user.email });
+        req.session.resetEmail = userData;
+        req.session.otp = true;
+        generateVerificationCode(userData);
+        res.redirect("/otp");
+      } else {
+        req.flash("message", "Please enter your email");
+        res.redirect("/forget");
+      }
+    } else {
+      const userData = await user.findOne({ email: req.body.email });
+      if (userData) {
+        req.session.resetEmail = userData;
+        req.session.otp = true;
+        generateVerificationCode(userData);
+        res.redirect("/otp");
+      } else {
+        req.flash("message", "You are not registered with us. Please sign up.");
+        res.redirect("/forget");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// loadResetPassword
+const loadResetPassword = async (req, res) => {
+  try {
+    if (req.session.reset) {
+      if (req.session.cpassError) {
+        req.session.cpassError = false;
+        res.render("resetPassword", { message: "Passwords are not same" });
+      } else {
+        res.render("resetPassword");
+      }
+    } else {
+      res.redirect("/");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyResetPassword
+const verifyResetPassword = async (req, res) => {
+  try {
+    const email = req.session.resetEmail.email;
+    const userData = await user.findOne({ email: email });
+
+    if (userData) {
+      const password = req.body.password;
+      const cpassword = req.body.password;
+      if (password === cpassword) {
+        const spassword = await securePassword(password);
+        await user.updateOne(
+          { email: userData.email },
+          { $set: { password: spassword } }
+        );
+        req.session.reset = false;
+        if (req.session.user) {
+          req.flash("message", "Password Reset Successfully");
+          res.redirect("/profile");
+        } else {
+          req.flash("message1", "Password Reset Successfully");
+          res.redirect("/login");
+        }
+      } else {
+        req.session.cpassError = true;
+        res.redirect("/resetPassword");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// loadOtp
+const loadOtp = async (req, res) => {
+  try {
+    if (req.session.otp) {
+      if (req.session.otpError) {
+        req.session.otpError = false;
+        res.render("otp", { message: "Invalied otp" });
+      } else if (req.session.otpExpries) {
+        req.session.otpExpries = false;
+        res.render("otp", { message: "otp expired please resend" });
+      } else {
+        res.render("otp");
+      }
+    } else {
+      res.redirect("/");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verifyOtp
+const verifyOtp = async (req, res) => {
+  try {
+    if (req.session.userData) {
+      const otpDataAdd = await userOTPVerification.findOne({
+        userId: req.session.userData._id,
+      });
+      if (!otpDataAdd) {
+        req.session.otpExpries = true;
+        res.redirect("/otp");
+        return;
+      }
+      const otp = req.body.otp.join("");
+      const isOtpMatch = await bcrypt.compare(otp, otpDataAdd.otp);
+      if (isOtpMatch) {
+        await userOTPVerification.deleteOne({
+          userId: req.session.userData._id,
+        });
+        await user.insertMany(req.session.userData);
+        req.session.user = req.session.userData;
+        res.redirect("/");
+      } else {
+        req.session.otpError = true;
+        res.redirect("/otp");
+      }
+    } else if (req.session.resetEmail) {
+      const otpDataChangePass = await userOTPVerification.findOne({
+        userId: req.session.resetEmail._id,
+      });
+
+      if (!otpDataChangePass) {
+        req.session.otpExpries = true;
+        res.redirect("/otp");
+        return;
+      }
+      const otp = req.body.otp.join("");
+      const isOtpMatch = await bcrypt.compare(otp, otpDataChangePass.otp);
+
+      if (isOtpMatch) {
+        await userOTPVerification.deleteOne({
+          userId: req.session.resetEmail._id,
+        });
+        req.session.reset = true;
+        res.redirect("/resetPassword");
+      } else {
+        req.session.otpError = true;
+        res.redirect("/otp");
+      }
+    } else {
+      res.redirect("/otp");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// userLogout
+const userLogout = (req, res) => {
+  try {
+    delete req.session.user;
+    res.redirect("/");
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+module.exports = {
+  loadLogin,
+  verifyLogin,
+  loadSignup,
+  verifySignUp,
+  loadOtp,
+  verifyOtp,
+  loadForgetPassword,
+  verifyForgetPassword,
+  loadResetPassword,
+  verifyResetPassword,
+  userLogout,
+};
