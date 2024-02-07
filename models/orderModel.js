@@ -44,6 +44,10 @@ const orderSchema = new mongoose.Schema({
   },
   deliveredDate:{
     type:Number,
+  },
+  isCancelled:{
+    type:Boolean,
+    default:false,
   }
 });
 

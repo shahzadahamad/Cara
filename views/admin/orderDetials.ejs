@@ -108,7 +108,7 @@
                     <%= order[i].userId.fullname %>
                   </td>
                   <td>
-                    $<%= order[i].orderAmount %>
+                    ₹<%= order[i].orderAmount %>
                   </td>
                   <td>
                     <%= order[i].paymentMethod %>
@@ -116,7 +116,7 @@
                   <td>
                     <%= order[i].orderDate.toString().split(' ').slice(0,4) %>
                   </td>
-                  <td>
+                  <td style="color: green;">
                     <%= order[i].orderStatus %>
                   </td>
                   <td>

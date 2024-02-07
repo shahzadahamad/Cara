@@ -1,4 +1,5 @@
 const Order = require('../../models/orderModel');
+const razorpay = require('razorpay');
 
 // Order detials 
 const loadOrder = async (req,res) => {
@@ -46,7 +47,8 @@ const verifyCancelPage = async (req,res) => {
     const update = {
       orderStatus:'Cancelled',
       cancelReason:reason,
-      cancelDate:new Date
+      cancelDate:new Date,
+      isCancelled: true,
     }
     await Order.updateOne({_id:id},{$set:update});
     res.redirect('/order');

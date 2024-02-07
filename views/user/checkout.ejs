@@ -227,6 +227,7 @@
         <%= locals.address ? 'Choose your address' : 'Please Add Address' %>
       </h4>
       <form action="/checkout" method="post">
+
         <section id="user-detials">
           <% if(locals.address) {%>
             <% if(locals.address.address.length>0){ %>
@@ -266,23 +267,22 @@
                 <% } %>
                   <% }else { %>
                     <form action="/checkout-add-address" method="post">
-                    <div style="display: flex; justify-content: center; margin-top: 0px;">
-                      <a style="  background-color: #088178; color: #fff;"  id="alert"
-                        onclick="window.location.href='/checkout-add-address'" class="normal">Add Address</a>
-                    </div>
-                  </form>
+                      <div style="display: flex; justify-content: center; margin-top: 0px;">
+                        <a style="  background-color: #088178; color: #fff;" id="alert"
+                          onclick="window.location.href='/checkout-add-address'" class="normal">Add Address</a>
+                      </div>
+                    </form>
                     <% } %>
                       <% }else{ %>
                         <form action="/checkout-add-address" method="post">
                           <div style="display: flex; justify-content: center; margin-top: 0px;">
-                            <a style="  background-color: #088178; color: #fff;"  id="alert"
+                            <a style="  background-color: #088178; color: #fff;" id="alert"
                               onclick="window.location.href='/checkout-add-address'" class="normal">Add Address</a>
                           </div>
                         </form>
                         <% } %>
-                        </div>
+                          </div>
         </section>
-
 
         <section id="user-detials">
           <div id="div" style="width: 500px; margin-bottom: 30px;" class="user-detials-container">
@@ -305,24 +305,24 @@
                           <%= product.products[i].quantity%>
                         </span>
                     </td>
-                    <td data-label="Total">$<%= product.products[i].productId.price * product.products[i].quantity %>
+                    <td data-label="Total">₹<%= product.products[i].productId.price * product.products[i].quantity %>
                     </td>
                   </tr>
                   <% } %>
                     <tr>
                       <td data-label="Product">Subtotal</td>
-                      <td data-label="Total">$<%= total %>
+                      <td data-label="Total">₹<%= total %>
                       </td>
                     </tr>
                     <tr>
                       <td data-label="Product">Shipping</td>
                       <td data-label="Total">
-                        <%= total<500? '$40' : 'Free' %>
+                        <%= total<500? '₹40' : 'Free' %>
                       </td>
                     </tr>
                     <tr>
                       <td style="font-weight: 700;" data-label="Product">Total</td>
-                      <td style="font-weight: 700;" data-label="Total">$<%= total<500 ? total+40 : total %>
+                      <td style="font-weight: 700;" data-label="Total">₹<%= total<500 ? total+40 : total %>
                       </td>
                     </tr>
               </tbody>
@@ -344,6 +344,7 @@
           </div>
 
         </section>
+
       </form>
 
 
@@ -430,7 +431,7 @@
         });
 
         function removeAddress(id, i) {
-          const div = document.getElementById(`div${i}`);
+          const div = document.getElementById(`div₹{i}`);
           fetch('/remove-address', {
             method: "PATCH",
             headers: {

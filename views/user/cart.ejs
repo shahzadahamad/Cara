@@ -59,7 +59,7 @@
                   <td><a onclick="removeProduct('<%= product[i]._id %>','<%= i %>')"><i
                         class="far fa-times-circle"></i></a>
                   </td>
-                  <td><img src="images/productImages/<%= product[i].productId.image[0] %>" alt=""></td>
+                  <td><img src="images/productImages/<%= product[i].productId.image[0] %>" onclick="window.location.href='/sproduct?id=<%= product[i].productId._id %>'"  alt=""></td>
                   <td>
 
 
@@ -74,7 +74,7 @@
 
 
                   </td>
-                  <td>$<%= product[i].productId.price %>
+                  <td>₹<%= product[i].productId.price %>
                   </td>
                   <td><input type="number" id="inputTag<%= i %>"
                       oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
@@ -132,9 +132,9 @@
                 <tr>
                   <td><strong>Total</strong></td>
                   <% if(locals.total) {%>
-                    <td><strong id="total">$<%= total < 500 ? total+40 : total %></strong></td>
+                    <td><strong id="total">₹<%= total < 500 ? total+40 : total %></strong></td>
                     <% } else { %>
-                      <td><strong id="total">$0</strong></td>
+                      <td><strong id="total">₹0</strong></td>
                       <% } %>
                 </tr>
               </table>
@@ -227,27 +227,27 @@
               }).then((res) => res.json())
                 .then((data) => {
 
-                  const value = subTotalRow.innerHTML.replace('$', '');
+                  const value = subTotalRow.innerHTML.replace('₹', '');
                   const lastOne = data.cartDelete.deletedCount;
                   row.remove();
                   if (lastOne) {
                     checkout.remove();
                   }
-                  cartSubtotal.innerHTML = '$' + Number(data.totalCart[0].total - value);
+                  cartSubtotal.innerHTML = '₹' + Number(data.totalCart[0].total - value);
 
 
                   if (data.totalCart[0].total < 500) {
-                    shipping.innerHTML = lastOne ? 'Free' : '$' + 40
-                    total.innerHTML = lastOne ? '$' + 0 : '$' + Number(data.totalCart[0].total + 40 - value);
+                    shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
+                    total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
                   } else {
-                    shipping.innerHTML = lastOne ? 'Free' : '$' + 40
-                    total.innerHTML = '$' + Number(data.totalCart[0].total - value);
+                    shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
+                    total.innerHTML = '₹' + Number(data.totalCart[0].total - value);
                   }
 
 
                   if (Number(cartSubtotal.innerHTML.slice(1, 5)) === 0) {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML='$'+0
+                    total.innerHTML='₹'+0
                     button.remove();
                   }
 
@@ -288,20 +288,20 @@
               }).then((res) => res.json())
                 .then((data) => {
 
-                  subTotalRow.innerHTML = '$' + price * input.value;
-                  cartSubtotal.innerHTML = '$' + data.totalCart[0].total;
+                  subTotalRow.innerHTML = '₹' + price * input.value;
+                  cartSubtotal.innerHTML = '₹' + data.totalCart[0].total;
 
                   if (data.totalCart[0].total < 500) {
-                    shipping.innerHTML = '$' + 40;
-                    total.innerHTML = '$' + Number(data.totalCart[0].total + 40)
+                    shipping.innerHTML = '₹' + 40;
+                    total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
                   } else {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML = '$' + Number(data.totalCart[0].total);
+                    total.innerHTML = '₹' + Number(data.totalCart[0].total);
                   }
 
                   if (Number(cartSubtotal.innerHTML.slice(1, 5)) === 0) {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML='$'+0
+                    total.innerHTML='₹'+0
                     button.remove();
                   }
 

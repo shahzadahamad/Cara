@@ -55,6 +55,9 @@ adminRouter.get('/order-detials',auth.isLogin,adminController.loadOrderDetials);
 // order full detials 
 adminRouter.get('/order-full-detials',auth.isLogin,adminController.loadOrderFullDetials);
 
+// order status chaning
+adminRouter.patch('/order-status',auth.isLogin,adminController.editOrderStatus);
+
 // logout
 adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);
 

@@ -17,6 +17,7 @@
       outline: none;
       transition: 0.2s;
     }
+
     table td {
       font-weight: 700;
       color: #000;
@@ -103,59 +104,102 @@
           </thead>
           <tbody>
             <% if(locals.order){ %>
-                <tr>
-                  <th style="text-align: start;">Customer</th>
-                  <td>
-                    <%= order.userId.fullname %></td>
-                </tr>
-                <tr>
-                  <th style="text-align: start;">Amount</th>
-                  <td> $<%= order.orderAmount %>
-                  </td>
-                </tr>
-                <tr>
-                  <th style="text-align: start;">Products</th>
-                  <td>
-                    <% for(let j=0;j<order.orderItems.length;j++) {%>
+              <tr>
+                <th style="text-align: start;">Customer</th>
+                <td>
+                  <%= order.userId.fullname %>
+                </td>
+              </tr>
+              <tr>
+                <th style="text-align: start;">Amount</th>
+                <td> ₹<%= order.orderAmount %>
+                </td>
+              </tr>
+              <tr>
+                <th style="text-align: start;">Products</th>
+                <td>
+                  <% for(let j=0;j<order.orderItems.length;j++) {%>
 
-                      <p style="color: #000;"> 
-                        <%= order.orderItems[j].productId.name %>&nbsp;
-                      <img  style="width: 100px;" src="/images/productImages/<%= order.orderItems[j].productId.image[0] %>" alt="">
+                    <p style="color: #000;">
+                      <%= order.orderItems[j].productId.name %>&nbsp;
+                        <img style="width: 100px;"
+                          src="/images/productImages/<%= order.orderItems[j].productId.image[0] %>" alt="">
                     </p>
 
-                      <% } %>
-                  </td>
-                </tr>
-                <tr>
-                  <th style="text-align: start;">Address</th>
+                    <% } %>
+                </td>
+              </tr>
+              <tr>
+                <th style="text-align: start;">Address</th>
+                <td>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.name %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.email %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.mobile %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.address %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.pincode %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.city %>
+                  </p>
+                  <p style="color: #000;">
+                    <%= order.deliveryAddress.status %>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <th style="text-align: start;">paymentMethod</th>
+                <td>
+                  <%= order.paymentMethod %>
+                </td>
+              </tr>
+              <tr>
+                <th style="text-align: start;">Order Status</th>
+
+                <% if( !order.isCancelled ){ %>
                   <td>
-                    <p style="color: #000;"><%= order.deliveryAddress.name %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.email %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.mobile %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.address %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.pincode %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.city %></p>
-                    <p style="color: #000;"><%= order.deliveryAddress.status %></p>
+                    <select onchange="orderStatus('<%= order._id %>')"
+                      style="font-size: 20px; outline: none; box-shadow: none; text-align: center;"
+                      class="btn btn-outline-success " name="orderStatus" id="selectTag">
+                      <option style="text-align: center; background-color:#fff; color: #000;" value="<%= order.orderStatus %>">
+                        <%= order.orderStatus %>
+                      </option>
+                      <option style="text-align: center; background-color:#fff; color: #000;" value="Shipping">Shipping</option>
+                      <option style="text-align: center; background-color:#fff; color: #000;" value="Delivered">Delivered
+                      </option>
+                    </select>
+        
+                    <span style="color: red; display: none;" id="pTag"></span>
+
                   </td>
-                </tr>
+                  <% } else { %>
+                    <td style="color: red;">
+                      <%= order.orderStatus %>
+                    </td>
+                    <% } %>
+              </tr>
+              <tr>
+                <th style="text-align: start;">Order Date</th>
+                <td>
+                  <%= order.orderDate %>
+                </td>
+              </tr>
+              <% if(locals.order.cancelDate){ %>
                 <tr>
-                  <th style="text-align: start;">paymentMethod</th>
+                  <th style="text-align: start;">Cancel Date</th>
                   <td>
-                    <%= order.paymentMethod %>
+                    <%= order.cancelDate %>
                   </td>
                 </tr>
-                <tr>
-                  <th style="text-align: start;">Order Status</th>
-                  <td>
-                    <%= order.orderStatus %>
-                  </td>
-                </tr>
-                <tr>
-                  <th style="text-align: start;">Order Date</th>
-                  <td>
-                    <%= order.orderDate %>
-                  </td>
-                </tr>
+                <% } %>
                   <% } %>
           </tbody>
           <tfoot>
@@ -171,6 +215,31 @@
 
 
   <script>
+
+    function orderStatus(orderId) {
+      const selectTag = document.getElementById('selectTag');
+      const pTag = document.getElementById('pTag');
+ 
+      fetch('/admin/order-status', {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: orderId,select:selectTag.value }),
+      }).then((res) => res.json())
+        .then((data) => {
+
+          if(!data.status){
+            selectTag.remove();
+            pTag.innerHTML='Cancelled';
+            pTag.style.display='block'
+          }
+          
+        })
+        .catch((error) => console.log(error.message));
+    }
+
+
   </script>
 
 

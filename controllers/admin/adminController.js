@@ -370,6 +370,25 @@ const loadOrderFullDetials= async (req, res) => {
   }
 };
 
+// order status change
+const editOrderStatus = async (req,res) => {
+  try{
+    const {id,select}=req.body;
+    const isUserCancelled = await Order.findOne({_id:id},{isCancelled:1});
+
+
+    if(!isUserCancelled.isCancelled){
+      const order = await Order.updateOne({_id:id},{$set:{orderStatus:select}});
+      res.send({status:true});
+    }else{
+      res.send({status:false})
+    }
+  
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
 // adminLogout
 const adminLogout = async (req, res) => {
   try {
@@ -400,5 +419,6 @@ module.exports = {
   loadEditCategory,
   verifyEditCategory,
   loadOrderDetials,
-  loadOrderFullDetials
+  loadOrderFullDetials,
+  editOrderStatus,
 };
