@@ -19,22 +19,22 @@ const userController = require('../controllers/user/userController');
 userRouter.get('/',auth.isLogout,userController.loadPage);
 
 // home
-userRouter.get('/home',userController.loadHome);
+userRouter.get('/home',auth.isBlocked,userController.loadHome);
 
 // shop
-userRouter.get('/shop',userController.loadShop);
+userRouter.get('/shop',auth.isBlocked,userController.loadShop);
 
 // about
-userRouter.get('/about',userController.loadAbout);
+userRouter.get('/about',auth.isBlocked,userController.loadAbout);
 
 // singleProduct
-userRouter.get('/sproduct',userController.loadSingleProduct);
+userRouter.get('/sproduct',auth.isBlocked,userController.loadSingleProduct);
 
 // profile
-userRouter.get('/profile',auth.isLogin,userController.loadProfile);
+userRouter.get('/profile',auth.isBlocked,auth.isLogin,userController.loadProfile);
 
 // user-edit
-userRouter.get('/edit-user',auth.isLogin,userController.loadEditUser);
+userRouter.get('/edit-user',auth.isLogin,auth.isBlocked,userController.loadEditUser);
 userRouter.post('/edit-user',userController.verifyEditUser);
 
 
@@ -74,7 +74,7 @@ const cartController = require('../controllers/user/cartController');
 
 
 // cart
-userRouter.get('/cart',auth.isLoginCart,cartController.loadCart);
+userRouter.get('/cart',auth.isLoginCart,auth.isBlocked,cartController.loadCart);
 
 // cart 
 userRouter.post('/add-to-cart',cartController.verifyAddToCart);
@@ -86,14 +86,14 @@ userRouter.patch('/remove-product',cartController.verifyRemoveCart);
 userRouter.patch('/cart-detials',cartController.verifyCartDetials);
 
 // checkout page and verify checkout 
-userRouter.get('/checkout',auth.isLogin,cartController.loadCheckout);
+userRouter.get('/checkout',auth.isLogin,auth.isBlocked,cartController.loadCheckout);
 userRouter.post('/checkout',cartController.verifyCheckout);
 
 // verify cart chekcout
 userRouter.post('/verify-cart-checkout',cartController.verifyCartCheckout)
 
 // user ordered page
-userRouter.get('/order-confirm',auth.isLogin,cartController.loadOrder);  
+userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,cartController.loadOrder);  
 
 
 // <--------------Address Controller-------------->
@@ -102,24 +102,24 @@ const addressController = require('../controllers/user/addressController');
 
 
 // user address
-userRouter.get('/address',auth.isLogin,addressController.loadAddress);
+userRouter.get('/address',auth.isLogin,auth.isBlocked,addressController.loadAddress);
 
 // user add address 
-userRouter.get('/add-address',auth.isLogin,addressController.loadAddAddress);
+userRouter.get('/add-address',auth.isLogin,auth.isBlocked,addressController.loadAddAddress);
 userRouter.post('/add-address',addressController.verifyAddAddress);
-userRouter.get('/checkout-add-address',auth.isLogin,addressController.loadCheckoutAddAddress);
+userRouter.get('/checkout-add-address',auth.isLogin,auth.isBlocked,addressController.loadCheckoutAddAddress);
 userRouter.post('/checkout-add-address',addressController.verifyCheckoutAddAddress);
 
 // Edit address
-userRouter.get('/edit-address',auth.isLogin,addressController.loadEditAddress);
+userRouter.get('/edit-address',auth.isLogin,auth.isBlocked,addressController.loadEditAddress);
 userRouter.post('/edit-address',addressController.verifyEditAddress);
 
 // Change Address
-userRouter.get('/change-address',auth.isLogin,addressController.loadChangeAddress);
+userRouter.get('/change-address',auth.isLogin,auth.isBlocked,addressController.loadChangeAddress);
 userRouter.post('/change-address',addressController.verifyChangeAddress);
 
 // change add address
-userRouter.get('/change-add-address',auth.isLogin,addressController.loadChangeAddAddress);
+userRouter.get('/change-add-address',auth.isLogin,auth.isBlocked,addressController.loadChangeAddAddress);
 userRouter.post('/change-add-address',addressController.verifyChangeAddAddress);
 
 // delete address
@@ -129,10 +129,10 @@ userRouter.patch('/remove-address',addressController.verifyDeleteAddress);
 const orderController = require('../controllers/user/orderController');
 // <--------------Order Controller-------------->
 
-userRouter.get('/order',auth.isLogin,orderController.loadOrder);
-userRouter.get('/order-detials',auth.isLogin,orderController.loadOrderDetials);
+userRouter.get('/order',auth.isLogin,auth.isBlocked,orderController.loadOrder);
+userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.loadOrderDetials);
 
-userRouter.get('/cancel-order',auth.isLogin,orderController.loadCancelPage);
+userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
 
 module.exports = userRouter;

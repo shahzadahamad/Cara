@@ -40,10 +40,10 @@ const orderSchema = new mongoose.Schema({
     type:Date,
   },
   shippingDate:{
-    type:Number,
+    type:Date,
   },
   deliveredDate:{
-    type:Number,
+    type:Date,
   },
   isCancelled:{
     type:Boolean,

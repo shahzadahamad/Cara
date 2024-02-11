@@ -80,7 +80,7 @@
                       oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
                       value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity %>"
                       onkeydown="return false" min="1"></td>
-                  <td id="subTotal<%=i%>">$<%= product[i].productId.price * product[i].quantity %>
+                  <td id="subTotal<%=i%>">₹<%= product[i].productId.price * product[i].quantity %>
                   </td>
                 </tr>
                 <% } %>
@@ -113,17 +113,17 @@
                 <tr>
                   <td>Cart Subtotal</td>
                   <% if(locals.total) {%>
-                    <td id="cartSubtotal">$<%= total ? total : 0 %>
+                    <td id="cartSubtotal">₹<%= total ? total : 0 %>
                     </td>
                     <% } else { %>
-                      <td id="cartSubtotal">$0</td>
+                      <td id="cartSubtotal">₹0</td>
                       <% } %>
                 </tr>
                 <tr>
                   <td>Shipping</td>
                   <% if(locals.total) {%>
                     <td id="shipping">
-                      <%= total< 500 ? '$40' : 'Free' %>
+                      <%= total< 500 ? '₹40' : 'Free' %>
                     </td>
                     <% } else { %>
                       <td id="shipping">Free</td>

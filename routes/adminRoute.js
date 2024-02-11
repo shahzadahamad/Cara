@@ -1,8 +1,11 @@
 const express = require('express');
 const adminRouter = express();
-const adminController = require('../controllers/admin/adminController');
 const auth = require('../middleware/adminAuth');
 const upload = require('../middleware/multer');
+
+// <--------------Admin Controller-------------->
+const adminController = require('../controllers/admin/adminController');
+// <--------------Admin Controller-------------->
 
 // viewEngine
 adminRouter.set('view engine','ejs');
@@ -11,9 +14,6 @@ adminRouter.set('views','./views/admin');
 // login
 adminRouter.get('/',auth.isLogout,adminController.loadLogin);
 adminRouter.post('/login',auth.isLogout,adminController.verifyLogin);
-
-// dashboard
-adminRouter.get('/dashboard',auth.isLogin,adminController.loadDashboard);
 
 // userDetials
 adminRouter.get('/user-detials',auth.isLogin,adminController.loadUserDetials);
@@ -60,5 +60,14 @@ adminRouter.patch('/order-status',auth.isLogin,adminController.editOrderStatus);
 
 // logout
 adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);
+
+// <--------------Dashboard Controller-------------->
+const dashboardController = require('../controllers/admin/dashboardController');
+// <--------------Dashboard Controller-------------->
+
+// dashboard
+adminRouter.get('/dashboard',auth.isLogin,dashboardController.loadDashboard);
+adminRouter.patch('/dashboard',dashboardController.verifyDashboard);
+
 
 module.exports = adminRouter;

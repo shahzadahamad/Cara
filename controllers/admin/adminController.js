@@ -63,16 +63,6 @@ const verifyLogin = async (req, res) => {
   }
 };
 
-// loadDashboard
-const loadDashboard = async (req, res) => {
-  try {
-    const adminData = await admin.findById({ _id: req.session.admin_id });
-    res.render("dashboard", { admins: adminData });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
 // loadUserDetials
 const loadUserDetials = async (req, res) => {
   try {
@@ -376,9 +366,21 @@ const editOrderStatus = async (req,res) => {
     const {id,select}=req.body;
     const isUserCancelled = await Order.findOne({_id:id},{isCancelled:1});
 
+    const update = {
+      orderStatus:select,
+      deliveredDate:new Date,
+      shippingDate:new Date,
+    }
+
+    if(select==='Delivered'){
+      delete update.shippingDate;
+    }else if(select==='Shipping'){
+      delete update.deliveredDate;
+    }
+
 
     if(!isUserCancelled.isCancelled){
-      const order = await Order.updateOne({_id:id},{$set:{orderStatus:select}});
+      const order = await Order.updateOne({_id:id},{$set:update});
       res.send({status:true});
     }else{
       res.send({status:false})
@@ -402,7 +404,6 @@ const adminLogout = async (req, res) => {
 module.exports = {
   loadLogin,
   verifyLogin,
-  loadDashboard,
   loadUserDetials,
   loadProducts,
   loadAddProducts,

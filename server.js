@@ -46,5 +46,5 @@ app.use("/admin", adminRouter);
 // serverRunning
 const port = process.env.port || 3000;
 app.listen(port, () => {
-  console.log("Server running on 3000 : http://localhost:3000");
+  console.log("Server running on 3000 : http://localhost:3000 http://localhost:3000/admin");
 });
