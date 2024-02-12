@@ -11,7 +11,13 @@ const loadDashboard = async (req, res) => {
     const monthlyRevenue = await getMonthlyData();
     const yearlyRevenue = await getYearlyData();
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    res.render("dashboard", { admins: adminData,dailyRevenue:dailyRevenue.revenue ,monthlyRevenue:monthlyRevenue.revenue,yearlyRevenue:yearlyRevenue.revenue,totalRevenue:totalRevenue});
+    res.render("dashboard", {
+      admins: adminData,
+      dailyRevenue: dailyRevenue.revenue,
+      monthlyRevenue: monthlyRevenue.revenue,
+      yearlyRevenue: yearlyRevenue.revenue,
+      totalRevenue: totalRevenue,
+    });
   } catch (error) {
     console.log(error.message);
   }
@@ -140,6 +146,7 @@ const verifyDashboard = async (req, res) => {
         orders,
         revenue,
         cancelledOrder,
+        type,
       });
     } else if (type === "monthly") {
       const monthlyData = await getMonthlyData();
@@ -148,6 +155,7 @@ const verifyDashboard = async (req, res) => {
         orders,
         revenue,
         cancelledOrder,
+        type,
       });
     } else if (type === "yearly") {
       const yearlyData = await getYearlyData();
@@ -156,8 +164,66 @@ const verifyDashboard = async (req, res) => {
         orders,
         revenue,
         cancelledOrder,
+        type,
       });
     }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// custom sales report
+const loadCustomSalesReport = async (req, res) => {
+  try {
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    res.render("CustomSaleReport", {
+      admins: adminData,
+      info: req.session.info,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verify custom report
+const verifyCustomSalesReport = async (req, res) => {
+  try {
+    const { from, to } = req.body;
+    
+    const customReport = await Order.aggregate([
+      {
+        $match: {
+          orderDate: {
+            $gte: new Date(from),
+            $lte: new Date(to),
+          },
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: {
+            $sum: {
+              $cond: [{ $eq: ["$isCancelled", false] }, "$orderAmount", 0]
+            }
+          },
+          cancelledOrdersCount: {
+            $sum: {
+              $cond: [{ $eq: ["$isCancelled", true] }, 1, 0]
+            }
+          },
+          totalOrders: { $sum: 1 }
+        }
+      },
+      {
+        $project:{
+          _id:0
+        }
+      },
+    ]);
+    
+    req.session.info = customReport;
+    res.redirect("/admin//custom-sale-report");
   } catch (error) {
     console.log(error.message);
   }
@@ -166,4 +232,6 @@ const verifyDashboard = async (req, res) => {
 module.exports = {
   loadDashboard,
   verifyDashboard,
+  loadCustomSalesReport,
+  verifyCustomSalesReport,
 };

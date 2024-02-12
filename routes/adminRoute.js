@@ -67,7 +67,11 @@ const dashboardController = require('../controllers/admin/dashboardController');
 
 // dashboard
 adminRouter.get('/dashboard',auth.isLogin,dashboardController.loadDashboard);
-adminRouter.patch('/dashboard',dashboardController.verifyDashboard);
+adminRouter.patch('/dashboard',dashboardController.verifyDashboard);+
+
+// custum sales report
+adminRouter.get('/custom-sale-report',auth.isLogin,dashboardController.loadCustomSalesReport);
+adminRouter.post('/custom-sale-report',dashboardController.verifyCustomSalesReport);
 
 
 module.exports = adminRouter;

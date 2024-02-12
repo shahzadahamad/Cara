@@ -73,7 +73,7 @@
         <div class="payment--card light-red">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Today Revenue</span>
+              <span class="title">Total Revenue</span>
               <span class="amount--value">₹<%= totalRevenue %></span>
             </div>
             <i class="fas fa-dollar-sign icon"></i>
@@ -126,7 +126,7 @@
             <button id="dailyBtn" class="btn btn-outline-primary">Daily</button>
             <button id="monthlyBtn" class="btn btn-outline-primary">Monthly</button>
             <button id="yearlyBtn" class="btn btn-outline-primary">Yearly</button>
-            
+            <a href="/admin/custom-sale-report" id="yearlyBtn" class="btn btn-outline-primary">Custom</a>
         </div>
         </div>
       </div>
@@ -170,15 +170,12 @@ async function updateChart(dataType) {
 
   const data = await fetchData(`/admin/dashboard?type=${dataType}`);
 
-  const { orders, revenue,cancelledOrder } = data;
+  const { orders, revenue,cancelledOrder,type } = data;
 
-  myChart.data.datasets[0].data.push(orders);
-  myChart.data.datasets[1].data.push(revenue);
-  myChart.data.datasets[2].data.push(cancelledOrder);
+  myChart.data.datasets[0].data=[orders];
+  myChart.data.datasets[1].data=[revenue];
+  myChart.data.datasets[2].data=[cancelledOrder];
   myChart.update();
-  console.log(myChart.data.datasets[0].data)
-  console.log(myChart.data.datasets[1].data)
-  console.log(myChart.data.datasets[2].data)
 }
 
 const myChart = new Chart(ctx, {
