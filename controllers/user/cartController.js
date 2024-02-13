@@ -3,6 +3,7 @@ const cart = require("../../models/cartModel");
 const Address = require("../../models/addressModel");
 const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
+const moment = require('moment');
 
 // totalCart price
 const totalCartPrice = async (id, req, res) => {
@@ -262,7 +263,7 @@ const verifyCheckout = async (req, res) => {
         paymentMethod: selectedPaymentMethod,
         orderItems: cartPro.products,
         orderStatus: selectedPaymentMethod === "COD" ? "Placed" : "Pending",
-        orderDate: new Date(),
+        orderDate: moment().toDate(),
       });
 
       await order.save();

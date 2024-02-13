@@ -8,11 +8,23 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.0/xlsx.full.min.js"></script>
+
 
   <style>
     td {
       padding: 25px;
       font-size: 20px;
+    }
+
+    table thead tr th{
+      border: 1px solid black;
+      padding: 8px;
+    }
+
+    table tbody tr td{
+      border: 1px solid black;
+      padding: 8px;
     }
   </style>
 
@@ -79,13 +91,14 @@
       <div style="display: flex; justify-content: space-between;">
         <h3 class="main--title">Custom Report</h3>
         <div>
-          <% if(locals.info && locals.info.report){ %>
-            <a id="download" class="btn btn-outline-success  ms-4">Dowload Pdf</a>
+          <% if(locals.info && locals.info.customReport.length>0){ %>
+            <a id="downloadPdf" class="btn btn-outline-success  ms-4">Dowload As Pdf</a>
+            <a id="downloadExcel" class="btn btn-outline-success  ms-4">Dowload As Excel</a>
             <% } %>
         </div>
       </div>
       <br>
-      <div id="report">
+      <div>
         <div style="justify-content: start;" class="card--wrapper">
           <div>
             <form action="/admin/custom-sale-report" method="post">
@@ -100,30 +113,41 @@
             </form>
           </div>
         </div>
-        <div class="tabular--wrapper">
+        <div id="report" class="tabular--wrapper">
           <% if(locals.info){ %>
-            <% if(locals.info.Order){ %>
-              <table>
+            <% if(locals.info.customReport.length>0){ %>
+              <table style="font-size: 14px; border-collapse: collapse;">
                 <thead>
                   <tr>
-                    <th>Total Order</th>
-                    <th>Total Revenue</th>
-                    <th>Total Cancelled_Order</th>
+                    <th>No</th>
+                    <th>Date</th>
+                    <th>Orders</th>
+                    <th>Revenue</th>
+                    <th>Cancelled_Orders</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <% for(let i=0;i<info.customReport.length;i++){ %>
 
                   <tr style="font-size: 20px;">
-                    <td>
-                      <%= info.Order %>
-                    </td>
-                    <td>
-                      <%= info.Revenue %>
-                    </td>
-                    <td>
-                      <%= info.CancelledOrder %>
-                    </td>
+                      <td>
+                        <%= i+1 %>
+                      </td>
+                      <td>
+                        <%= info.customReport[i].date  %>
+                      </td>
+                      <td>
+                        <%= info.customReport[i].totalOrders %>
+                      </td>
+                      <td>
+                        <%= info.customReport[i].totalRevenue %>
+                      </td>
+                      <td>
+                        <%= info.customReport[i].cancelledOrdersCount %>
+                      </td>
                   </tr>
+                  <% } %>
+
 
                 </tbody>
               </table>
@@ -143,20 +167,45 @@
 
     window.onload = function () {
 
-      const download = document.getElementById('download')
+      const downloadPdf = document.getElementById('downloadPdf')
         .addEventListener('click', () => {
 
-          const report = this.document.getElementById('report');
-          const opt = {
-            margin: 1,
-            filename: 'report.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-          };
-          html2pdf().from(report).set(opt).save()
+          generatePdf();
+
+        });
+
+      const downloadExcel = document.getElementById('downloadExcel')
+        .addEventListener('click', () => {
+
+          exportToExcel();
+
         })
+
+
+      function generatePdf() {
+        const report = this.document.getElementById('report');
+        const opt = {
+          margin: 1,
+          filename: 'report.pdf',
+          image: { type: 'jpeg', quality: 0.8 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().from(report).set(opt).save();
+      }
+
+      function exportToExcel() {
+        const table = document.getElementById('report');
+        const ws = XLSX.utils.table_to_sheet(table);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'report.xlsx');
+      }
+
     };
+
+
+
 
   </script>
 

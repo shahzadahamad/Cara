@@ -176,17 +176,19 @@ const verifyDashboard = async (req, res) => {
 const loadCustomSalesReport = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const {Order,Revenue,CancelledOrder,From,To} = req.query;
-    if(Order&&Revenue&&CancelledOrder&&From&&To){
+    const { From, To, customReport } = req.query;
+
+    if (customReport && From && To) {
+      const parsedCustomReport = JSON.parse(decodeURIComponent(customReport));
+      console.log(parsedCustomReport);
       return res.render("CustomSaleReport", {
         admins: adminData,
-        info:{Order,Revenue,CancelledOrder,From,To}
+        info: { From, To, customReport: parsedCustomReport },
       });
     }
-      res.render("CustomSaleReport", {
-        admins: adminData,
-      });
-    
+    res.render("CustomSaleReport", {
+      admins: adminData,
+    });
   } catch (error) {
     console.log(error.message);
   }
@@ -209,7 +211,7 @@ const verifyCustomSalesReport = async (req, res) => {
         },
         {
           $group: {
-            _id: null,
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
             totalRevenue: {
               $sum: {
                 $cond: [{ $eq: ["$isCancelled", false] }, "$orderAmount", 0],
@@ -226,15 +228,21 @@ const verifyCustomSalesReport = async (req, res) => {
         {
           $project: {
             _id: 0,
+            date: "$_id",
+            totalRevenue: 1,
+            cancelledOrdersCount: 1,
+            totalOrders: 1,
           },
         },
+        {
+          $sort: { date: 1 },
+        },
       ]);
-
-      const totalOrder = customReport[0].totalOrders;
-      const totalRevenue = customReport[0].totalRevenue;
-      const cancelledOrder = customReport[0].cancelledOrdersCount;
+  
       res.redirect(
-        `/admin/custom-sale-report?Order=${totalOrder}&Revenue=${totalRevenue}&CancelledOrder=${cancelledOrder}&From=${from}&To=${to}`
+        `/admin/custom-sale-report?From=${from}&To=${to}&customReport=${encodeURIComponent(
+          JSON.stringify(customReport)
+        )}`
       );
     } else {
       res.redirect("/admin/custom-sale-report");
