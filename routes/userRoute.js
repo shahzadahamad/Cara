@@ -24,6 +24,9 @@ userRouter.get('/home',auth.isBlocked,userController.loadHome);
 // shop
 userRouter.get('/shop',auth.isBlocked,userController.loadShop);
 
+// search
+userRouter.get('/search',auth.isBlocked,userController.loadSearch);
+
 // about
 userRouter.get('/about',auth.isBlocked,userController.loadAbout);
 
@@ -55,6 +58,9 @@ userRouter.post('/signup',userValidationController.verifySignUp);
 // otpVerification
 userRouter.get('/otp',auth.isLogout,userValidationController.loadOtp);
 userRouter.post('/otp',userValidationController.verifyOtp);
+
+// reset-otp
+userRouter.post('/resetOtp',userValidationController.verifyResetOtp);
 
 // forgetPassword
 userRouter.get('/forget',userValidationController.loadForgetPassword);

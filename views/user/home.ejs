@@ -80,7 +80,8 @@
                 ₹<%= product[i].price %>
               </h4>
             </div>
-            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
+            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
+                class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -102,7 +103,8 @@
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
-            <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>" alt="">
+            <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>"
+              alt="">
             <div class="des">
               <span>
                 <%= latestProducts[i].brand %>
@@ -119,7 +121,8 @@
                 ₹<%= latestProducts[i].price %>
               </h4>
             </div>
-            <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
+            <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i
+                class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -222,8 +225,19 @@
     </div>
   </footer>
 
-  
- 
+
+  <script>
+    const query = new URLSearchParams(window.location.search);
+
+    const status = query.get('status');
+
+    if(status==='true'){
+      localStorage.removeItem('countdown')
+    };
+
+  </script>
+
+
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

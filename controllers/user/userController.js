@@ -34,13 +34,43 @@ const loadHome = async (req, res) => {
 // loadShop
 const loadShop = async (req, res) => {
   try {
-    const productData = await product.find();
     const categorys = await category.find();
-    res.render("shop", {
-      login: req.session.user,
-      product: productData,
-      category: categorys,
+    const {id}=req.query;
+    if(id && id!=='allCategory'){
+      const selectedCategory = await product.find({categoryId:id}).populate('categoryId');
+      res.render('shop',{
+        login:req.session.user,
+        product:selectedCategory,
+        category:categorys
+      })
+    }else{
+      const productData = await product.find();
+      res.render("shop", {
+        login: req.session.user,
+        product: productData,
+        category: categorys,
+        id:id,
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// search
+const loadSearch = async (req, res) => {
+  try {
+    const {data}=req.query;
+  
+    const products = await product.find({
+      $or:[
+        {name:{$regex:data,$options:'i'}},
+        {brand:{$regex:data,$options:'i'}}
+      ]
     });
+
+    res.send({products});
+
   } catch (error) {
     console.log(error.message);
   }
@@ -126,4 +156,5 @@ module.exports = {
   loadProfile,
   loadEditUser,
   verifyEditUser,
+  loadSearch,
 };

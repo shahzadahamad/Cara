@@ -78,29 +78,48 @@
   <section id="category">
     <div class="tabular--wrapper">
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
-        <select class="dropdown"
+        <select onchange="selectedCategory(this)" class="dropdown"
           style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
-          <option>All Category</option>
-          <% if(category.length> 0){ %>
-            <% for(let i=0; i< category.length; i++){ %>
-              <option value="<%= category[i]._id %>">
-                <%= category[i].name %>
-              </option>
-              <% } %>
-                <% } else { %>
-                  <option>No Category</option>
-                  <% } %>
+
+
+          <option>
+            <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
+          </option>
+
+
+
+          <% if(!locals.id&&locals.product[0].categoryId.name){ %>
+            <option value="allCategory">All Category</option>
+            <% } %>
+
+              <% if(category.length> 0){ %>
+                <% for(let i=0; i< category.length; i++){ %>
+                  <% if(locals.product[0].categoryId.name !==category[i].name){ %>
+                    <option value="<%= category[i]._id %>">
+                      <%= category[i].name %>
+                    </option>
+                    <% } %>
+                      <% } %>
+                        <% } else { %>
+                          <option>No Category</option>
+                          <% } %>
         </select>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" placeholder="Search" />
+          <input type="text" id="searchInput" oninput="search()" placeholder="Search" />
+          <br>
+          <div>
+            <ul id="searchResults"></ul>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <section style="padding: 0px 40px;" id="product1" class="section-p1">
-    <h4 class="h4-category">All Category</h4>
+    <h4 class="h4-category">
+      <%= locals.product[0].categoryId.name ? locals.product[0].categoryId.name : 'All Category' %>
+    </h4>
     <div class="pro-container">
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
@@ -123,7 +142,8 @@
                 ₹<%= product[i].price %>
               </h4>
             </div>
-            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
+            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
+                class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -202,8 +222,39 @@
     </div>
   </footer>
 
+
+  <script>
+    function selectedCategory(id) {
+      window.location.href = `/shop?id=${id.value}`
+    }
+
+    async function search() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const searchResults = document.getElementById('searchResults');
+
+      //clear previous search results
+      searchResults.innerHTML = '';
+
+
+      try {
+        const response = await fetch(`/search?data=${searchInput}`);
+        const data = await response.json();
+       
+
+        data.products.forEach(element => {
+          console.log(element)
+          const li = document.createElement('li');
+          li.textContent = element.name || element.brand;
+          searchResults.appendChild(li);
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/javaScript/script.js"></script>
 
-  
+
   <%- include('../layouts/footer.ejs') -%>

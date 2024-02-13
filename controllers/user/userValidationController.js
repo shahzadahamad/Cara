@@ -49,7 +49,7 @@ const sendOtpVerifyMail = async (name, email, otp) => {
 const generateVerificationCode = async (userData) => {
   const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-  const expirationTime = new Date(Date.now() + 120000);
+  const expirationTime = new Date(Date.now() + 1*60*1000);
   const sOtp = await securePassword(verificationCode);
 
   const addOTP = new userOTPVerification({
@@ -68,8 +68,10 @@ const generateVerificationCode = async (userData) => {
 const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
   const currentTime = new Date();
   const timeUntilExpiration = expirationTime - currentTime;
+  console.log('in')
   setTimeout(async () => {
     try {
+      console.log('done');
       await userOTPVerification.deleteOne({ _id: otpId, userId: userId });
     } catch (error) {
       console.log(error.message);
@@ -302,7 +304,7 @@ const verifyOtp = async (req, res) => {
         });
         await user.insertMany(req.session.userData);
         req.session.user = req.session.userData;
-        res.redirect("/");
+        res.redirect('/home?status=true');
       } else {
         req.session.otpError = true;
         res.redirect("/otp");
@@ -325,7 +327,7 @@ const verifyOtp = async (req, res) => {
           userId: req.session.resetEmail._id,
         });
         req.session.reset = true;
-        res.redirect("/resetPassword");
+        res.redirect("/resetPassword?status=true");
       } else {
         req.session.otpError = true;
         res.redirect("/otp");
@@ -334,6 +336,16 @@ const verifyOtp = async (req, res) => {
       res.redirect("/otp");
     }
   } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// resetotp
+const verifyResetOtp = async (req,res) => {
+  try{
+    generateVerificationCode(req.session.userData);
+    res.redirect("/otp");
+  }catch(error){
     console.log(error.message);
   }
 };
@@ -360,4 +372,5 @@ module.exports = {
   loadResetPassword,
   verifyResetPassword,
   userLogout,
+  verifyResetOtp,
 };

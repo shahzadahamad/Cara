@@ -5,6 +5,7 @@ const razorpay = require('razorpay');
 const loadOrder = async (req,res) => {
   try{
     const order = await Order.find({userId:req.session.user._id}).populate('userId orderItems.productId');
+    console.log(order)
     res.render('orderDetials',{user:req.session.user,order:order});
   }catch(error){
     console.log(error.message)

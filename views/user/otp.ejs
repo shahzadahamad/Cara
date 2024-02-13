@@ -1,49 +1,51 @@
 <%- include('../layouts/header.ejs') -%>
 
 
-<style>
-  body{
-    overflow-y: hidden;
-    margin-top: -40px;
-  }
-</style>
+  <style>
+    body {
+      overflow-y: hidden;
+      margin-top: -40px;
+    }
+  </style>
 
-      <header id="header">
-        <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
-        <div>
-          <ul id="navbar">
-            <li><a href="/home">Home</a></li>
-            <li><a href="/shop">Shop</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="<%= locals.login ? '/profile' : '/login' %>" > <%= locals.login ? 'Profile' : 'Login' %></a></li>
-            <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
-            <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
-          </ul>
-        </div>
-        <div id="mobile">
-          <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
-          <i id="bar" class="fas fa-outdent"></i>
-        </div>
-      </header>
+  <header id="header">
+    <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="<%= locals.login ? '/profile' : '/login' %>">
+            <%= locals.login ? 'Profile' : 'Login' %>
+          </a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
+    </div>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
+    </div>
+  </header>
 
-      <section id="forms">
-        <div id="wrapper">
-          <div class="title">
-            <i class="bx bxs-check-shield"></i>
-            <span>OTP verification</span>
-          </div>
-          <% if( locals.message ){ %>
-            <div class="detials" id="hide">
-              <%=message%>
-            </div>
-            <% } %>
+  <section id="forms">
+    <div id="wrapper">
+      <div class="title">
+        <i class="bx bxs-check-shield"></i>
+        <span>OTP verification</span>
+      </div>
+      <% if( locals.message ){ %>
+        <div class="detials" id="hide">
+          <%=message%>
+        </div>
+        <% } %>
           <div id="otp-para">
             <p>We have sent a 4 digit verification code to your email address</p>
           </div>
 
           <form style="padding: 30px 25px 0px 25px;" action="/otp" method="post">
             <div class="input-field">
-              <input type="number" name="otp" required> 
+              <input type="number" name="otp" required>
               <input type="number" name="otp" required>
               <input type="number" name="otp" required>
               <input type="number" name="otp" required>
@@ -52,15 +54,47 @@
               <input type="submit" value="Verify OTP">
             </div>
           </form>
-          <form style="padding: 0px 0px 20px 0px;" action="/resubmit" method="post">
-          <div style="margin: 0; text-align: center;" class="pass"><button type="submit" style="border:0; background-color: transparent;"><a style="color: #088178;">Resend OTP</a></button>
-            <span style="margin-left: 10px; color: #088178;">120</span>
-          </div>
+          <form style="padding: 0px 0px 20px 0px;" action="/resetOtp" method="post">
+            <div style="margin: 0; text-align: center;" class="pass">
+              <button type="submit" id="resendButton" style="border:0; background-color: transparent;"><a
+                  style="color: #088178;">Resend OTP</a></button>
+              <span id="timer" style="margin-left: 10px; color: #088178;"></span>
+            </div>
 
-        </form>
-        </div>
-      </section>
+          </form>
+    </div>
+  </section>
 
-      <script src="/javaScript/script.js"></script>
+  <script>
 
-      <%- include('../layouts/footer.ejs') -%>
+    const updateTimer = () => {
+      const timer = document.getElementById('timer');
+      const resendButton = document.getElementById('resendButton');
+
+      let countdown = localStorage.getItem('countdown') || 60;
+
+      timer.textContent=countdown;
+
+      countdown--;
+
+      if(countdown<=0){
+        localStorage.removeItem('countdown');
+        timer.style.display='none'
+        clearInterval(timerInterval);
+        resendButton.disabled=false;
+        resendButton.style.opacity=1;
+        return
+      }else{
+        resendButton.style.opacity=0.3;
+        resendButton.disabled=true;
+      }
+      localStorage.setItem('countdown',countdown);
+    }
+
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
+  </script>
+
+  <script src="/javaScript/script.js"></script>
+
+  <%- include('../layouts/footer.ejs') -%>

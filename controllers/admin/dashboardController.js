@@ -176,10 +176,17 @@ const verifyDashboard = async (req, res) => {
 const loadCustomSalesReport = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    res.render("CustomSaleReport", {
-      admins: adminData,
-      info: req.session.info,
-    });
+    const {Order,Revenue,CancelledOrder,From,To} = req.query;
+    if(Order&&Revenue&&CancelledOrder&&From&&To){
+      return res.render("CustomSaleReport", {
+        admins: adminData,
+        info:{Order,Revenue,CancelledOrder,From,To}
+      });
+    }
+      res.render("CustomSaleReport", {
+        admins: adminData,
+      });
+    
   } catch (error) {
     console.log(error.message);
   }
@@ -189,41 +196,49 @@ const loadCustomSalesReport = async (req, res) => {
 const verifyCustomSalesReport = async (req, res) => {
   try {
     const { from, to } = req.body;
-    
-    const customReport = await Order.aggregate([
-      {
-        $match: {
-          orderDate: {
-            $gte: new Date(from),
-            $lte: new Date(to),
+
+    if (from && to) {
+      const customReport = await Order.aggregate([
+        {
+          $match: {
+            orderDate: {
+              $gte: new Date(from),
+              $lte: new Date(to),
+            },
           },
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalRevenue: {
-            $sum: {
-              $cond: [{ $eq: ["$isCancelled", false] }, "$orderAmount", 0]
-            }
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: {
+              $sum: {
+                $cond: [{ $eq: ["$isCancelled", false] }, "$orderAmount", 0],
+              },
+            },
+            cancelledOrdersCount: {
+              $sum: {
+                $cond: [{ $eq: ["$isCancelled", true] }, 1, 0],
+              },
+            },
+            totalOrders: { $sum: 1 },
           },
-          cancelledOrdersCount: {
-            $sum: {
-              $cond: [{ $eq: ["$isCancelled", true] }, 1, 0]
-            }
+        },
+        {
+          $project: {
+            _id: 0,
           },
-          totalOrders: { $sum: 1 }
-        }
-      },
-      {
-        $project:{
-          _id:0
-        }
-      },
-    ]);
-    
-    req.session.info = customReport;
-    res.redirect("/admin//custom-sale-report");
+        },
+      ]);
+
+      const totalOrder = customReport[0].totalOrders;
+      const totalRevenue = customReport[0].totalRevenue;
+      const cancelledOrder = customReport[0].cancelledOrdersCount;
+      res.redirect(
+        `/admin/custom-sale-report?Order=${totalOrder}&Revenue=${totalRevenue}&CancelledOrder=${cancelledOrder}&From=${from}&To=${to}`
+      );
+    } else {
+      res.redirect("/admin/custom-sale-report");
+    }
   } catch (error) {
     console.log(error.message);
   }
