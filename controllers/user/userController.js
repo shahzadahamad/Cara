@@ -4,8 +4,9 @@ const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
-const { render } = require("ejs");
+const { render, name } = require("ejs");
 const { default: mongoose } = require("mongoose");
+const { CategoryScale } = require("chart.js");
 
 // loadHome
 const loadPage = (req, res) => {
@@ -31,27 +32,82 @@ const loadHome = async (req, res) => {
   }
 };
 
+// searchFillting
+const searchFillter = async (name, brand) => {
+  try {
+    if (name) {
+      const fillteredProducts = await product.find({ name: name });
+      return fillteredProducts;
+    } else if (brand) {
+      const fillteredProducts = await product.find({ brand: brand });
+      return fillteredProducts;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadShop
 const loadShop = async (req, res) => {
   try {
     const categorys = await category.find();
-    const {id}=req.query;
-    if(id && id!=='allCategory'){
-      const selectedCategory = await product.find({categoryId:id}).populate('categoryId');
-      res.render('shop',{
-        login:req.session.user,
-        product:selectedCategory,
-        category:categorys
+    const { id, nameSearch, brandSearch , results ,value } = req.query;
+
+    if(results){
+      const decodedProducts = JSON.parse(decodeURIComponent(Buffer.from(results, 'base64').toString('utf-8')));
+      return res.render('shop',{
+        login: req.session.user,
+        product: decodedProducts,
+        category: categorys,
+        selectedSearch: value,
       })
-    }else{
+    }
+
+    if (nameSearch || brandSearch) {
+      const filltered = await searchFillter(nameSearch, brandSearch);
+      return res.render("shop",{
+        login: req.session.user,
+        product: filltered,
+        category: categorys,
+        selectedSearch: nameSearch ? nameSearch : brandSearch,
+      });
+    }
+
+    if (id && id !== "allCategory") {
+      const selectedCategory = await product
+        .find({ categoryId: id })
+        .populate("categoryId");
+      return res.render("shop", {
+        login: req.session.user,
+        product: selectedCategory,
+        category: categorys,
+      });
+    } else {
       const productData = await product.find();
-      res.render("shop", {
+      return res.render("shop", {
         login: req.session.user,
         product: productData,
         category: categorys,
-        id:id,
+        id: id,
       });
     }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// shop search verify
+const verifyShopSearch = async (req, res) => {
+  try {
+    const {value}=req.body;
+
+    const regex = new RegExp(value, 'i');
+    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0});
+
+    const encodedProducts = Buffer.from(JSON.stringify(products)).toString('base64');
+
+    res.redirect(`/shop?value=${value}&results=${encodeURIComponent(encodedProducts)}`);
+   
   } catch (error) {
     console.log(error.message);
   }
@@ -60,17 +116,16 @@ const loadShop = async (req, res) => {
 // search
 const loadSearch = async (req, res) => {
   try {
-    const {data}=req.query;
-  
+    const { data } = req.query;
+
     const products = await product.find({
-      $or:[
-        {name:{$regex:data,$options:'i'}},
-        {brand:{$regex:data,$options:'i'}}
-      ]
+      $or: [
+        { name: { $regex: data, $options: "i" } },
+        { brand: { $regex: data, $options: "i" } },
+      ],
     });
 
-    res.send({products});
-
+    res.send({ products });
   } catch (error) {
     console.log(error.message);
   }
@@ -139,9 +194,8 @@ const verifyEditUser = async (req, res) => {
       { $set: update }
     );
 
-    req.flash('message','Profile edited')
-      res.redirect("/profile");
-
+    req.flash("message", "Profile edited");
+    res.redirect("/profile");
   } catch (error) {
     console.log(error.message);
   }
@@ -157,4 +211,5 @@ module.exports = {
   loadEditUser,
   verifyEditUser,
   loadSearch,
+  verifyShopSearch,
 };

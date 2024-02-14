@@ -253,9 +253,11 @@
                     <tr>
                       <th>Products</th>
                       <th>Order Status</th>
-                      <% if(order[0].orderStatus !== 'Cancelled'){ %>           
+                      <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way'){ %>           
                       <th>Cancel Order</th>
-                      <% } %>
+                      <% }else if(order[0].orderStatus==='Delivered'){ %>
+                        <th>Return Order</th>
+                        <% } %>
                     </tr>
                   </thead>
                   <tbody>
@@ -277,11 +279,15 @@
                           <%= order[0].orderStatus %>
                         </td>
                         <% } %>
-                        <% if(order[0].orderStatus !== 'Cancelled'){ %>
+                        <% if(order[0].orderStatus !== 'Cancelled'&&order[0].orderStatus !== 'Delivered'&& order[0].orderStatus !== 'On The Way'){ %>
                       <td>
                         <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>">Cancel</a>
                       </td>
-                      <% } %>
+                      <% }else if(order[0].orderStatus==='Delivered'){ %>
+                        <td>
+                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>">Return</a>
+                        </td>
+                        <% } %>
                     </tr>
                     <% }else{ %>
                       <tr>

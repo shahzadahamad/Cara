@@ -23,6 +23,7 @@ userRouter.get('/home',auth.isBlocked,userController.loadHome);
 
 // shop
 userRouter.get('/shop',auth.isBlocked,userController.loadShop);
+userRouter.post('/shop-search',auth.isBlocked,userController.verifyShopSearch);
 
 // search
 userRouter.get('/search',auth.isBlocked,userController.loadSearch);

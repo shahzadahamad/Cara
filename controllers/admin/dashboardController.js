@@ -71,6 +71,38 @@ const getDailyData = async (req, res) => {
   }
 };
 
+const getWeeklyData = async (req, res) => {
+  try {
+    const startOfWeek = moment().startOf("week");
+    const endOfWeek = moment().endOf("week");
+
+    const weeklyOrder = await Order.find({
+      orderDate: {
+        $gte: startOfWeek.toDate(),
+        $lte: endOfWeek.toDate(),
+      },
+    });
+
+    let count = 0;
+    const weeklyRevenue = weeklyOrder.reduce((acc, order) => {
+      if (!order.isCancelled) {
+        return acc + order.orderAmount;
+      } else {
+        count++;
+        return acc;
+      }
+    }, 0);
+
+    return {
+      orders: weeklyOrder.length,
+      revenue: weeklyRevenue,
+      cancelledOrder: count,
+    };
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 const getMonthlyData = async (req, res) => {
   try {
     const startOfMouth = moment().startOf("month");
@@ -148,7 +180,16 @@ const verifyDashboard = async (req, res) => {
         cancelledOrder,
         type,
       });
-    } else if (type === "monthly") {
+    }else if(type=== 'weekly'){
+      const weekData = await getWeeklyData();
+      const { orders, revenue, cancelledOrder } = weekData;
+      res.send({
+        orders,
+        revenue,
+        cancelledOrder,
+        type,
+      });
+    }else if (type === "monthly") {
       const monthlyData = await getMonthlyData();
       const { orders, revenue, cancelledOrder } = monthlyData;
       res.send({
@@ -180,7 +221,6 @@ const loadCustomSalesReport = async (req, res) => {
 
     if (customReport && From && To) {
       const parsedCustomReport = JSON.parse(decodeURIComponent(customReport));
-      console.log(parsedCustomReport);
       return res.render("CustomSaleReport", {
         admins: adminData,
         info: { From, To, customReport: parsedCustomReport },

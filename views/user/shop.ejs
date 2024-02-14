@@ -17,6 +17,7 @@
     }
 
     .search--box {
+      width: 300px;
       background: rgb(237, 237, 237);
       border-radius: 15px;
       /* color: rgba(113, 99, 186, 255); */
@@ -27,11 +28,35 @@
       padding: 4px 12px;
     }
 
+    #searchResults {
+      list-style: none;
+      border-radius: 10px;
+    }
+
+    #searchResults li {
+      width: 100%;
+      background-color: rgb(237, 237, 237);
+      border: 1px solid rgb(53, 48, 48);
+      padding: 10px;
+    }
+
+    #searchResults li:hover {
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    #searchResults li a {
+      text-decoration: none;
+      color: #000;
+      font-weight: 600;
+    }
+
     .search--box input {
       background-color: transparent;
       padding: 10px;
       border: 0;
       outline: 0;
+      width: 16rem;
     }
 
     .search--box i {
@@ -78,78 +103,104 @@
   <section id="category">
     <div class="tabular--wrapper">
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
-        <select onchange="selectedCategory(this)" class="dropdown"
-          style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
 
+        <% if(!locals.selectedSearch){ %>
+        <select class="dropdown" onchange="selectedCategory(this)" style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
 
-          <option>
-            <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
-          </option>
+            <option>
+              <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
+            </option>
+  
 
-
-
-          <% if(!locals.id&&locals.product[0].categoryId.name){ %>
-            <option value="allCategory">All Category</option>
-            <% } %>
-
-              <% if(category.length> 0){ %>
-                <% for(let i=0; i< category.length; i++){ %>
-                  <% if(locals.product[0].categoryId.name !==category[i].name){ %>
-                    <option value="<%= category[i]._id %>">
-                      <%= category[i].name %>
-                    </option>
+                <% if(locals.product.length>0){ %>
+                  <% if(!locals.id&&locals.product[0].categoryId.name){ %>
+                    <option value="allCategory">All Category</option>
                     <% } %>
-                      <% } %>
-                        <% } else { %>
-                          <option>No Category</option>
-                          <% } %>
+                      <% }%>
+
+                        <% if(locals.category.length> 0){ %>
+                          <% for(let i=0; i< category.length; i++){ %>
+                            <% if(locals.product.length>0 && locals.product[0].categoryId.name !==category[i].name){ %>
+                              <option value="<%= category[i]._id %>">
+                                <%= category[i].name %>
+                              </option>
+                              <% }%>
+                                <% } %>
+                                  <% } else { %>
+                                    <option>No Category</option>
+                                    <% } %>
         </select>
-        <div class="search--box">
-          <i class="fa-solid fa-search"></i>
-          <input type="text" id="searchInput" oninput="search()" placeholder="Search" />
-          <br>
-          <div>
-            <ul id="searchResults"></ul>
+        <% }else{ %>
+          <select class="dropdown"
+          style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
+            <option>Sort By</option>
+            <option>Aa to Zz</option>
+            <option>Zz to Aa</option>
+            <option>Low to High</option>
+            <option>Hign to Low</option>
+          </select>
+          <% } %>
+        <form action="/shop-search" method="post">
+          <div class="search--box">
+
+
+            <i class="fa-solid fa-search"></i>
+            <input type="text" name="value" id="searchInput" value="<%= locals.selectedSearch %>" oninput="search()"
+              placeholder="Search" />
+
           </div>
-        </div>
+        </form>
+
+      </div>
+      <div id="suggestion">
+        <ul id="searchResults"></ul>
       </div>
     </div>
   </section>
 
   <section style="padding: 0px 40px;" id="product1" class="section-p1">
-    <h4 class="h4-category">
-      <%= locals.product[0].categoryId.name ? locals.product[0].categoryId.name : 'All Category' %>
-    </h4>
-    <div class="pro-container">
-      <% if(product.length>0){%>
-        <% for(let i=0;i< product.length ;i++){ %>
+    <% if(!locals.selectedSearch){ %>
+      <h4 class="h4-category">
+        <%= locals.product[0].categoryId.name ? locals.product[0].categoryId.name : 'All Category' %>
+      </h4>
+      <% }else{ %>
+        <h4 class="h4-category">
+          Results
+        </h4>
+        <% } %>
+          <div class="pro-container">
+            <% if(product.length>0){%>
+              <% for(let i=0;i< product.length ;i++){ %>
 
-          <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-            <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>" alt="">
-            <div class="des">
-              <span>
-                <%= product[i].brand %>
-              </span>
-              <h5>
-                <%= product[i].name %>
-              </h5>
-              <div class="star">
-                <% for(let j=0;j< product[i].rating; j++){ %>
-                  <i class="ri-star-fill"></i>
-                  <% } %>
-              </div>
-              <h4>
-                ₹<%= product[i].price %>
-              </h4>
-            </div>
-            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
-                class="ri-shopping-cart-2-line cart"></i></a>
+                <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
+                  <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"alt="">
+                  <% if(locals.selectedSearch && product[i].quantity===0){ %>
+                    <p style="color: red; font-weight: 700;">Out Of Stock</p>
+                    <% } %>
+                  <div class="des">
+                    <span>
+                      <%= product[i].brand %>
+                    </span>
+                    <h5>
+                      <%= product[i].name %>
+                    </h5>
+                    <div class="star">
+                      <% for(let j=0;j< product[i].rating; j++){ %>
+                        <i class="ri-star-fill"></i>
+                        <% } %>
+                    </div>
+                    <h4>
+                      ₹<%= product[i].price %>
+                    </h4>
+                  </div>
+                  <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
+                      class="ri-shopping-cart-2-line cart"></i></a>
+                </div>
+                <% } %>
+                  <% } else { %>
+                    <h2>Products Not Found</h2>
+                    <% } %>
           </div>
-          <% } %>
-            <% } else { %>
-              <h2>Products Not Found</h2>
-              <% } %>
-    </div>
   </section>
 
   <section id="pagination" class="section-p1">
@@ -235,18 +286,52 @@
       //clear previous search results
       searchResults.innerHTML = '';
 
+      if (searchInput === '') {
+        return;
+      }
+
+      const addedBrands = new Set();
+
 
       try {
         const response = await fetch(`/search?data=${searchInput}`);
         const data = await response.json();
-       
 
         data.products.forEach(element => {
-          console.log(element)
-          const li = document.createElement('li');
-          li.textContent = element.name || element.brand;
-          searchResults.appendChild(li);
+
+
+          if (!addedBrands.has(element.brand)) {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+
+            link.textContent = element.brand;
+            link.href = `/shop?brandSearch=${element.brand}`
+
+            li.appendChild(link);
+
+            searchResults.appendChild(li);
+
+            addedBrands.add(element.brand);
+
+            li.addEventListener('click', () => {
+              window.location.href = link.href
+            })
+          }
+
+
+          const li1 = document.createElement('li');
+          const link1 = document.createElement('a');
+          link1.textContent = element.name;
+          link1.href = `/shop?nameSearch=${element.name}`
+          li1.appendChild(link1);
+          searchResults.appendChild(li1);
+
+          li1.addEventListener('click', () => {
+            window.location.href = link1.href
+          })
+
         });
+
       } catch (error) {
         console.log(error.message);
       }

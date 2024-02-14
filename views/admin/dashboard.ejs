@@ -124,6 +124,7 @@
           <canvas width="100" style="display: flex;" id="myChart"></canvas>
           <div style="display: flex; justify-content: center;" class="gap-3 mt-4 ">
             <button id="dailyBtn" class="btn btn-outline-primary">Daily</button>
+            <button id="weeklyBtn" class="btn btn-outline-primary">Weekly</button>
             <button id="monthlyBtn" class="btn btn-outline-primary">Monthly</button>
             <button id="yearlyBtn" class="btn btn-outline-primary">Yearly</button>
             <a href="/admin/custom-sale-report" id="yearlyBtn" class="btn btn-outline-primary">Custom</a>
@@ -136,11 +137,13 @@
   <script>
 const ctx = document.getElementById('myChart');
 const dailyBtn = document.getElementById('dailyBtn');
+const weeklyBtn = document.getElementById('weeklyBtn');
 const monthlyBtn = document.getElementById('monthlyBtn');
 const yearlyBtn = document.getElementById('yearlyBtn');
 
 updateChart('daily');
 dailyBtn.addEventListener('click', () => updateChart('daily'));
+weeklyBtn.addEventListener('click',()=> updateChart('weekly'));
 monthlyBtn.addEventListener('click', () => updateChart('monthly'));
 yearlyBtn.addEventListener('click', () => updateChart('yearly'));
 
