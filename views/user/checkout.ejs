@@ -2,6 +2,9 @@
 
   <!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
   <style>
     * {
       margin: 0;
@@ -226,7 +229,7 @@
       <h4 style="text-align: center; margin-top: 20px;">
         <%= locals.address ? 'Choose your address' : 'Please Add Address' %>
       </h4>
-      <form action="/checkout" method="post">
+      <form id="paymentForm" action="/checkout" method="post">
 
         <section id="user-detials">
           <% if(locals.address) {%>
@@ -322,7 +325,7 @@
                     </tr>
                     <tr>
                       <td style="font-weight: 700;" data-label="Product">Total</td>
-                      <td style="font-weight: 700;" data-label="Total">₹<%= total<500 ? total+40 : total %>
+                      <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹<%=total<500?total+40:total%>
                       </td>
                     </tr>
               </tbody>
@@ -341,7 +344,7 @@
               <label for="Wallet">Wallet</label>
             </div>
             <br>
-            <button style="width: 100%; background-color: #088178; color: #fff;" type="submit" id="alert"
+            <button style="width: 100%; background-color: #088178; color: #fff;" type="submit" id="payButton"
               class="normal">Place Order</button>
 
           </div>
@@ -416,38 +419,67 @@
       </footer>
 
 
-      <script>
-        const logout = document.getElementById('logout');
-        logout.addEventListener('click', () => {
-          Swal.fire({
-            title: "Are you sure?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Logout"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = '/logout'
-            }
-          });
-        });
 
-        function removeAddress(id, i) {
-          const div = document.getElementById(`div₹{i}`);
-          fetch('/remove-address', {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: id }),
-          }).then((res) => res.json())
-            .then((data) => {
-              div.remove();
-            })
-            .catch((error) => console.log(error.message));
+
+      <script>
+
+        document.getElementById('paymentForm').onsubmit = function (event) {
+          const selectedPaymentMethod = document.querySelector('input[name="selectedPaymentMethod"]:checked').value;
+          const selectedAddress = document.querySelector('input[name=selectedAddress]:checked').value;
+          const total = document.getElementById('totalAmount').textContent;
+          const amount = total.replace('₹', '');
+          if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'Wallet') {
+            return true;
+          } else {
+            event.preventDefault();
+
+            if (selectedPaymentMethod === 'Online') {
+              fetch('/verify-razorpay', {
+                method: 'POST',
+                headers: {
+                  "Content-Type": "application/json"
+                },
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  const options = {
+                    key: data.key,
+                    amount: data.amount,
+                    currency: 'INR',
+                    name: 'Cara Online Shopping Site',
+                    description: 'Purchase Description add letter',
+                    order_id: data.orderId,
+                    handler: function (responce) {
+                      fetch('/razorpay-success',{
+                        method: "PATCH",
+                        headers:{
+                          "Content-Type":"application/json"
+                        },
+                        body:JSON.stringify({id:selectedAddress})
+                      }).then((res)=>res.json())
+                      .then((data)=>{
+                        console.log(data);
+                        if(data.status){
+                          window.location.href='/order-confirm';
+                        }
+                      })
+                    },
+                    prefill: {
+                      name: data.cusName,
+                      email: data.cusEmail,
+                      contact: data.cusContact,
+                    },
+                  };
+                  const razorpay = new Razorpay(options);
+                  razorpay.open();
+                })
+            }
+          }
         }
+
       </script>
+
+
 
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

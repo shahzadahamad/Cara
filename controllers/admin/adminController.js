@@ -376,6 +376,9 @@ const editOrderStatus = async (req,res) => {
       delete update.shippingDate;
     }else if(select==='Shipping'){
       delete update.deliveredDate;
+    }else if(select==='On The Way' || select==='Placed' || select === 'Pending'){
+      delete update.deliveredDate
+      delete update.shippingDate
     }
 
 

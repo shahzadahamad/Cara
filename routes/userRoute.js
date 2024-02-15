@@ -102,6 +102,10 @@ userRouter.post('/verify-cart-checkout',cartController.verifyCartCheckout)
 // user ordered page
 userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,cartController.loadOrder);  
 
+// verifyRazorpay
+userRouter.post('/verify-razorpay',auth.isLogin,auth.isBlocked,cartController.verifyRazorpay);
+userRouter.patch('/razorpay-success',auth.isLogin,auth.isBlocked,cartController.razorpaySuccess);
+
 
 // <--------------Address Controller-------------->
 const addressController = require('../controllers/user/addressController');
@@ -139,6 +143,7 @@ const orderController = require('../controllers/user/orderController');
 userRouter.get('/order',auth.isLogin,auth.isBlocked,orderController.loadOrder);
 userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.loadOrderDetials);
 
+// cancel order
 userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
 

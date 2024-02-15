@@ -1,5 +1,4 @@
 const Order = require('../../models/orderModel');
-const razorpay = require('razorpay');
 
 // Order detials 
 const loadOrder = async (req,res) => {
@@ -64,4 +63,4 @@ module.exports = {
   loadOrder,
   loadCancelPage,
   verifyCancelPage,
-}
+};
