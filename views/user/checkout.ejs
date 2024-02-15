@@ -419,8 +419,6 @@
       </footer>
 
 
-
-
       <script>
 
         document.getElementById('paymentForm').onsubmit = function (event) {
@@ -450,17 +448,17 @@
                     description: 'Purchase Description add letter',
                     order_id: data.orderId,
                     handler: function (responce) {
+                      console.log(responce);
                       fetch('/razorpay-success',{
                         method: "PATCH",
                         headers:{
                           "Content-Type":"application/json"
                         },
-                        body:JSON.stringify({id:selectedAddress})
+                        body:JSON.stringify({id:selectedAddress,transactionId:responce.razorpay_order_id})
                       }).then((res)=>res.json())
                       .then((data)=>{
-                        console.log(data);
                         if(data.status){
-                          window.location.href='/order-confirm';
+                          window.location.href='/order-confirm/#page-header';
                         }
                       })
                     },

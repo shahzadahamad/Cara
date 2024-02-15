@@ -215,6 +215,7 @@
     </header>
     <ul>
       <li><a href="/profile"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="/Wallet"><i class="fa-solid fa-wallet"></i>Wallet</a></li>
       <li><a href="/order" class="active"><i class="fa-solid fa-check"></i>Order</a></li>
       <li><a href="/address"><i class="fa-solid fa-location-dot"></i>Address</a></li>
       <li><a href="/forget"><i class="fa-solid fa-lock"></i></i>Change Password</a></li>
@@ -241,27 +242,48 @@
       <section id="user-detials">
         <div id="user-detials-container">
 
-          <form action="/cancel-order?id=<%= id %>" method="post">
-            <h4>Please select a reason for canceling this order</h4>
-            <br><br>
-            <input type="radio" name="reason" id="a" value="Found a Better Price">
-            <label  for="a" >Found a Better Price</label><br><br>
-            <input type="radio" name="reason" id="b"  value="Ordered by Mistake">
-            <label  for="b" >Ordered by Mistake</label><br><br>
-            <input type="radio" name="reason" id="c"  value="Shipping Delays">
-            <label  for="c" >Shipping Delays</label><br><br>
-            <input type="radio" name="reason" id="d"  value="Gift Recipient Changed">
-            <label  for="d" >Gift Recipient Changed</label><br><br>
-            <input type="radio" name="reason" id="e"  value="Better Product Options Found">
-            <label  for="e" >Better Product Options Found</label><br><br>
-            <input type="radio" name="reason" id="f"  value="System Error During Order Placement">
-            <label  for="f" >System Error During Order Placement</label><br><br>
-            <input type="radio" name="reason" id="g" value="Customer Dissatisfaction with Seller Feedback">
-            <label  for="g" >Customer Dissatisfaction with Seller Feedback</label><br><br>
-            <input type="radio" name="reason" id="h"  value="Other reason">
-            <label  for="h" >Other reason</label><br><br><br>
-            <button type="submit" style="background-color: #088178; color: #fff;"
-              class="normal edit-btn">Submit</button>      
+          <form action="/cancel-order?id=<%= id %>&type=<%= type %>" method="post">
+            <% if(type==='cancel' ){ %>
+              <h4>Please select a reason for canceling this order</h4>
+              <br><br>
+              <input type="radio" name="reason" id="a" value="Found a Better Price">
+              <label for="a">Found a Better Price</label><br><br>
+              <input type="radio" name="reason" id="b" value="Ordered by Mistake">
+              <label for="b">Ordered by Mistake</label><br><br>
+              <input type="radio" name="reason" id="c" value="Shipping Delays">
+              <label for="c">Shipping Delays</label><br><br>
+              <input type="radio" name="reason" id="d" value="Gift Recipient Changed">
+              <label for="d">Gift Recipient Changed</label><br><br>
+              <input type="radio" name="reason" id="e" value="Better Product Options Found">
+              <label for="e">Better Product Options Found</label><br><br>
+              <input type="radio" name="reason" id="f" value="System Error During Order Placement">
+              <label for="f">System Error During Order Placement</label><br><br>
+              <input type="radio" name="reason" id="g" value="Customer Dissatisfaction with Seller Feedback">
+              <label for="g">Customer Dissatisfaction with Seller Feedback</label><br><br>
+              <input type="radio" name="reason" id="h" value="Other reason">
+              <label for="h">Other reason</label><br><br><br>
+              <% }else if(type==='return' ){ %>
+                <h4>Please select a reason for returning this order</h4>
+                <br><br>
+                <input type="radio" name="reason" id="a" value="Found a Better Price">
+                <label for="a">Found a Better Price</label><br><br>
+                <input type="radio" name="reason" id="b" value="Ordered by Mistake">
+                <label for="b">Ordered by Mistake</label><br><br>
+                <input type="radio" name="reason" id="c" value="Damaged Product">
+                <label for="c">Damaged Product</label><br><br>
+                <input type="radio" name="reason" id="d" value="Low Quality">
+                <label for="d">Low Quality</label><br><br>
+                <input type="radio" name="reason" id="e" value="Change my mind">
+                <label for="e">Change my mind</label><br><br>
+                <input type="radio" name="reason" id="f" value="System Error During Order Placement">
+                <label for="f">System Error During Order Placement</label><br><br>
+                <input type="radio" name="reason" id="g" value="Product not good as i think">
+                <label for="g">Product not good as i think</label><br><br>
+                <input type="radio" name="reason" id="h" value="Other reason">
+                <label for="h">Other reason</label><br><br><br>
+                <% } %>
+                  <button type="submit" style="background-color: #088178; color: #fff;"
+                    class="normal edit-btn">Submit</button>
           </form>
 
         </div>

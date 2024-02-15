@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema({
   }],
   orderStatus:{
     type:String,
-    enum:['Pending','Placed','Shipping','On The Way','Delivered','Cancelled'],
+    enum:['Pending','Placed','Shipping','On The Way','Delivered','Cancelled','Returned','Return Requasted'],
   },
   cancelReason:{
     tyep:String,
@@ -51,6 +51,9 @@ const orderSchema = new mongoose.Schema({
   },
   isReturned: {
     type: Boolean,
+  },
+  returnedRequestDate:{
+    type:Date,
   },
   returnedDate:{
     type:Date,

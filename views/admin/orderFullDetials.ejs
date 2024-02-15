@@ -89,10 +89,6 @@
         <div>
           <h3 style="font-size: 30px;" class="main--title">Orders Detials</h3>
         </div>
-        <div class="search--box">
-          <i class="fa-solid fa-search"></i>
-          <input type="text" placeholder="Search" />
-        </div>
       </div>
 
       <div style="overflow-x: auto;" class="table--container">
@@ -164,8 +160,9 @@
               <tr>
                 <th style="text-align: start;">Order Status</th>
 
-                <% if( !order.isCancelled ){ %>
+                <% if( !order.isCancelled && !order.isReturned ){ %>
                   <td>
+                    <% if(order.orderStatus!=='Return Requasted'){ %>
                     <select onchange="orderStatus('<%= order._id %>')"
                       style="font-size: 20px; outline: none; box-shadow: none; text-align: center;"
                       class="btn btn-outline-success " name="orderStatus" id="selectTag">
@@ -176,6 +173,16 @@
                       <option style="text-align: center; background-color:#fff; color: #000;" value="On The Way">On The Way</option>
                       <option style="text-align: center; background-color:#fff; color: #000;" value="Delivered">Delivered</option>
                     </select>
+                    <% }else { %>
+                      <select onchange="orderStatus('<%= order._id %>')"
+                        style="font-size: 20px; outline: none; box-shadow: none; text-align: center;"
+                        class="btn btn-outline-success " name="orderStatus" id="selectTag">
+                        <option style="text-align: center; background-color:#fff; color: #000;" value="<%= order.orderStatus %>">
+                          <%= order.orderStatus %>
+                        </option>
+                        <option style="text-align: center; background-color:#fff; color: #000;" value="Returned">Returned</option>
+                      </select>
+                      <% } %>
         
                     <span style="color: red; display: none;" id="pTag"></span>
 

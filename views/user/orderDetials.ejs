@@ -214,6 +214,7 @@
     </header>
     <ul>
       <li><a href="/profile"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="/Wallet"><i class="fa-solid fa-wallet"></i>Wallet</a></li>
       <li><a href="/order" class="active"><i class="fa-solid fa-check"></i>Order</a></li>
       <li><a href="/address"><i class="fa-solid fa-location-dot"></i>Address</a></li>
       <li><a href="/forget"><i class="fa-solid fa-lock"></i></i>Change Password</a></li>
@@ -256,7 +257,7 @@
                     <img style="width: 100px;" onclick="window.location.href='/sproduct?id=<%= order[i].orderItems[j].productId._id %>'" src="/images/productImages/<%= order[i].orderItems[j].productId.image[0] %>" alt="">
                     <% } %>
                 </td>
-                <% if(order[i].orderStatus==='Cancelled') {%>
+                <% if(order[i].orderStatus==='Cancelled' || order[i].orderStatus==='Return Requasted' || order[i].orderStatus==='Returned') {%>
                 <td style="color: red; font-weight: 700;"> <%= order[i].orderStatus %></td>
                 <% } else {%>
                 <td style="color: green; font-weight: 700;"> <%= order[i].orderStatus %></td>

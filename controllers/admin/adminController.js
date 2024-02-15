@@ -4,6 +4,8 @@ const user = require("../../models/userModel");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
 const Order = require('../../models/orderModel');
+const Payment = require('../../models/paymentModel');
+const refund = require('../../controllers/user/orderController');
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 
@@ -366,25 +368,39 @@ const editOrderStatus = async (req,res) => {
     const {id,select}=req.body;
     const isUserCancelled = await Order.findOne({_id:id},{isCancelled:1});
 
-    const update = {
-      orderStatus:select,
-      deliveredDate:new Date,
-      shippingDate:new Date,
-    }
-
-    if(select==='Delivered'){
-      delete update.shippingDate;
-    }else if(select==='Shipping'){
-      delete update.deliveredDate;
-    }else if(select==='On The Way' || select==='Placed' || select === 'Pending'){
-      delete update.deliveredDate
-      delete update.shippingDate
-    }
-
-
     if(!isUserCancelled.isCancelled){
-      const order = await Order.updateOne({_id:id},{$set:update});
-      res.send({status:true});
+      if(select==='Delivered'){
+        const update = {
+          orderStatus:select,
+          deliveredDate:new Date,
+        }
+         await Payment.updateOne({orderId:id},{$set:{status:'Success'}});
+        await Order.updateOne({_id:id},{$set:update});
+        res.send({status:true});
+      }else if(select==='Shipping'){
+        const update = {
+          orderStatus:select,
+          shippingDate:new Date,
+        }
+        await Order.updateOne({_id:id},{$set:update});
+        res.send({status:true});
+      }else if(select==='Returned'){
+        const update = {
+          orderStatus:select,
+          isReturned:true,
+          returedDate:new Date,
+        }
+        await Order.updateOne({ _id: id }, { $set: update });
+        await refund.incrementProductQuatity(id);
+        await refund.refundToWallet(id, req.session.user._id);
+        res.send({status:true});
+      }else if(select==='On The Way'){
+        const update = {
+          orderStatus:select,
+        }
+        await Order.updateOne({_id:id},{$set:update});
+        res.send({status:true});
+      }
     }else{
       res.send({status:false})
     }

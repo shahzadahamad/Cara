@@ -223,6 +223,7 @@
     </header>
     <ul>
       <li><a href="/profile"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="/Wallet"><i class="fa-solid fa-wallet"></i>Wallet</a></li>
       <li><a href="/order" class="active"><i class="fa-solid fa-check"></i>Order</a></li>
       <li><a href="/address"><i class="fa-solid fa-location-dot"></i>Address</a></li>
       <li><a href="/forget"><i class="fa-solid fa-lock"></i></i>Change Password</a></li>
@@ -253,7 +254,7 @@
                     <tr>
                       <th>Products</th>
                       <th>Order Status</th>
-                      <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way'){ %>           
+                      <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way' && order[0].orderStatus !== 'Returned'&& order[0].orderStatus!=='Return Requasted'){ %>           
                       <th>Cancel Order</th>
                       <% }else if(order[0].orderStatus==='Delivered'){ %>
                         <th>Return Order</th>
@@ -270,7 +271,7 @@
                           </p>
                           <% } %>
 
-                       <% if(order[0].orderStatus === 'Cancelled'){ %>
+                       <% if(order[0].orderStatus === 'Cancelled' || order[0].orderStatus==='Returned' || order[0].orderStatus==='Return Requasted'){ %>
                       <td style="color: red; font-weight: 800; text-align: center;">
                         <%= order[0].orderStatus %>
                       </td>
@@ -279,13 +280,13 @@
                           <%= order[0].orderStatus %>
                         </td>
                         <% } %>
-                        <% if(order[0].orderStatus !== 'Cancelled'&&order[0].orderStatus !== 'Delivered'&& order[0].orderStatus !== 'On The Way'){ %>
+                        <% if(order[0].orderStatus !== 'Cancelled'&&order[0].orderStatus !== 'Delivered'&& order[0].orderStatus !== 'On The Way'&&order[0].orderStatus !== 'Returned'&&order[0].orderStatus!=='Return Requasted'){ %>
                       <td>
-                        <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>">Cancel</a>
+                        <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=cancel">Cancel</a>
                       </td>
                       <% }else if(order[0].orderStatus==='Delivered'){ %>
                         <td>
-                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>">Return</a>
+                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=return">Return</a>
                         </td>
                         <% } %>
                     </tr>
@@ -370,7 +371,7 @@
               
                         <tr>
                           <td data-label="Product">Subtotal</td>
-                          <td data-label="Total">₹<%= order[0].orderAmount %>
+                          <td data-label="Total">₹<%= order[0].orderAmount<500 ? order[0].orderAmount-40 : order[0].orderAmount %>
                           </td>
                         </tr>
                         <tr>
@@ -381,7 +382,7 @@
                         </tr>
                         <tr>
                           <td style="font-weight: 700;" data-label="Product">Total</td>
-                          <td style="font-weight: 700;" data-label="Total">₹<%= order[0].orderAmount<500 ?  order[0].orderAmount+40 :  order[0].orderAmount %>
+                          <td style="font-weight: 700;" data-label="Total">₹<%= order[0].orderAmount %>
                           </td>
                         </tr>
                         <% } %>

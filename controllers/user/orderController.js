@@ -1,59 +1,132 @@
-const Order = require('../../models/orderModel');
+const mongoose = require("mongoose");
+const Order = require("../../models/orderModel");
+const Product = require("../../models/productsModel");
+const Wallet = require("../../models/walletModel");
 
-// Order detials 
-const loadOrder = async (req,res) => {
-  try{
+// increment the cancelled order data in products
+const incrementProductQuatity = async (id) => {
+  try {
+    const orderPro = await Order.findOne(
+      { _id: id },
+      { orderItems: 1 }
+    ).populate("orderItems.productId");
 
-    const orders = await Order.find({ userId: req.session.user._id }).populate('userId orderItems.productId').sort({ orderDate: -1 });
+    orderPro.orderItems.forEach(async (x) => {
+      const productQuantity = await Product.findOne({ _id: x.productId });
+      const store = productQuantity.quantity + x.quantity;
+      await Product.updateOne(
+        { _id: x.productId._id },
+        { $set: { quantity: store } }
+      );
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
-    res.render('orderDetials',{user:req.session.user,order:orders});
-  }catch(error){
-    console.log(error.message)
+// refunding to the wallet
+const refundToWallet = async (id, userId) => {
+  try {
+    const order = await Order.findOne({ _id: id });
+    const wallet = await Wallet.findOneAndUpdate(
+      { userId: userId },
+      {
+        $inc: { totalAmount: order.orderAmount },
+        $push: {
+          transactions: {
+            type: "credit",
+            amount: order.orderAmount,
+            transactionDate: new Date(),
+          },
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// Order detials
+const loadOrder = async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.session.user._id })
+      .populate("userId orderItems.productId")
+      .sort({ orderDate: -1 });
+
+    res.render("orderDetials", { user: req.session.user, order: orders });
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
 // Order full Detials
-const loadOrderDetials = async (req,res) => {
-  try{
+const loadOrderDetials = async (req, res) => {
+  try {
     const id = req.query.id;
-    const order = await Order.find({_id:id}).populate('userId orderItems.productId');
-    res.render('orderFullDetials',{user:req.session.user,order:order});
-  }catch(error){
-    console.log(error.message)
+    const order = await Order.find({ _id: id }).populate(
+      "userId orderItems.productId"
+    );
+    res.render("orderFullDetials", { user: req.session.user, order: order });
+  } catch (error) {
+    console.log(error.message);
   }
 };
 
 // cancel page
-const loadCancelPage = async (req,res) => {
-  try{
-    const {id}=req.query;
-    const message = req.flash('message');
-    const _id = await Order.findOne({_id:id},{_id:1});
-    res.render('orderCancel',{user:req.session.user,id:_id.id,message});
-  }catch(error){
+const loadCancelPage = async (req, res) => {
+  try {
+    const { id, type } = req.query;
+    const message = req.flash("message");
+
+    const _id = await Order.findOne({ _id: id }, { _id: 1 });
+    res.render("orderCancel", {
+      user: req.session.user,
+      id: _id.id,
+      message,
+      type: type,
+    });
+  } catch (error) {
     console.log(error.message);
   }
 };
 
 // verify cancel page
-const verifyCancelPage = async (req,res) => {
-  try{
-    const {id} = req.query;
-    const {reason}=req.body;
+const verifyCancelPage = async (req, res) => {
+  try {
+    const { id, type } = req.query;
+    const { reason } = req.body;
 
-    if(!reason){
-      req.flash('message','Please give a reason');
+    if (!reason) {
+      req.flash("message", "Please give a reason");
       return res.redirect(`/cancel-order?id=${id}`);
     }
-    const update = {
-      orderStatus:'Cancelled',
-      cancelReason:reason,
-      cancelDate:new Date,
-      isCancelled: true,
+
+
+    if (type === "cancel") {
+      const update = {
+        orderStatus: "Cancelled",
+        cancelReason: reason,
+        cancelDate: new Date(),
+        isCancelled: true,
+      };
+      await Order.updateOne({ _id: id }, { $set: update });
+      await incrementProductQuatity(id);
+      await refundToWallet(id, req.session.user._id);
+    } else if (type === "return") {
+      const update = {
+        orderStatus: "Return Requasted",
+        returnedReason: reason,
+        returnedRequestDate: new Date(),
+      };
+      await Order.updateOne({ _id: id }, { $set: update });
     }
-    await Order.updateOne({_id:id},{$set:update});
-    res.redirect('/order');
-  }catch(error){
+
+    res.redirect("/order");
+  } catch (error) {
     console.log(error.message);
   }
 };
@@ -63,4 +136,6 @@ module.exports = {
   loadOrder,
   loadCancelPage,
   verifyCancelPage,
+  incrementProductQuatity,
+  refundToWallet,
 };

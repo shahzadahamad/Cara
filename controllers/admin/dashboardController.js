@@ -1,6 +1,8 @@
 const moment = require("moment");
 const admin = require("../../models/adminModel");
 const Order = require("../../models/orderModel");
+const User = require("../../models/userModel");
+const Product = require("../../models/productsModel");
 const mongoose = require("mongoose");
 
 // loadDashboard
@@ -10,6 +12,9 @@ const loadDashboard = async (req, res) => {
     const dailyRevenue = await getDailyData();
     const monthlyRevenue = await getMonthlyData();
     const yearlyRevenue = await getYearlyData();
+    const totalCustomers = await User.find({});
+    const totalOrders = await Order.find({});
+    const totalProducts = await Product.find({});
     const adminData = await admin.findById({ _id: req.session.admin_id });
     res.render("dashboard", {
       admins: adminData,
@@ -17,6 +22,9 @@ const loadDashboard = async (req, res) => {
       monthlyRevenue: monthlyRevenue.revenue,
       yearlyRevenue: yearlyRevenue.revenue,
       totalRevenue: totalRevenue,
+      totalCustomers: totalCustomers.length,
+      totalOrders: totalOrders.length,
+      totalProducts: totalProducts.length,
     });
   } catch (error) {
     console.log(error.message);
@@ -28,7 +36,7 @@ const gettotalRevenue = async (req, res) => {
     const total = await Order.find({});
 
     const dailyRevenue = total.reduce((acc, order) => {
-      if (!order.isCancelled) {
+      if (!order.isCancelled && !order.isReturned) {
         return acc + order.orderAmount;
       } else {
         return acc;
@@ -54,7 +62,7 @@ const getDailyData = async (req, res) => {
 
     let count = 0;
     const dailyRevenue = dailyOrder.reduce((acc, order) => {
-      if (!order.isCancelled) {
+      if (!order.isCancelled && !order.isReturned) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -85,7 +93,7 @@ const getWeeklyData = async (req, res) => {
 
     let count = 0;
     const weeklyRevenue = weeklyOrder.reduce((acc, order) => {
-      if (!order.isCancelled) {
+      if (!order.isCancelled && !order.isReturned) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -117,7 +125,7 @@ const getMonthlyData = async (req, res) => {
 
     let count = 0;
     const monthlyRevenue = monthlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled) {
+      if (!order.isCancelled && !order.isReturned) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -149,7 +157,7 @@ const getYearlyData = async (req, res) => {
 
     let count = 0;
     const yearlyRevenue = yearlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled) {
+      if (!order.isCancelled && !order.isReturned) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -180,7 +188,7 @@ const verifyDashboard = async (req, res) => {
         cancelledOrder,
         type,
       });
-    }else if(type=== 'weekly'){
+    } else if (type === "weekly") {
       const weekData = await getWeeklyData();
       const { orders, revenue, cancelledOrder } = weekData;
       res.send({
@@ -189,7 +197,7 @@ const verifyDashboard = async (req, res) => {
         cancelledOrder,
         type,
       });
-    }else if (type === "monthly") {
+    } else if (type === "monthly") {
       const monthlyData = await getMonthlyData();
       const { orders, revenue, cancelledOrder } = monthlyData;
       res.send({
@@ -254,12 +262,30 @@ const verifyCustomSalesReport = async (req, res) => {
             _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
             totalRevenue: {
               $sum: {
-                $cond: [{ $eq: ["$isCancelled", false] }, "$orderAmount", 0],
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ["$isCancelled", false] },
+                      { $eq: ["$isReturned", false] },
+                    ],
+                  },
+                  "$orderAmount",
+                  0,
+                ],
               },
             },
             cancelledOrdersCount: {
               $sum: {
-                $cond: [{ $eq: ["$isCancelled", true] }, 1, 0],
+                $cond: [
+                  {
+                    $or: [
+                      { $eq: ["$isCancelled", true] },
+                      { $eq: ["$isReturned", true] },
+                    ],
+                  },
+                  1,
+                  0,
+                ],
               },
             },
             totalOrders: { $sum: 1 },
@@ -278,7 +304,7 @@ const verifyCustomSalesReport = async (req, res) => {
           $sort: { date: 1 },
         },
       ]);
-  
+
       res.redirect(
         `/admin/custom-sale-report?From=${from}&To=${to}&customReport=${encodeURIComponent(
           JSON.stringify(customReport)

@@ -1,7 +1,5 @@
 <%- include('../layouts/header.ejs') -%>
 
-  <!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
-
   <style>
     * {
       margin: 0;
@@ -114,78 +112,106 @@
 
     #user-detials {
       display: flex;
-      flex-wrap: wrap;
-      flex-direction: row;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
       margin: 40px 0;
       padding: 10px;
     }
 
-    #user-detials .user-detials-container {
-      padding: 30px;
+    #user-detials #user-detials-container {
+      padding: 70px;
       border: 1px solid #042331;
       border-radius: 10px;
       background: rgb(226, 240, 229);
     }
 
-    .normal {
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 20px;
-      color: #000;
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
       background-color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      outline: none;
-      transition: 0.2s;
+      border-radius: 8px;
+      padding: 50px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
     }
 
-    #p p {
-      font-size: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .wallet {
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
       margin-bottom: 20px;
     }
 
-    th,
-    td {
-      border: 1px solid #ddd;
-      padding: 15px;
-      text-align: left;
+    .wallet h2 {
+      margin-top: 0;
     }
 
-    th {
-      background-color: #f2f2f2;
+    .wallet p {
+      font-size: 25px;
+      color: #000;
+      font-weight: 600;
     }
 
+    .wallet p span {
+      font-weight: 900;
+    }
 
+    .add-money-btn {
+      display: block;
+      width: calc(100% - 22px);
+      padding: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
 
+    input[type="number"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-textfield-decoration-container {
+        display: none;
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    @media only screen and (max-width: 768px) {
+      .container {
+        max-width: 90%;
+        margin: 20px auto;
+      }
+    }
 
     @media (max-width:699px) {
-      #user-detials .user-detials-container {
+      #user-detials #user-detials-container {
         width: 500px;
       }
     }
 
-    /* Responsive table styles */
-    @media screen and (max-width: 600px) {
-
-      th,
-      td {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        margin-bottom: 10px;
+    @media only screen and (max-width: 480px) {
+      .add-money-btn {
+        font-size: 14px;
       }
     }
 
     @media (max-width:415px) {
-      #user-detials .user-detials-container {
+      #user-detials #user-detials-container {
         width: 340px;
       }
     }
@@ -199,10 +225,10 @@
         <li><a href="/home">Home</a></li>
         <li><a href="/shop">Shop</a></li>
         <li><a href="/about">About</a></li>
-        <li><a href="<%= locals.user ? '/profile' : '/login' %>">
+        <li><a class="active" href="<%= locals.user ? '/profile' : '/login' %>">
             <%= locals.user ? 'Profile' : 'Login' %>
           </a></li>
-        <li id="lg-bag"><a href="/cart" class="active"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
         <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
       </ul>
     </div>
@@ -212,26 +238,44 @@
     </div>
   </header>
 
+  <input type="checkbox" id="check">
+  <label for="check">
+    <i class="fas fa-bars" id="btn"></i>
+    <i class="fas fa-times" id="cancel"></i>
+  </label>
+  <div class="sidebar">
+    <header>
+      <h4>My Account</h4>
+    </header>
+    <ul>
+      <li><a href="/profile"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="/Wallet" class="adtive"><i class="fa-solid fa-wallet"></i>Wallet</a></li>
+      <li><a href="/order"><i class="fa-solid fa-check"></i>Order</a></li>
+      <li><a href="/address"><i class="fa-solid fa-location-dot"></i>Address</a></li>
+      <li><a href="/forget"><i class="fa-solid fa-lock"></i></i>Change Password</a></li>
+      <li><a id="logout"><i class="fas fa-sign-out"></i>Logout</a></li>
+    </ul>
+  </div>
 
   <section id="page-header" class="about-header">
-    <h2>#Checkout</h2>
-    <p>Purchese and get coupens!</p>
+    <h2>#My Wallet</h2>
+    <p>Customize your identity with a personalized one!</p>
   </section>
 
-      <section id="user-detials">
+  <% if( locals.message ){ %>
+    <div style="color: green; text-align: center; margin-top: 20px;" id="hide">
+      <%=message%>
+    </div>
+    <% } %>
 
-        <div style=" text-align: center; margin-top: 25px;">
-          <i style="color: green; font-size: 70px;" class="fa-solid fa-check"></i>
-          <br><br>
-          <h2 style="color: green; font-size: 50px; font-weight: 900;">Thank You!</h2>
-          <p style="font-weight: 500; font-size: 25px;">You order was successfuly completed.</p>
-          <br>
-          <button style="background-color: #088178; color: #fff;" onclick="window.location.href='/shop'" id="alert" class="normal">Shop</button>
+      <div class="container">
+        <div class="wallet">
+          <h2>My Wallet</h2>
+          <p>Balance: ₹ <span><%= wallet.totalAmount %></span></p>
         </div>
-     
-
-      </section>
-
+        <input type="number" id="add-amount" name="amount" placeholder="Enter Amount">
+        <button class="add-money-btn" onclick="addMoney()">Add Money</button>
+      </div>
 
       <section id="newsletter" class="section-p1 section-m1">
         <div class="newstext">
@@ -313,22 +357,7 @@
               window.location.href = '/logout'
             }
           });
-        });
-
-        function removeAddress(id, i) {
-          const div = document.getElementById(`div${i}`);
-          fetch('/remove-address', {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: id }),
-          }).then((res) => res.json())
-            .then((data) => {
-              div.remove();
-            })
-            .catch((error) => console.log(error.message));
-        }
+        })
       </script>
 
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

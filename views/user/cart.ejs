@@ -78,10 +78,15 @@
                   </td>
                   <td><input type="number" id="inputTag<%= i %>"
                       oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
-                      value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity %>"
+                      value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity ? product[i].quantity : product[i].quantity+1 %>"
                       onkeydown="return false" min="1"></td>
+                      <% if(product[i].quantity){ %>
                   <td id="subTotal<%=i%>">₹<%= product[i].productId.price * product[i].quantity %>
                   </td>
+                  <% }else{ %>
+                    <td id="subTotal<%=i%>">₹<%= product[i].productId.price * 1 %>
+                    </td>
+                    <% } %>
                 </tr>
                 <% } %>
                   <% } else { %>

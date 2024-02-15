@@ -118,7 +118,7 @@
                   <td>
                     <%= order[i].orderDate.toString().split(' ').slice(0,4) %>
                   </td>
-                  <% if(order[i].orderStatus==='Cancelled'){ %>
+                  <% if(order[i].orderStatus==='Cancelled' || order[i].orderStatus==='Return Requasted' || order[i].orderStatus==='Returned'){ %>
                   <td style="color: red;">
                     <%= order[i].orderStatus %>
                   </td>

@@ -92,20 +92,6 @@ userRouter.patch('/remove-product',cartController.verifyRemoveCart);
 // cart products detials
 userRouter.patch('/cart-detials',cartController.verifyCartDetials);
 
-// checkout page and verify checkout 
-userRouter.get('/checkout',auth.isLogin,auth.isBlocked,cartController.loadCheckout);
-userRouter.post('/checkout',cartController.verifyCheckout);
-
-// verify cart chekcout
-userRouter.post('/verify-cart-checkout',cartController.verifyCartCheckout)
-
-// user ordered page
-userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,cartController.loadOrder);  
-
-// verifyRazorpay
-userRouter.post('/verify-razorpay',auth.isLogin,auth.isBlocked,cartController.verifyRazorpay);
-userRouter.patch('/razorpay-success',auth.isLogin,auth.isBlocked,cartController.razorpaySuccess);
-
 
 // <--------------Address Controller-------------->
 const addressController = require('../controllers/user/addressController');
@@ -146,5 +132,32 @@ userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.load
 // cancel order
 userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
+
+
+// <--------------Order Controller-------------->
+const checkoutController = require('../controllers/user/checkoutController');
+// <--------------Order Controller-------------->
+
+
+// checkout page and verify checkout 
+userRouter.get('/checkout',auth.isLogin,auth.isBlocked,checkoutController.loadCheckout);
+userRouter.post('/checkout',checkoutController.verifyCheckout);
+
+// verify cart chekcout
+userRouter.post('/verify-cart-checkout',checkoutController.verifyCartCheckout)
+
+// user ordered page
+userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,checkoutController.loadOrder);  
+
+// verifyRazorpay
+userRouter.post('/verify-razorpay',auth.isLogin,auth.isBlocked,checkoutController.verifyRazorpay);
+userRouter.patch('/razorpay-success',auth.isLogin,auth.isBlocked,checkoutController.razorpaySuccess);
+
+
+// <--------------Order Controller-------------->
+const walletController = require('../controllers/user/walletController');
+// <--------------Order Controller-------------->
+
+userRouter.get('/wallet',auth.isLogin,auth.isBlocked,walletController.loadWallet);
 
 module.exports = userRouter;

@@ -86,10 +86,10 @@
         <div class="payment--card light-purple">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Daily Revenue</span>
-              <span class="amount--value">₹<%=dailyRevenue%></span>
+              <span class="title">Total Customers</span>
+              <span class="amount--value"><%=totalCustomers%></span>
             </div>
-            <i class="fas fa-dollar-sign icon dark-purple"></i>
+            <i class="fa-solid fa-users icon dark-purple"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -97,10 +97,10 @@
         <div class="payment--card light-green">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Monthly Revenue</span>
-              <span class="amount--value">₹<%=monthlyRevenue%></span>
+              <span class="title">Total Orders</span>
+              <span class="amount--value"><%=totalOrders%></span>
             </div>
-            <i class="fas fa-dollar-sign icon dark-green"></i>
+            <i class="fa-solid fa-check icon dark-green"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -108,10 +108,10 @@
         <div class="payment--card light-blue">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Yearly Revenue</span>
-              <span class="amount--value">₹<%=yearlyRevenue%></span>
+              <span class="title">Total Products</span>
+              <span class="amount--value"><%=totalProducts%></span>
             </div>
-            <i class="fas fa-dollar-sign icon dark-blue"></i>
+            <i class="fa-solid fa-cart-shopping icon dark-blue"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -199,7 +199,7 @@ const myChart = new Chart(ctx, {
         borderWidth: 1,
       },
       {
-        label: 'Cancelled_Order',
+        label: 'Cancelled or Returned',
         backgroundColor: 'rgba(255, 0,0, 0.6)',
         data: [],
         borderWidth: 1,
