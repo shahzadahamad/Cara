@@ -1,5 +1,8 @@
 <%- include('../layouts/header.ejs') -%>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
   <style>
     * {
       margin: 0;
@@ -181,14 +184,14 @@
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-textfield-decoration-container {
-        display: none;
-        -webkit-appearance: none;
-        margin: 0;
+      display: none;
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     input[type="number"] {
-        -moz-appearance: textfield;
-        appearance: textfield;
+      -moz-appearance: textfield;
+      appearance: textfield;
     }
 
     @media only screen and (max-width: 768px) {
@@ -271,9 +274,12 @@
       <div class="container">
         <div class="wallet">
           <h2>My Wallet</h2>
-          <p>Balance: ₹ <span><%= wallet.totalAmount %></span></p>
+          <p>Balance: ₹ <span>
+              <%= locals.wallet ? wallet.totalAmount : 0 %>
+            </span></p>
         </div>
-        <input type="number" id="add-amount" name="amount" placeholder="Enter Amount">
+        <p style="color: red;margin: 0px;font-size: 15px; margin-bottom: 5px;" class="checking"></p>
+        <input type="number" id="add-amount" placeholder="Enter Amount">
         <button class="add-money-btn" onclick="addMoney()">Add Money</button>
       </div>
 
@@ -342,7 +348,70 @@
       </footer>
 
 
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       <script>
+
+        async function addMoney() {
+          try {
+            const inputEmtpy = document.querySelector('.checking');
+            const amount = document.getElementById('add-amount').value;
+            if (amount.value === ' ' || !amount) {
+              inputEmtpy.textContent = 'Enter Amount'
+              inputEmtpy.style.display = 'block'
+              return
+            } else {
+              inputEmtpy.textContent = '';
+              inputEmtpy.style.display = 'none'
+            }
+
+
+            const responce = await axios.post('add-to-wallet', { amount });
+            const { data } = responce;
+            if (data) {
+              const options = {
+                key: data.key,
+                amount: data.amount,
+                currency: 'INR',
+                name: 'Cara Online Shopping Site',
+                description: 'Add money to wallet',
+                order_id: data.orderId,
+                handler: async function (responce) {
+                  try {
+                    const success = await axios.patch('/waller-add-success', { amount: data.amount/100 });
+                    if (success.status) {
+                      Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful!',
+                        text: 'Thank you for your purchase.',
+                      }).then((result)=>{
+                        window.location.href='/wallet'
+                      })
+                    }
+                  } catch (error) {
+                    console.log(error);
+                  }
+                },
+                prefill: {
+                  name: data.cusName,
+                  email: data.cusEmail,
+                  contact: data.cusContact,
+                }
+              }
+              const razorpay = new Razorpay(options);
+              razorpay.open();
+            };
+
+          } catch (error) {
+            console.log(error.message)
+            alert('Error')
+          }
+        }
+
+
+
+
+
+
         const logout = document.getElementById('logout');
         logout.addEventListener('click', () => {
           Swal.fire({

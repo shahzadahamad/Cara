@@ -159,5 +159,7 @@ const walletController = require('../controllers/user/walletController');
 // <--------------Order Controller-------------->
 
 userRouter.get('/wallet',auth.isLogin,auth.isBlocked,walletController.loadWallet);
+userRouter.post('/add-to-wallet',walletController.verifyAddMoney);
+userRouter.patch('/waller-add-success',walletController.verifySuccessAddMoney);
 
 module.exports = userRouter;

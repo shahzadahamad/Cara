@@ -424,8 +424,6 @@
         document.getElementById('paymentForm').onsubmit = function (event) {
           const selectedPaymentMethod = document.querySelector('input[name="selectedPaymentMethod"]:checked').value;
           const selectedAddress = document.querySelector('input[name=selectedAddress]:checked').value;
-          const total = document.getElementById('totalAmount').textContent;
-          const amount = total.replace('₹', '');
           if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'Wallet') {
             return true;
           } else {
@@ -448,7 +446,6 @@
                     description: 'Purchase Description add letter',
                     order_id: data.orderId,
                     handler: function (responce) {
-                      console.log(responce);
                       fetch('/razorpay-success',{
                         method: "PATCH",
                         headers:{

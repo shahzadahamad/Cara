@@ -9,6 +9,7 @@ const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
 const nodemon = require("nodemon");
 const flash = require('connect-flash');
+const morgan = require('morgan');
 const dotEnv = require("dotenv");
 dotEnv.config();
 
@@ -21,6 +22,9 @@ app.use(
     cookie: { maxAge: 2 * 30 * 24 * 60 * 60 * 1000  },
   })
 );
+
+// morgan
+// app.use(morgan('dev'));
 
 // flash 
 app.use(flash());

@@ -9,6 +9,17 @@ const Payment = require('../../models/paymentModel');
 const Wallet = require('../../models/walletModel');
 const moment = require("moment");
 
+const razorpay = async () => {
+  const { key_id, key_secret } = process.env;
+
+  const razorpayInstance = new Razorpay({
+    key_id: key_id,
+    key_secret: key_secret,
+  });
+
+  return razorpayInstance;
+}
+
 // decremting the product quantity
 const decrementProductQuatity = async (id) => {
   try {
@@ -81,12 +92,8 @@ const verifyRazorpay = async (req, res) => {
     const totalAmount = Number(shipping)*100
 
 
-    const { key_id, key_secret } = process.env;
+    const razorpayInstance =  await razorpay();
 
-    const razorpayInstance = new Razorpay({
-      key_id: key_id,
-      key_secret: key_secret,
-    });
 
     const options = {
       amount: totalAmount,
@@ -96,7 +103,7 @@ const verifyRazorpay = async (req, res) => {
     razorpayInstance.orders.create(options, (err, order) => {
       if (!err) {
         res.status(200).send({
-          key: key_id,
+          key: razorpayInstance.key_id,
           orderId: order.id,
           amount: totalAmount,
           cusName: req.session.user.fullname,
@@ -257,4 +264,5 @@ module.exports= {
   verifyCartCheckout,
   verifyRazorpay,
   razorpaySuccess,
+  razorpay,
 }

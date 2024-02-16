@@ -282,11 +282,11 @@
                         <% } %>
                         <% if(order[0].orderStatus !== 'Cancelled'&&order[0].orderStatus !== 'Delivered'&& order[0].orderStatus !== 'On The Way'&&order[0].orderStatus !== 'Returned'&&order[0].orderStatus!=='Return Requasted'){ %>
                       <td>
-                        <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=cancel">Cancel</a>
+                        <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=cancel&method=<%= order[0].paymentMethod %>">Cancel</a>
                       </td>
-                      <% }else if(order[0].orderStatus==='Delivered'){ %>
+                      <% }else if(order[0].orderStatus==='Delivered' && !locals.status){ %>
                         <td>
-                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=return">Return</a>
+                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"   href="/cancel-order?id=<%= order[0]._id %>&type=return">Return</a>
                         </td>
                         <% } %>
                     </tr>
