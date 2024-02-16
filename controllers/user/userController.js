@@ -102,8 +102,7 @@ const verifyShopSearch = async (req, res) => {
     const {value}=req.body;
 
     const regex = new RegExp(value, 'i');
-    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0});
-
+    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0})
     const encodedProducts = Buffer.from(JSON.stringify(products)).toString('base64');
 
     res.redirect(`/shop?value=${value}&results=${encodeURIComponent(encodedProducts)}`);
@@ -124,6 +123,8 @@ const loadSearch = async (req, res) => {
         { brand: { $regex: data, $options: "i" } },
       ],
     });
+
+console.log(products);
 
     res.send({ products });
   } catch (error) {

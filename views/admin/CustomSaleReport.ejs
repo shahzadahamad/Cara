@@ -100,6 +100,7 @@
       <br>
       <div>
         <div style="justify-content: start;" class="card--wrapper">
+          <% if(!locals.status){ %>
           <div>
             <form action="/admin/custom-sale-report" method="post">
               <label for="">From Date : </label>
@@ -112,6 +113,7 @@
 
             </form>
           </div>
+          <% } %>
         </div>
         <div id="report" class="tabular--wrapper">
           <% if(locals.info){ %>

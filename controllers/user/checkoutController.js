@@ -212,7 +212,13 @@ const verifyCheckout = async (req, res) => {
          req.flash('message','No Balace in Wallat');
          return res.redirect('/checkout');
       }else{
-        await Wallet.updateOne({userId:req.session.user._id},{$inc:{totalAmount:-order.orderAmount}})
+        const update = {
+          type:'debit',
+          amount:order.orderAmount,
+          transactionDate:new Date(),
+        }
+        await Wallet.updateOne({userId:req.session.user._id},{$inc:{totalAmount:-order.orderAmount}});
+        await Wallet.updateOne({userId:req.session.user._id},{$push:{transactions:update}});
         await order.save()
         await cart.deleteOne({ userId: req.session.user._id });
         res.redirect("/order-confirm/#page-header");

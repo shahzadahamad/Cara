@@ -86,10 +86,10 @@
         <div class="payment--card light-purple">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Total Customers</span>
-              <span class="amount--value"><%=totalCustomers%></span>
+              <span class="title">Daily Revenue</span>
+              <span class="amount--value">₹<%=dailyRevenue%></span>
             </div>
-            <i class="fa-solid fa-users icon dark-purple"></i>
+            <i class="fas fa-dollar-sign icon dark-purple"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -97,10 +97,10 @@
         <div class="payment--card light-green">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Total Orders</span>
-              <span class="amount--value"><%=totalOrders%></span>
+              <span class="title">Monthly Revenue</span>
+              <span class="amount--value">₹<%=monthlyRevenue%></span>
             </div>
-            <i class="fa-solid fa-check icon dark-green"></i>
+            <i class="fas fa-dollar-sign icon dark-green"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -108,10 +108,10 @@
         <div class="payment--card light-blue">
           <div class="card--header">
             <div class="amount">
-              <span class="title">Total Products</span>
-              <span class="amount--value"><%=totalProducts%></span>
+              <span class="title">Yearly Revenue</span>
+              <span class="amount--value">₹<%=yearlyRevenue%></span>
             </div>
-            <i class="fa-solid fa-cart-shopping icon dark-blue"></i>
+            <i class="fas fa-dollar-sign icon dark-blue"></i>
           </div>
           <span class="card--detail">**** **** ****</span>
         </div>
@@ -123,10 +123,10 @@
         <div style="width: 160vh;">
           <canvas width="100" style="display: flex;" id="myChart"></canvas>
           <div style="display: flex; justify-content: center;" class="gap-3 mt-4 ">
-            <button id="dailyBtn" class="btn btn-outline-primary">Daily</button>
-            <button id="weeklyBtn" class="btn btn-outline-primary">Weekly</button>
-            <button id="monthlyBtn" class="btn btn-outline-primary">Monthly</button>
-            <button id="yearlyBtn" class="btn btn-outline-primary">Yearly</button>
+            <button id="dailyBtn" class="btn btn-outline-primary" onclick="window.location.href='/admin/custom-sale-report?data=Daily'">Daily</button>
+            <button id="weeklyBtn" class="btn btn-outline-primary"onclick="window.location.href='/admin/custom-sale-report?data=Weekly'">Weekly</button>
+            <button id="monthlyBtn" class="btn btn-outline-primary"onclick="window.location.href='/admin/custom-sale-report?data=Monthly'">Monthly</button>
+            <button id="yearlyBtn" class="btn btn-outline-primary"onclick="window.location.href='/admin/custom-sale-report?data=Yearly'">Yearly</button>
             <a href="/admin/custom-sale-report" id="yearlyBtn" class="btn btn-outline-primary">Custom</a>
         </div>
         </div>
@@ -137,17 +137,10 @@
   <script>
 const ctx = document.getElementById('myChart');
 const dailyBtn = document.getElementById('dailyBtn');
-const weeklyBtn = document.getElementById('weeklyBtn');
-const monthlyBtn = document.getElementById('monthlyBtn');
-const yearlyBtn = document.getElementById('yearlyBtn');
 
 updateChart('daily');
-dailyBtn.addEventListener('click', () => updateChart('daily'));
-weeklyBtn.addEventListener('click',()=> updateChart('weekly'));
-monthlyBtn.addEventListener('click', () => updateChart('monthly'));
-yearlyBtn.addEventListener('click', () => updateChart('yearly'));
 
-
+let myChart;
 
 // fetching data
 async function fetchData(url) {
@@ -165,7 +158,7 @@ async function fetchData(url) {
   } catch (error) {
     console.error(error.message);
   }
-}
+};
 
 
 // updateing data
@@ -173,18 +166,19 @@ async function updateChart(dataType) {
 
   const data = await fetchData(`/admin/dashboard?type=${dataType}`);
 
-  const { orders, revenue,cancelledOrder,type } = data;
+  const { orders, revenue,cancelledOrder,type,date } = data;
 
   myChart.data.datasets[0].data=[orders];
   myChart.data.datasets[1].data=[revenue];
   myChart.data.datasets[2].data=[cancelledOrder];
+  myChart.data.labels=[date]
   myChart.update();
 }
 
-const myChart = new Chart(ctx, {
+myChart = new Chart(ctx, {
   type: 'bar',
   data: {
-    labels: ['Sun'],
+    labels: [],
     datasets: [
       {
         label: 'Orders',
@@ -195,6 +189,7 @@ const myChart = new Chart(ctx, {
       {
         label: 'Revenue',
         backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        yAxisID:'percentage',
         data: [],
         borderWidth: 1,
       },
@@ -208,14 +203,33 @@ const myChart = new Chart(ctx, {
   },
   options: {
     scales: {
-      y: {
-        beginAtZero: true
+      x:{
+        title:{
+          display: true,
+          text: 'Date',
+        }
       },
+      y:{
+        beginAtZero: true,
+        title: {
+          display:true,
+          text:'Orders'
+        }
+      },
+      percentage:{
+        beginAtZero: true,
+        title: {
+          display:true,
+          text:'Revenue',
+        },
+        position: 'right'
+      }
     },
     elements: {
       bar: {
         borderWidth: 2,
-        borderColor: 'rgba(0,0,0,0.9)'
+        borderColor: 'rgba(0,0,0,0.9)',
+        position: 'right'
       }
     }
   }

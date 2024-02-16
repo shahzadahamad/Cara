@@ -51,6 +51,7 @@ const orderSchema = new mongoose.Schema({
   },
   isReturned: {
     type: Boolean,
+    default:false,
   },
   returnedRequestDate:{
     type:Date,

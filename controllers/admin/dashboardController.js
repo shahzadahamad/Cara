@@ -12,9 +12,6 @@ const loadDashboard = async (req, res) => {
     const dailyRevenue = await getDailyData();
     const monthlyRevenue = await getMonthlyData();
     const yearlyRevenue = await getYearlyData();
-    const totalCustomers = await User.find({});
-    const totalOrders = await Order.find({});
-    const totalProducts = await Product.find({});
     const adminData = await admin.findById({ _id: req.session.admin_id });
     res.render("dashboard", {
       admins: adminData,
@@ -22,9 +19,6 @@ const loadDashboard = async (req, res) => {
       monthlyRevenue: monthlyRevenue.revenue,
       yearlyRevenue: yearlyRevenue.revenue,
       totalRevenue: totalRevenue,
-      totalCustomers: totalCustomers.length,
-      totalOrders: totalOrders.length,
-      totalProducts: totalProducts.length,
     });
   } catch (error) {
     console.log(error.message);
@@ -73,6 +67,7 @@ const getDailyData = async (req, res) => {
       orders: dailyOrder.length,
       revenue: dailyRevenue,
       cancelledOrder: count,
+      date: moment().format("YYYY-MM-DD"),
     };
   } catch (error) {
     console.log(error.message);
@@ -105,6 +100,8 @@ const getWeeklyData = async (req, res) => {
       orders: weeklyOrder.length,
       revenue: weeklyRevenue,
       cancelledOrder: count,
+      startOfWeek:startOfWeek,
+      endOfWeek:endOfWeek,
     };
   } catch (error) {
     console.log(error.message);
@@ -137,6 +134,8 @@ const getMonthlyData = async (req, res) => {
       orders: monthlyOrder.length,
       revenue: monthlyRevenue,
       cancelledOrder: count,
+      startOfMouth:startOfMouth,
+      endOfMouth:endOfMouth,
     };
   } catch (error) {
     console.log(error.message);
@@ -169,11 +168,73 @@ const getYearlyData = async (req, res) => {
       orders: yearlyOrder.length,
       revenue: yearlyRevenue,
       cancelledOrder: count,
+      startOfYear:startOfYear,
+      endOfYear:endOfYear,
     };
   } catch (error) {
     console.log(error.message);
   }
 };
+
+const customReport = async (fromDate, toDate) => {
+  const customReport = await Order.aggregate([
+    {
+      $match: {
+        orderDate: {
+          $gte: new Date(fromDate),
+          $lte: new Date(toDate),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
+        totalRevenue: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $eq: ["$isReturned", false] },
+                  { $eq: ["$isCancelled", false] },
+                ],
+              },
+              "$orderAmount",
+              0,
+            ],
+          },
+        },
+        cancelledOrdersCount: {
+          $sum: {
+            $cond: [
+              {
+                $or: [
+                  { $eq: ["$isCancelled", true] },
+                  { $eq: ["$isReturned", true] },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
+        totalOrders: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: "$_id",
+        totalRevenue: 1,
+        cancelledOrdersCount: 1,
+        totalOrders: 1,
+      },
+    },
+    {
+      $sort: { date: 1 },
+    },
+  ]);
+  return customReport;
+}
 
 // verifyDashboard
 const verifyDashboard = async (req, res) => {
@@ -181,39 +242,13 @@ const verifyDashboard = async (req, res) => {
     const { type } = req.query;
     if (type === "daily") {
       const dailyData = await getDailyData();
-      const { orders, revenue, cancelledOrder } = dailyData;
+      const { orders, revenue, cancelledOrder, date } = dailyData;
       res.send({
         orders,
         revenue,
         cancelledOrder,
         type,
-      });
-    } else if (type === "weekly") {
-      const weekData = await getWeeklyData();
-      const { orders, revenue, cancelledOrder } = weekData;
-      res.send({
-        orders,
-        revenue,
-        cancelledOrder,
-        type,
-      });
-    } else if (type === "monthly") {
-      const monthlyData = await getMonthlyData();
-      const { orders, revenue, cancelledOrder } = monthlyData;
-      res.send({
-        orders,
-        revenue,
-        cancelledOrder,
-        type,
-      });
-    } else if (type === "yearly") {
-      const yearlyData = await getYearlyData();
-      const { orders, revenue, cancelledOrder } = yearlyData;
-      res.send({
-        orders,
-        revenue,
-        cancelledOrder,
-        type,
+        date,
       });
     }
   } catch (error) {
@@ -221,42 +256,25 @@ const verifyDashboard = async (req, res) => {
   }
 };
 
-// custom sales report
-const loadCustomSalesReport = async (req, res) => {
-  try {
-    const adminData = await admin.findById({ _id: req.session.admin_id });
-    const { From, To, customReport } = req.query;
+// getiing the monthly yearly weekly daily
+const custsomMonthYearWeekDaily = async (data) => {
+  try{
 
-    if (customReport && From && To) {
-      const parsedCustomReport = JSON.parse(decodeURIComponent(customReport));
-      return res.render("CustomSaleReport", {
-        admins: adminData,
-        info: { From, To, customReport: parsedCustomReport },
-      });
-    }
-    res.render("CustomSaleReport", {
-      admins: adminData,
-    });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
+    if(data==='Monthly'){
+      const {startOfMouth,endOfMouth} = await getMonthlyData();
+      const result = await customReport(startOfMouth,endOfMouth);
+      return result;
+    }else if(data==='Weekly'){
+      const {startOfWeek,endOfWeek} = await getWeeklyData();
+      const result = await customReport(startOfWeek,endOfWeek);
+      return result;
+    }else if(data==='Yearly'){
+      const {startOfYear,endOfYear} = await getYearlyData();
+      const result = await customReport(startOfYear,endOfYear);
+      return result;
+    }else if(data==='Daily'){
 
-// verify custom report
-const verifyCustomSalesReport = async (req, res) => {
-  try {
-    const { from, to } = req.body;
-
-    if (from && to) {
-      const customReport = await Order.aggregate([
-        {
-          $match: {
-            orderDate: {
-              $gte: new Date(from),
-              $lte: new Date(to),
-            },
-          },
-        },
+      const result = await Order.aggregate([
         {
           $group: {
             _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
@@ -265,8 +283,8 @@ const verifyCustomSalesReport = async (req, res) => {
                 $cond: [
                   {
                     $and: [
-                      { $eq: ["$isCancelled", false] },
                       { $eq: ["$isReturned", false] },
+                      { $eq: ["$isCancelled", false] },
                     ],
                   },
                   "$orderAmount",
@@ -304,10 +322,63 @@ const verifyCustomSalesReport = async (req, res) => {
           $sort: { date: 1 },
         },
       ]);
+      return result;
+    }
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+// custom sales report
+const loadCustomSalesReport = async (req, res) => {
+  try {
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    const { From, To, customReport,data } = req.query;
+
+    if (customReport && From && To) {
+      const parsedCustomReport = JSON.parse(decodeURIComponent(customReport));
+      return res.render("CustomSaleReport", {
+        admins: adminData,
+        info: { From, To, customReport: parsedCustomReport },
+        status:false,
+      });
+    }
+
+    if(data){
+     const result = await custsomMonthYearWeekDaily(data);
+      return res.render('CustomSaleReport',{
+        admins:adminData,
+        info: {customReport:result},
+        status:true,
+      })
+    }
+
+    res.render("CustomSaleReport", {
+      admins: adminData,
+      status:false
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// verify custom report
+const verifyCustomSalesReport = async (req, res) => {
+  try {
+    const { from, to } = req.body;
+
+    const fromDate = new Date(from).setHours(0,0,0,0)
+    const toDate = new Date(to).setHours(23,59,59,999)
+ 
+
+    if (from && to) {
+
+      const result = await customReport(fromDate,toDate);
 
       res.redirect(
         `/admin/custom-sale-report?From=${from}&To=${to}&customReport=${encodeURIComponent(
-          JSON.stringify(customReport)
+          JSON.stringify(result)
         )}`
       );
     } else {
