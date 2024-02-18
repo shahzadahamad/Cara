@@ -8,6 +8,10 @@ const orderSchema = new mongoose.Schema({
   orderAmount:{
     type: Number,
   },
+  couponApplied:{
+    type: mongoose.Schema.ObjectId,
+    ref:'coupon'
+  },
   deliveryAddress:{
     type: Object,
     ref:'address',

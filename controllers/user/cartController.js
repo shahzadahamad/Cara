@@ -3,6 +3,7 @@ const cart = require("../../models/cartModel");
 const Address = require("../../models/addressModel");
 const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
+const Coupon = require("../../models/couponModel");
 const moment = require("moment");
 
 // totalCart price
@@ -59,6 +60,7 @@ const totalCartPrice = async (id, req, res) => {
 // loadCart
 const loadCart = async (req, res) => {
   try {
+    const coupons = await Coupon.find();
     const message = req.flash("message");
     const products = await cart
       .findOne({ userId: req.session.user._id })
@@ -70,6 +72,7 @@ const loadCart = async (req, res) => {
         product: products.products,
         total: totalCart[0].total,
         message,
+        coupons,
       });
     } else {
       res.render("cart", { login: req.session.user, message });
@@ -190,10 +193,46 @@ const verifyCartDetials = async (req, res) => {
   }
 };
 
+const verifyCoupon = async (req, res) => {
+  try {
+    const { couponCode } = req.body;
+    if(req.session.coupon){
+      return res.json({msg:'Coupon Already Applied'})
+    }
+    const coupon = await Coupon.findOne({ couponCode: couponCode });
+    if (coupon) {
+      req.session.coupon = coupon;
+    }
+    const appliedCoupon = await Coupon.findOne({ couponCode: couponCode });
+    if (!couponCode) {
+      return res.json({ msg: "Add Coupon Code" });
+    }
+    if (!appliedCoupon) {
+      return res.json({ msg: "Invalied Coupon Code" });
+    } else {
+      const total = await totalCartPrice(req.session.user._id);
+      return res.json({ status: appliedCoupon.discountAmount, total: total});
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const clearCoupon = async (req, res) => {
+  try {
+    delete req.session.coupon;
+    res.json({ status: "success" });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadCart,
   verifyAddToCart,
   verifyRemoveCart,
   verifyCartDetials,
   totalCartPrice,
+  verifyCoupon,
+  clearCoupon,
 };

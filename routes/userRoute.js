@@ -92,6 +92,10 @@ userRouter.patch('/remove-product',cartController.verifyRemoveCart);
 // cart products detials
 userRouter.patch('/cart-detials',cartController.verifyCartDetials);
 
+// apply Coupon 
+userRouter.post('/apply-coupon',cartController.verifyCoupon);
+userRouter.post('/clear-coupon',cartController.clearCoupon);
+
 
 // <--------------Address Controller-------------->
 const addressController = require('../controllers/user/addressController');

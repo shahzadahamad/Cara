@@ -1,8 +1,73 @@
 <%- include('../layouts/header.ejs') -%>
 
+
+
   <style>
     #crusor {
       cursor: pointer;
+    }
+
+    .style {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+      background-color: #088178;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%;
+      max-height: 80%;
+      overflow-y: auto;
+      position: fixed;
+      left: 345px;
+      top: -16%;
+    }
+
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .coupon-container {
+      margin-bottom: 20px;
+    }
+
+    .coupon {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 5px;
     }
   </style>
 
@@ -59,7 +124,8 @@
                   <td><a onclick="removeProduct('<%= product[i]._id %>','<%= i %>')"><i
                         class="far fa-times-circle"></i></a>
                   </td>
-                  <td><img src="images/productImages/<%= product[i].productId.image[0] %>" onclick="window.location.href='/sproduct?id=<%= product[i].productId._id %>'"  alt=""></td>
+                  <td><img src="images/productImages/<%= product[i].productId.image[0] %>"
+                      onclick="window.location.href='/sproduct?id=<%= product[i].productId._id %>'" alt=""></td>
                   <td>
 
 
@@ -76,17 +142,23 @@
                   </td>
                   <td>₹<%= product[i].productId.price %>
                   </td>
-                  <td><input type="number" id="inputTag<%= i %>"
-                      oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
-                      value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity ? product[i].quantity : product[i].quantity+1 %>"
-                      onkeydown="return false" min="1"></td>
-                      <% if(product[i].quantity){ %>
-                  <td id="subTotal<%=i%>">₹<%= product[i].productId.price * product[i].quantity %>
+                  <td>
+                    <% if(product[i].productId.quantity>0){ %>
+                      <input type="number" id="inputTag<%= i %>"
+                        oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
+                        value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity ? product[i].quantity : product[i].quantity+1 %>"
+                        onkeydown="return false" min="1">
+                      <% } %>
                   </td>
-                  <% }else{ %>
-                    <td id="subTotal<%=i%>">₹<%= product[i].productId.price * 1 %>
-                    </td>
-                    <% } %>
+                  <% if(product[i].productId.quantity>0){ %>
+                    <% if(product[i].quantity){ %>
+                      <td id="subTotal<%=i%>">₹<%= product[i].productId.price * product[i].quantity %>
+                      </td>
+                      <% }else{ %>
+                        <td id="subTotal<%=i%>">₹<%= product[i].productId.price * 1 %>
+                        </td>
+                        <% } %>
+                          <% } %>
                 </tr>
                 <% } %>
                   <% } else { %>
@@ -102,14 +174,47 @@
       </section>
 
 
+      <div id="couponModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <% if(locals.coupons && locals.coupons.length>0){ %>
+            <h4>Coupons Available</h4>
+            <br>
+            <% for(let i=0;i<coupons.length;i++){ %>
+              <% if(coupons[i].discountAmount<=(total < 500 ? total + 40 : total) && coupons[i].quantity>0){ %>
+                <div class="coupon-container">
+                  <div class="coupon">
+                    <p style="font-weight: 700; color: #000;">Coupon Code : <span
+                        style="font-weight: 900; color: #088178;" id="textToCopy<%= i %>">
+                        <%= coupons[i].couponCode %>
+                      </span></p>
+                    <p style="font-weight: 700; color: #000;">Detials : <%= coupons[i].description %>
+                    </p>
+                  </div>
+                  <button class="style" onclick="myFunction('<%= i %>')">Copy Code</button>
+                </div>
+                <% } %>
+                  <% } %>
+                    <% }else{ %>
+                      <h5>No Coupon Available</h5>
+                      <% } %>
+        </div>
+      </div>
+
       <% if(locals.product){%>
         <form action="/verify-cart-checkout" method="post">
           <section id="cart-add" class="section-p1">
             <div id="coupon">
               <h3>Apply Coupon</h3>
+              <p style="display: none; font-weight: 800; font-size: 12px; color: red; margin: 0px; text-align: start; "
+                id="errorMsg"></p>
               <div>
-                <input type="text" placeholder="Enter Your Coupon">
-                <button class="normal">Apply</button>
+                <form>
+                  <input type="text" id="inputVal" placeholder="Enter Your Coupon Code">
+                  <button class="normal" onclick="CouponApply()">Apply</button>
+                </form>
+                <br><br>
+                <a style="padding: 8px;" class="style" id="openModalBtn">Show Coupon</a>
               </div>
             </div>
             <div id="subtotal">
@@ -133,6 +238,10 @@
                     <% } else { %>
                       <td id="shipping">Free</td>
                       <% } %>
+                </tr>
+                <tr style="display: none" id="discountbox">
+                  <td>Discount</td>
+                  <td id="discount">-</td>
                 </tr>
                 <tr>
                   <td><strong>Total</strong></td>
@@ -207,7 +316,123 @@
             </div>
           </footer>
 
+
+          <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+
           <script>
+
+            function myFunction(index) {
+
+              const element = document.getElementById(`textToCopy${index}`);
+              const modal = document.getElementById('couponModal');
+
+
+              var range = document.createRange();
+              range.selectNode(element);
+
+
+              window.getSelection().removeAllRanges();
+              window.getSelection().addRange(range);
+
+              document.execCommand("copy");
+
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Code Copied!',
+                showConfirmButton: false,
+                timer: 800,
+              }).then((result) => {
+                modal.style.display = 'none'
+              })
+            }
+
+            // modal for available coupon
+            document.addEventListener('DOMContentLoaded', function () {
+              const openModalBtn = document.getElementById('openModalBtn');
+              const modal = document.getElementById('couponModal');
+              const closeModalBtn = modal.querySelector('.close');
+
+              openModalBtn.addEventListener('click', function () {
+                modal.style.display = 'block';
+              });
+
+              closeModalBtn.addEventListener('click', function () {
+                modal.style.display = 'none';
+              });
+
+              window.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                  modal.style.display = 'none';
+                }
+              });
+            });
+            // modal for available coupon
+
+            window.addEventListener('DOMContentLoaded', () => {
+              deleteSession();
+            })
+
+
+            let discounts;
+
+
+            async function CouponApply() {
+              event.preventDefault()
+              const errorMsg = document.getElementById('errorMsg');
+              const discount = document.getElementById('discount');
+              const discountbox = document.getElementById('discountbox');
+              const total = document.getElementById('total');
+              const couponCode = document.getElementById('inputVal').value;
+              const responce = await axios.post('/apply-coupon', { couponCode });
+
+              if (responce.data.msg === 'Coupon Already Applied') {
+                errorMsg.style.color = 'green'
+              } else {
+                errorMsg.style.color = 'red'
+              }
+
+              if (responce.data.msg) {
+                errorMsg.innerHTML = responce.data.msg
+                errorMsg.style.display = 'block'
+              } else {
+                errorMsg.style.display = 'none'
+              }
+
+              discounts = responce.data.status;
+
+              if (responce.data.status) {
+                discount.innerHTML = "-₹" + responce.data.status
+                discountbox.style.display = 'contents'
+                if (responce.data.total[0].total < 500) {
+                  total.innerHTML = "₹" + Number(responce.data.total[0].total + 40 - responce.data.status);
+                  console.log(total.innerHTML)
+                } else {
+                  total.innerHTML = "₹" + Number(responce.data.total[0].total - responce.data.status);
+                }
+                errorMsg.innerHTML = 'Coupon Applied',
+                  errorMsg.style.display = 'block'
+                errorMsg.style.color = 'green'
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Coupen Applied!',
+                  showConfirmButton: false,
+                  timer: 1000,
+                })
+              }
+
+            }
+
+            async function deleteSession() {
+              try {
+                await axios.post('/clear-coupon');
+              } catch (error) {
+                console.log(error.message);
+              }
+            }
+
 
 
             function removeProduct(id, i) {
@@ -219,6 +444,7 @@
               const checkout = document.getElementById('cart-add');
               const button = document.getElementById('button');
 
+              const pTag = document.getElementById(`pTag${i}`);
 
 
 
@@ -232,34 +458,80 @@
               }).then((res) => res.json())
                 .then((data) => {
 
-                  const value = subTotalRow.innerHTML.replace('₹', '');
+
+
                   const lastOne = data.cartDelete.deletedCount;
                   row.remove();
                   if (lastOne) {
                     checkout.remove();
                   }
-                  cartSubtotal.innerHTML = '₹' + Number(data.totalCart[0].total - value);
 
 
-                  if (data.totalCart[0].total < 500) {
-                    shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
-                    total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
-                  } else {
-                    shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
-                    total.innerHTML = '₹' + Number(data.totalCart[0].total - value);
+                  if (pTag.innerHTML && !lastOne) {
+                    return
                   }
 
+                  if (subTotalRow) {
+                    const value = subTotalRow.innerHTML.replace('₹', '');
 
-                  if (Number(cartSubtotal.innerHTML.slice(1, 5)) === 0) {
+
+
+                    cartSubtotal.innerHTML = '₹' + Number(data.totalCart[0].total - value);
+
+
+
+
+                    if (data.totalCart[0].total < 500) {
+                      shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
+                      shipping.innerHTML = data.totalCart[0].total - value === 0 ? "Free" : "₹" + 40
+                      total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
+                      if (discount && discounts!=undefined) {
+                        console.log('lasdf;')
+                        total.innerHTML = data.totalCart[0].total - value === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value - discounts);
+                      } else {
+                        total.innerHTML = data.totalCart[0].total - value === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
+                      }
+                    } else {
+                      shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
+                      if (discount && discounts!=undefined) {
+                        console.log('lasdf;')
+                        total.innerHTML = '₹' + Number(data.totalCart[0].total - value-discounts);
+                      } else {
+                        total.innerHTML = '₹' + Number(data.totalCart[0].total - value);
+                      }
+                    }
+
+                  }
+
+                  if (data.totalCart[0].total <= 0) {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML='₹'+0
-                    button.remove();
+                    total.innerHTML = '₹' + 0
+                    button.style.display = 'none';
+                  }
+
+                  const totalVal = total.innerHTML.replace('₹', '');
+                  if (Number(totalVal) <= 0) {
+                    shipping.innerHTML = 'Free';
+                    total.innerHTML = '₹' + 0
+                    button.style.display = 'none';
+                  }
+
+                  const subCartTotoal = cartSubtotal.innerHTML.replace('₹', '');
+                  if (Number(subCartTotoal) <= 0) {
+                    shipping.innerHTML = 'Free';
+                    cartSubtotal.innerHTML = '₹' + 0
+                    button.style.display = 'none';
                   }
 
 
                 })
                 .catch((error) => console.log(error.message));
             }
+
+
+
+
+
 
             function countOfQuantity(id, price, i, stock) {
               const input = document.getElementById(`inputTag${i}`);
@@ -298,15 +570,23 @@
 
                   if (data.totalCart[0].total < 500) {
                     shipping.innerHTML = '₹' + 40;
-                    total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
+                    if (discount && discounts!=undefined) {
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total + 40 - discounts)
+                    } else {
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
+                    }
                   } else {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML = '₹' + Number(data.totalCart[0].total);
+                    if (discount && discounts!=undefined) {
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total - discounts);
+                    } else {
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total);
+                    }
                   }
 
-                  if (Number(cartSubtotal.innerHTML.slice(1, 5)) === 0) {
+                  if (data.totalCart[0].total === 0) {
                     shipping.innerHTML = 'Free';
-                    total.innerHTML='₹'+0
+                    total.innerHTML = '₹' + 0
                     button.remove();
                   }
 
@@ -318,6 +598,9 @@
 
 
           </script>
+
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
           <script src="/javaScript/script.js"></script>
 

@@ -301,33 +301,46 @@
               <tbody>
 
                 <% for(let i=0 ;i<product.products.length;i++){ %>
-                  <tr>
-                    <td data-label="Product">
-                      <%= product.products[i].productId.name %><span style="font-weight: 500;"> - </span><span
-                          style="font-weight: 500;">
-                          <%= product.products[i].quantity%>
-                        </span>
-                    </td>
-                    <td data-label="Total">₹<%= product.products[i].productId.price * product.products[i].quantity %>
-                    </td>
-                  </tr>
-                  <% } %>
+                  <% if(product.products[i].productId.quantity!==0){ %>
                     <tr>
-                      <td data-label="Product">Subtotal</td>
-                      <td data-label="Total">₹<%= total %>
+                      <td data-label="Product">
+                        <%= product.products[i].productId.name %><span style="font-weight: 500;"> - </span><span
+                            style="font-weight: 500;">
+                            <%= product.products[i].quantity%>
+                          </span>
+                      </td>
+                      <td data-label="Total">₹<%= product.products[i].productId.price * product.products[i].quantity %>
                       </td>
                     </tr>
-                    <tr>
-                      <td data-label="Product">Shipping</td>
-                      <td data-label="Total">
-                        <%= total<500? '₹40' : 'Free' %>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight: 700;" data-label="Product">Total</td>
-                      <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹<%=total<500?total+40:total%>
-                      </td>
-                    </tr>
+                    <% } %>
+                      <% } %>
+                        <tr>
+                          <td data-label="Product">Subtotal</td>
+                          <td data-label="Total">₹<%= discount ? total + discount.discountAmount : total %>
+                          </td>
+                        </tr>
+               
+
+                            <tr>
+                              <td data-label="Product">Shipping</td>
+                              <td data-label="Total">
+                                <%= total<500? '₹40' : 'Free' %>
+                              </td>
+                            </tr>
+                            <% if(locals.discount){ %>
+
+                              <tr>
+                                <td data-label="Product">Discount</td>
+                                <td data-label="Totol">-₹<%= discount.discountAmount %>
+                                </td>
+                              </tr>
+                              <% } %>
+                            <tr>
+                              <td style="font-weight: 700;" data-label="Product">Total</td>
+                              <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹
+                                <%=total<500?total+40:total%>
+                              </td>
+                            </tr>
               </tbody>
             </table>
             <br>
@@ -446,18 +459,18 @@
                     description: 'Purchase Description add letter',
                     order_id: data.orderId,
                     handler: function (responce) {
-                      fetch('/razorpay-success',{
+                      fetch('/razorpay-success', {
                         method: "PATCH",
-                        headers:{
-                          "Content-Type":"application/json"
+                        headers: {
+                          "Content-Type": "application/json"
                         },
-                        body:JSON.stringify({id:selectedAddress,transactionId:responce.razorpay_order_id})
-                      }).then((res)=>res.json())
-                      .then((data)=>{
-                        if(data.status){
-                          window.location.href='/order-confirm/#page-header';
-                        }
-                      })
+                        body: JSON.stringify({ id: selectedAddress, transactionId: responce.razorpay_order_id })
+                      }).then((res) => res.json())
+                        .then((data) => {
+                          if (data.status) {
+                            window.location.href = '/order-confirm/#page-header';
+                          }
+                        })
                     },
                     prefill: {
                       name: data.cusName,

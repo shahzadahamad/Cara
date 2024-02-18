@@ -256,7 +256,7 @@
                       <th>Order Status</th>
                       <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way' && order[0].orderStatus !== 'Returned'&& order[0].orderStatus!=='Return Requasted'){ %>           
                       <th>Cancel Order</th>
-                      <% }else if(order[0].orderStatus==='Delivered'){ %>
+                      <% }else if(order[0].orderStatus==='Delivered'&&!locals.status){ %>
                         <th>Return Order</th>
                         <% } %>
                     </tr>
@@ -355,31 +355,34 @@
                       </span></p> 
                           <% } %>
                       </td>
-                     
-
+      
+                      <% let subtotal = 0; %>
                       <td data-label="Total">
                       <% for(let i=0;i<order[0].orderItems.length;i++){ %>
 
-                      <p>$<%= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %></p>
-                     
+                      <p>₹<%= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %></p>
+                      <% subtotal+= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %>
                         <% } %>
-                      </td>
-                 
-
-                  
+                      </td>            
                     </tr>
-              
                         <tr>
                           <td data-label="Product">Subtotal</td>
-                          <td data-label="Total">₹<%= order[0].orderAmount<500 ? order[0].orderAmount-40 : order[0].orderAmount %>
+                          <td data-label="Total">₹<%= subtotal %>
                           </td>
+
                         </tr>
                         <tr>
                           <td data-label="Product">Shipping</td>
-                          <td data-label="Total"><%= order[0].orderAmount<500 ? "₹"+40 : 'Free' %>
-
+                          <td data-label="Total"><%= subtotal<500 ? "₹"+40 : 'Free' %>
                           </td>
                         </tr>
+                        <% if(locals.order[0].couponApplied){ %>
+                          <tr>
+                            <td data-label="Product">Discount</td>
+                            <td data-label="Total">₹<%= order[0].couponApplied.discountAmount %>
+                            </td>
+                          </tr>
+                          <% } %>
                         <tr>
                           <td style="font-weight: 700;" data-label="Product">Total</td>
                           <td style="font-weight: 700;" data-label="Total">₹<%= order[0].orderAmount %>

@@ -6,7 +6,7 @@
 
 
   <div class="sidebar">
-    <div class="logo"></div>
+    <br>
     <ul class="menu">
       <li>
         <a href="/admin/dashboard">
@@ -42,6 +42,12 @@
         <a href="/admin/category">
           <i class="fa-solid fa-list"></i>
           <span>Category</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/coupon">
+          <i class="fa-solid fa-ticket"></i>
+          <span>Coupons</span>
         </a>
       </li>
       <li class="logout">
@@ -102,7 +108,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="8">Total Products: <%= category.length %></td>
+              <td id="totalCategory" colspan="8">Total Products: <%= category.length %></td>
             </tr>
           </tfoot>
         </table>
@@ -115,6 +121,7 @@
   <script>
     
     function deleteCategory(id,i){
+      let totalCategory = document.getElementById('totalCategory');
       const row = document.getElementById(`row${i}`);
       fetch(`/admin/delete-category?id=${id}`,{
         method: "DELETE",

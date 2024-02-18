@@ -124,7 +124,7 @@ const loadSearch = async (req, res) => {
       ],
     });
 
-console.log(products);
+
 
     res.send({ products });
   } catch (error) {

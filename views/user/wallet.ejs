@@ -355,15 +355,17 @@
           try {
             const inputEmtpy = document.querySelector('.checking');
             const amount = document.getElementById('add-amount').value;
-            if (amount.value === ' ' || !amount) {
+            if (amount === ' ' || !amount) {
               inputEmtpy.textContent = 'Enter Amount'
               inputEmtpy.style.display = 'block'
               return
+            } else if (/^0+$/.test(amount)) {
+              inputEmtpy.textContent = 'Enter a valied amount'
+              inputEmtpy.style.display = 'block'
+              return
             } else {
-              inputEmtpy.textContent = '';
               inputEmtpy.style.display = 'none'
             }
-
 
             const responce = await axios.post('add-to-wallet', { amount });
             const { data } = responce;
@@ -377,14 +379,16 @@
                 order_id: data.orderId,
                 handler: async function (responce) {
                   try {
-                    const success = await axios.patch('/waller-add-success', { amount: data.amount/100 });
+                    const success = await axios.patch('/waller-add-success', { amount: data.amount / 100 });
                     if (success.status) {
                       Swal.fire({
                         icon: 'success',
-                        title: 'Payment Successful!',
-                        text: 'Thank you for your purchase.',
-                      }).then((result)=>{
-                        window.location.href='/wallet'
+                        title: 'Amount Added to your Wallet!',
+                        text: 'Thank you.',
+                        showConfirmButton: false,
+                        timer: 1000,
+                      }).then((result) => {
+                        window.location.href = '/wallet'
                       })
                     }
                   } catch (error) {
@@ -403,7 +407,6 @@
 
           } catch (error) {
             console.log(error.message)
-            alert('Error')
           }
         }
 

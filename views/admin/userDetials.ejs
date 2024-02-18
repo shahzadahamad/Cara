@@ -6,7 +6,7 @@
 
 
   <div class="sidebar">
-    <div class="logo"></div>
+   <br>
     <ul class="menu">
       <li>
         <a href="/admin/dashboard">
@@ -42,6 +42,12 @@
         <a href="/admin/category">
           <i class="fa-solid fa-list"></i>
           <span>Category</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/coupon">
+          <i class="fa-solid fa-ticket"></i>
+          <span>Coupons</span>
         </a>
       </li>
       <li class="logout">
@@ -99,7 +105,7 @@
                     <%= users[i].mobile %>
                   </td>
                   <td>
-                    <%= users[i].createdDate.toString().split(' ').slice(0,5) %>
+                    <%= users[i].createdDate.toString().split(' ').slice(0,4) %>
                   </td>
                   <td>
                     <button id="block<%= i %>" onclick="blockUser('<%= users[i]._id %>','<%= i %>')" class=" btn <%= users[i].isBlocked ?  'btn-outline-danger' :  'btn-outline-success' %>">

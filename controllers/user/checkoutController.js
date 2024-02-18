@@ -64,20 +64,20 @@ const paymentDetials = async (transactionId,userId,orderId,amount,method) => {
 
 // checkout
 const loadCheckout = async (req, res) => {
-  try {
+  try {;
     const address = await Address.findOne({ userId: req.session.user._id });
     const products = await cart
       .findOne({ userId: req.session.user._id })
       .populate("products.productId");
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
-
     const message = req.flash("message");
     res.render("checkout", {
       user: req.session.user,
       address: address,
       product: products,
-      total: totalCart[0].total,
+      total: req.session.coupon ? totalCart[0].total - req.session.coupon.discountAmount : totalCart[0].total,
       message,
+      discount:req.session.coupon ? req.session.coupon: false,
     });
   } catch (error) {
     console.log(error.message);
@@ -89,7 +89,8 @@ const verifyRazorpay = async (req, res) => {
   try {
     const amount = await totalPrice.totalCartPrice(req.session.user._id);
     const shipping = amount[0].total < 500 ? amount[0].total+40 : amount[0].total;
-    const totalAmount = Number(shipping)*100
+    const discount = req.session.coupon ? shipping-req.session.coupon.discountAmount : shipping
+    const totalAmount = Number(discount)*100
 
 
     const razorpayInstance =  await razorpay();
@@ -134,18 +135,24 @@ const razorpaySuccess = async (req,res) => {
     const cartPro = await decrementProductQuatity(req.session.user._id);
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
 
+    const shipping = totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
+    const discount = req.session.coupon ? shipping - req.session.coupon.discountAmount : shipping;
+
     const order = new Order({
       userId: req.session.user._id,
-      orderAmount:
-        totalCart[0].total < 500
-          ? totalCart[0].total + 40
-          : totalCart[0].total,
+      orderAmount: discount,
+      couponApplied: req.session.coupon,
       deliveryAddress: address.address[0],
       paymentMethod: 'Online',
       orderItems: cartPro.products,
       orderStatus: 'Pending',
-      orderDate: moment().toDate(),
+      orderDate: new Date(),
     });
+
+    
+    if(!req.session.coupon){
+      delete order.couponApplied;
+    }
 
     await paymentDetials(transactionId,order.userId,order._id,order.orderAmount,order.paymentMethod);
 
@@ -175,10 +182,6 @@ const verifyCheckout = async (req, res) => {
       return res.redirect("/checkout");
     }
 
-    if(selectedPaymentMethod==='Wallet'){
-
-    }
-
     const address = await Address.findOne(
       { userId: req.session.user._id },
       { address: { $elemMatch: { _id: selectedAddress } } }
@@ -190,18 +193,23 @@ const verifyCheckout = async (req, res) => {
 
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
 
+    const shipping = totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
+    const discount = req.session.coupon ? shipping - req.session.coupon.discountAmount : shipping;
+
     const order = new Order({
       userId: req.session.user._id,
-      orderAmount:
-        totalCart[0].total < 500
-          ? totalCart[0].total + 40
-          : totalCart[0].total,
+      orderAmount: discount,
+      couponApplied: req.session.coupon,
       deliveryAddress: address.address[0],
       paymentMethod: selectedPaymentMethod,
       orderItems: cartPro.products,
       orderStatus: selectedPaymentMethod === "COD" ? "Placed" : "Pending",
-      orderDate: moment().toDate(),
+      orderDate: new Date,
     });
+
+    if(!req.session.coupon){
+      delete order.couponApplied;
+    }
 
     await paymentDetials(false,order.userId,order._id,order.orderAmount,order.paymentMethod);
 

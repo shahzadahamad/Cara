@@ -69,12 +69,12 @@ const loadOrderDetials = async (req, res) => {
   try {
     const id = req.query.id;
     const order = await Order.find({ _id: id }).populate(
-      "userId orderItems.productId"
+      "userId orderItems.productId couponApplied"
     );
     if(order.deliveredDate){
       const expiredDate = moment().subtract(7,'days').toDate();
       if(expiredDate<orderData.deliveredDate){
-        res.render("orderFullDetials",{user:req.session.user, order:order,status:true});
+       return res.render("orderFullDetials",{user:req.session.user, order:order,status:true});
       }
     }
     res.render("orderFullDetials", { user: req.session.user, order: order });
