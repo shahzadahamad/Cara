@@ -73,17 +73,22 @@
     <section style="border-radius: 10px; height: 500px;" id="forms">
       <div id="wrapper">
         <div class="title">
-          <span>Add Products</span>
+          <span><%= locals.edit ? 'Edit Category' : 'Add Category'  %></span>
         </div>
         <% if( locals.message ){ %>
-          <div style="color: green;" class="detials" id="hide">
+          <div style="color: green; font-weight: 900;" class="detials" id="hide">
             <%=message%>
+          </div>
+          <% } %>
+        <% if( locals.message1 ){ %>
+          <div style="color: red; font-weight: 900;" class="detials" id="hide">
+            <%=message1%>
           </div>
           <% } %>
         <form action="/admin/edit-categorys?id=<%= category._id %>" method="post">
           <div class="row">
             <i class="fa-solid fa-signature"></i>
-            <input type="text" name="name" placeholder="Name" value="<%= category.name %>" required>
+            <input type="text" name="name" placeholder="Name" value="<%= category.name %>" >
           </div>
           <div class="row button">
             <input type="submit" value="Edit">

@@ -18,21 +18,10 @@ const loadCategory = async (req, res) => {
 const loadAddCategory = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    if (req.session.addCategory) {
-      req.session.addCategory = false;
-      res.render("addCategory", {
-        admins: adminData,
-        message: "Category Added",
-      });
-    } else if (req.session.exitCategory) {
-      req.session.exitCategory = false;
-      res.render("addCategory", {
-        admins: adminData,
-        message1: "Category Already Exist",
-      });
-    } else {
-      res.render("addCategory", { admins: adminData });
-    }
+
+    const {message,message1} = req.flash();
+      res.render("addCategory", { admins: adminData,message,message1 });
+    
   } catch (error) {
     console.log(error.message);
   }
@@ -41,20 +30,34 @@ const loadAddCategory = async (req, res) => {
 // verifyAddCategory
 const verifyAddCategory = async (req, res) => {
   try {
+    const {name}=req.body;
+
+    const existingCategory = await category.findOne({ name: name });
+
+
+
+    if(!name){
+      req.flash('message1','Invalied Category Name');
+      return res.redirect(`/admin/add-category`);
+    }
+
+
+    if (existingCategory) {
+      req.flash('message1','Category Already Exist')
+      return res.redirect("/admin/add-category");
+    } 
+
+    const covertedName = name.trim().replace(/\s+/g, " ");
+
     const addCategory = new category({
-      name: req.body.name,
+      name: covertedName,
     });
 
-    const existingCategory = await category.findOne({ name: addCategory.name });
-    if (existingCategory) {
-      req.session.exitCategory = true;
-      res.redirect("/admin/add-category");
-    } else {
-      await category.insertMany(addCategory);
 
-      req.session.addCategory = true;
+      await category.insertMany(addCategory);
+      req.flash('message','Category Added');
       res.redirect("/admin/add-category");
-    }
+    
   } catch (error) {
     console.log(error.message);
   }
@@ -63,15 +66,13 @@ const verifyAddCategory = async (req, res) => {
 // loadEditCategory
 const loadEditCategory = async (req,res) => {
   try{
+    const {message,message1} = req.flash();
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const id = req.query.id;
     const categoryId = await category.findById({_id:id});
-    if(req.session.editCategory){
-      req.session.editCategory=false;
-      res.render('editCategory',{admins:adminData,category:categoryId,message:'Edit Category'});
-    }else{
-      res.render('editCategory',{admins:adminData,category:categoryId});
-    }
+
+      res.render('editCategory',{admins:adminData,category:categoryId,message,message1,edit:true});
+    
   }catch(error){
     console.log(error.message);
   }
@@ -81,11 +82,23 @@ const loadEditCategory = async (req,res) => {
 const verifyEditCategory = async (req,res) => {
   try{
     const id = req.query.id;
-    const update = {
-      name: req.body.name,
-    };
-    await category.findByIdAndUpdate({_id:id},{$set:update});
-    req.session.editCategory=true;
+    const {name}=req.body
+    const existingCategory = await category.findOne({name:name})
+
+    if(!name){
+      req.flash('message1','Invalied Category Name');
+      return res.redirect(`/admin/edit-categorys?id=${id}`);
+    }
+
+    if(existingCategory){
+      req.flash('message1','This Category Already exist');
+      return res.redirect(`/admin/edit-categorys?id=${id}`);
+    }
+
+     const covertedName = name.trim().replace(/\s+/g, " ");
+
+    await category.findByIdAndUpdate({_id:id},{$set:{name:covertedName}});
+    req.flash('message','Category Edited');
     res.redirect(`/admin/edit-categorys?id=${id}`);
   }catch(error){
     console.log(error.message);

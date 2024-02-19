@@ -83,8 +83,13 @@
           <span>Edit Product</span>
         </div>
         <% if( locals.message ){ %>
-          <div style="color: green; text-align: center;" class="detials" id="hide">
+          <div style="color: green; text-align: center; font-weight: 900;" class="detials" id="hide">
             <%=message%>
+          </div>
+          <% } %>
+        <% if( locals.message1 ){ %>
+          <div style="color: red; text-align: center; font-weight: 900;" class="detials" id="hide">
+            <%=message1%>
           </div>
           <% } %>
             <form action="/admin/edit-products?id=<%= product._id %>" method="post" enctype="multipart/form-data">

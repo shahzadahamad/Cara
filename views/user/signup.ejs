@@ -24,30 +24,30 @@
             <span>Sign Up</span>
           </div>
           <% if( locals.message ){ %>
-            <div class="detials" id="hide">
+            <div style="color: red; font-weight: 900;" class="detials" id="hide">
               <%=message%>
             </div>
             <% } %>
           <form action="/signup" method="post">
             <div class="row">
               <i class="fas fa-user"></i>
-              <input type="text" name="name" placeholder="Full Name" required>
+              <input type="text" name="name" placeholder="Full Name" >
             </div>
             <div class="row">
               <i class="fas fa-user"></i>
-              <input type="text" name="email" placeholder="Email" required>
+              <input type="text" name="email" placeholder="Email" >
             </div>
             <div class="row">
               <i class="fa-solid fa-phone"></i>
-              <input type="tel" name="mobile" placeholder="Phone Number" pattern="[0-9]{10}" required>
+              <input type="tel" name="mobile" placeholder="Phone Number" pattern="[0-9]{10}" >
             </div>
             <div class="row">
               <i class="fas fa-lock"></i>
-              <input type="password" name="password" placeholder="Password" required>
+              <input type="password" name="password" placeholder="Password" >
             </div>
             <div class="row">
               <i class="fas fa-lock"></i>
-              <input type="password" name="cpassword" placeholder="Confirm Password" required>
+              <input type="password" name="cpassword" placeholder="Confirm Password" >
             </div>
             <div class="row button">
               <input type="submit" value="Sign Up">

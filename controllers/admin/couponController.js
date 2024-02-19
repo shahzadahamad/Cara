@@ -18,9 +18,8 @@ const validation = (couponCode,discount,expire,discription,quantity) => {
   }
 
   const quantityValue = parseFloat(quantity);
-  if(isNaN(quantityValue)||quantity<=0){
+  if(isNaN(quantityValue)||quantity<0){
     return "Quantity must be a positive number" 
-
   }
 
   const expiryDataRegex = /^\d{4}-\d{2}-\d{2}$/;

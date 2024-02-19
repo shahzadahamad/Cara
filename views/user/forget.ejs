@@ -32,14 +32,14 @@
         <span><%= locals.login || locals.user ? 'Change Password' : 'Forget Password' %></span>
       </div>
       <% if( locals.message ){ %>
-        <div class="detials" id="hide">
+        <div style="font-weight: 900;" class="detials" id="hide">
           <%=message%>
         </div>
         <% } %>
       <form action="/forget" method="post">
         <div class="row">
           <i class="fas fa-user"></i>
-          <input type="text" name="email" value="<%if(locals.user){%><%= user.email %><%}%>" placeholder="Email" required>
+          <input type="text" name="email" value="<%if(locals.user){%><%= user.email %><%}%>" placeholder="Email" >
         </div>
         <div class="row button">
           <input type="submit" value="Send OTP">

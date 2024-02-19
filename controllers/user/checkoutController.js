@@ -6,6 +6,7 @@ const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
 const totalPrice = require('../../controllers/user/cartController');
 const Payment = require('../../models/paymentModel');
+const Coupon = require('../../models/couponModel');
 const Wallet = require('../../models/walletModel');
 const moment = require("moment");
 
@@ -154,6 +155,10 @@ const razorpaySuccess = async (req,res) => {
       delete order.couponApplied;
     }
 
+    if(order.couponApplied){
+      await Coupon.updateOne({_id:req.session.coupon},{$inc:{quantity:-1}});
+    }
+
     await paymentDetials(transactionId,order.userId,order._id,order.orderAmount,order.paymentMethod);
 
     await order.save();
@@ -181,6 +186,8 @@ const verifyCheckout = async (req, res) => {
       req.flash("message", "please select payment method");
       return res.redirect("/checkout");
     }
+
+    
 
     const address = await Address.findOne(
       { userId: req.session.user._id },
@@ -215,6 +222,11 @@ const verifyCheckout = async (req, res) => {
 
 
     if (selectedPaymentMethod === "COD") {
+
+      if(order.couponApplied){
+        await Coupon.updateOne({_id:req.session.coupon},{$inc:{quantity:-1}});
+      }
+
 
       await order.save();
       await cart.deleteOne({ userId: req.session.user._id });

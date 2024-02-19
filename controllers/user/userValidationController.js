@@ -2,7 +2,7 @@ const user = require("../../models/userModel");
 const userOTPVerification = require("../../models/userOTPVerificationModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
-
+const validator = require("validator");
 
 // hashPassword
 const securePassword = async (password) => {
@@ -49,7 +49,7 @@ const sendOtpVerifyMail = async (name, email, otp) => {
 const generateVerificationCode = async (userData) => {
   const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-  const expirationTime = new Date(Date.now() + 1*60*1000);
+  const expirationTime = new Date(Date.now() + 1 * 60 * 1000);
   const sOtp = await securePassword(verificationCode);
 
   const addOTP = new userOTPVerification({
@@ -68,10 +68,10 @@ const generateVerificationCode = async (userData) => {
 const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
   const currentTime = new Date();
   const timeUntilExpiration = expirationTime - currentTime;
-  console.log('in')
+  console.log("in");
   setTimeout(async () => {
     try {
-      console.log('done');
+      console.log("done");
       await userOTPVerification.deleteOne({ _id: otpId, userId: userId });
     } catch (error) {
       console.log(error.message);
@@ -95,27 +95,31 @@ const verifyLogin = async (req, res) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-
     const userData = await user.findOne({ email: email });
+
+    if (!email || !password) {
+      req.flash("message", "All fileds are require");
+      return res.redirect("/login");
+    }
 
     if (userData) {
       const isPasswordMatch = await bcrypt.compare(password, userData.password);
-      if (isPasswordMatch) {
-        if (userData.isBlocked) {
-          req.flash("message", "Your accout as been blocked");
-          res.redirect("/login");
-        } else {
-          req.session.user = userData;
-          res.redirect("/");
-        }
-      } else {
+      if (!isPasswordMatch) {
         req.flash("message", "Invalied Password");
-        res.redirect("/login");
+        return res.redirect("/login");
+      }
+
+      if (userData.isBlocked) {
+        req.flash("message", "Your accout as been blocked");
+        return res.redirect("/login");
       }
     } else {
       req.flash("message", "You are not registered with us. Please sign up");
-      res.redirect("/login");
+      return res.redirect("/login");
     }
+
+    req.session.user = userData;
+    return res.redirect("/");
   } catch (error) {
     console.log(error.messages);
   }
@@ -135,6 +139,23 @@ const loadSignup = (req, res) => {
 const verifySignUp = async (req, res) => {
   try {
     const { name, email, mobile, password, cpassword } = req.body;
+
+    if (!name || !email || !mobile || !password || !cpassword) {
+      req.flash("message", "All Fileds are requred");
+      return res.redirect("/signup");
+    }
+
+    if (!validator.isEmail(email)) {
+      req.flash("message", "Enter a Proper Email");
+      return res.redirect("/signup");
+    }
+
+    // const strongPasswordRegex =/^(?=.\d)(?=.[a-z])(?=.[A-Z])(?=.[!@#$%^&()_+}{":;'?/>.<,])(?=.[^\s]).{8,}$/;
+    // if (strongPasswordRegex.test(password)) {
+    // }else{
+    //   req.flash("message", "Week Password");
+    //   return res.redirect("/signup");
+    // }
 
     const addUser = new user({
       fullname: name,
@@ -184,6 +205,11 @@ const loadForgetPassword = async (req, res) => {
 // verifyForgetPassword
 const verifyForgetPassword = async (req, res) => {
   try {
+    if (!req.body.email) {
+      req.flash("message", "Enter Email");
+      return res.redirect("/forget");
+    }
+
     if (req.session.user) {
       if (req.body.email === req.session.user.email) {
         const userData = await user.findOne({ email: req.session.user.email });
@@ -216,12 +242,9 @@ const verifyForgetPassword = async (req, res) => {
 const loadResetPassword = async (req, res) => {
   try {
     if (req.session.reset) {
-      if (req.session.cpassError) {
-        req.session.cpassError = false;
-        res.render("resetPassword", { message: "Passwords are not same" });
-      } else {
-        res.render("resetPassword");
-      }
+      const message = req.flash("message");
+
+      res.render("resetPassword", { message });
     } else {
       res.redirect("/");
     }
@@ -238,7 +261,11 @@ const verifyResetPassword = async (req, res) => {
 
     if (userData) {
       const password = req.body.password;
-      const cpassword = req.body.password;
+      const cpassword = req.body.cpassword;
+      if (!password || !cpassword) {
+        req.flash("message", "Enter Passwords");
+        return res.redirect("/resetPassword");
+      }
       if (password === cpassword) {
         const spassword = await securePassword(password);
         await user.updateOne(
@@ -254,7 +281,7 @@ const verifyResetPassword = async (req, res) => {
           res.redirect("/login");
         }
       } else {
-        req.session.cpassError = true;
+        req.flash("message", "Passwords are not same");
         res.redirect("/resetPassword");
       }
     }
@@ -304,7 +331,7 @@ const verifyOtp = async (req, res) => {
         });
         await user.insertMany(req.session.userData);
         req.session.user = req.session.userData;
-        res.redirect('/home?status=true');
+        res.redirect("/home?status=true");
       } else {
         req.session.otpError = true;
         res.redirect("/otp");
@@ -341,11 +368,19 @@ const verifyOtp = async (req, res) => {
 };
 
 // resetotp
-const verifyResetOtp = async (req,res) => {
-  try{
-    generateVerificationCode(req.session.userData);
-    res.redirect("/otp");
-  }catch(error){
+const verifyResetOtp = async (req, res) => {
+  try {
+    if (req.session.userData) {
+      generateVerificationCode(req.session.userData);
+    } else if (req.session.resetEmail) {
+      generateVerificationCode(req.session.resetEmail);
+    } else if (req.session.user) {
+      const userData = await user.findOne({ _id: req.session.user._id });
+      generateVerificationCode(userData);
+    }
+    console.log("klsafjsadlk");
+    res.json({ status: true });
+  } catch (error) {
     console.log(error.message);
   }
 };

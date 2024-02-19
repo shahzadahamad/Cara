@@ -97,7 +97,7 @@
       <div style="display: flex; justify-content: space-between;">
         <h3 class="main--title">Custom Report</h3>
         <div>
-          <% if(locals.info && locals.info.customReport.length>0){ %>
+          <% if(locals.info && locals.info.customReport && locals.info.customReport.length>0){ %>
             <a id="downloadPdf" class="btn btn-outline-success  ms-4">Dowload As Pdf</a>
             <a id="downloadExcel" class="btn btn-outline-success  ms-4">Dowload As Excel</a>
             <% } %>
@@ -123,7 +123,7 @@
         </div>
         <div id="report" class="tabular--wrapper">
           <% if(locals.info){ %>
-            <% if(locals.info.customReport.length>0){ %>
+            <% if(locals.info.customReport && locals.info.customReport.length>0){ %>
               <table style="font-size: 14px; border-collapse: collapse;">
                 <thead>
                   <tr>

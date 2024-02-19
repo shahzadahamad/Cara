@@ -35,7 +35,7 @@
         <span>OTP verification</span>
       </div>
       <% if( locals.message ){ %>
-        <div class="detials" id="hide">
+        <div style="font-weight: 900; color: red;" class="detials" id="hide">
           <%=message%>
         </div>
         <% } %>
@@ -54,18 +54,32 @@
               <input type="submit" value="Verify OTP">
             </div>
           </form>
-          <form style="padding: 0px 0px 20px 0px;" action="/resetOtp" method="post">
+          <div style="padding: 0px 0px 20px 0px;">
             <div style="margin: 0; text-align: center;" class="pass">
-              <button type="submit" id="resendButton" style="border:0; background-color: transparent;"><a
-                  style="color: #088178;">Resend OTP</a></button>
+              <button onclick="resetOtp()" id="resendButton" style="border:0; background-color: transparent;"><a
+                  style="color: #088178; font-weight: 900;">Resend OTP</a></button>
               <span id="timer" style="margin-left: 10px; color: #088178;"></span>
             </div>
 
-          </form>
+          </div>
     </div>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
   <script>
+
+
+    async function resetOtp() {
+      event.preventDefault();
+      const response = await axios.post('/resetOtp');
+      console.log(response.data);
+      if (response.data.status) {
+        window.location.href = '/otp';
+      }
+    }
+
 
     const updateTimer = () => {
       const timer = document.getElementById('timer');
@@ -73,22 +87,22 @@
 
       let countdown = localStorage.getItem('countdown') || 60;
 
-      timer.textContent=countdown;
+      timer.textContent = countdown;
 
       countdown--;
 
-      if(countdown<=0){
+      if (countdown <= 0) {
         localStorage.removeItem('countdown');
-        timer.style.display='none'
+        timer.style.display = 'none'
         clearInterval(timerInterval);
-        resendButton.disabled=false;
-        resendButton.style.opacity=1;
+        resendButton.disabled = false;
+        resendButton.style.opacity = 1;
         return
-      }else{
-        resendButton.style.opacity=0.3;
-        resendButton.disabled=true;
+      } else {
+        resendButton.style.opacity = 0.3;
+        resendButton.disabled = true;
       }
-      localStorage.setItem('countdown',countdown);
+      localStorage.setItem('countdown', countdown);
     }
 
     updateTimer();

@@ -19,25 +19,12 @@ const loadProducts = async (req, res) => {
 // loadAddProducts
 const loadAddProducts = async (req, res) => {
   try {
+    const {message,message1} = req.flash();
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const categorys = await category.find();
-    if (req.session.addProduct) {
-      req.session.addProduct = false;
-      res.render("addProducts", {
-        admins: adminData,
-        message: "Product Added",
-        category: categorys,
-      });
-    } else if (req.session.exitProduct) {
-      req.session.exitProduct = false;
-      res.render("addProducts", {
-        admins: adminData,
-        message1: "Product Already Exist",
-        category: categorys,
-      });
-    } else {
-      res.render("addProducts", { admins: adminData, category: categorys });
-    }
+
+      res.render("addProducts", { admins: adminData, category: categorys ,message,message1});
+    
   } catch (error) {
     console.log(error.message);
   }
@@ -46,7 +33,27 @@ const loadAddProducts = async (req, res) => {
 // verifyAddProducts
 const verifyAddProducts = async (req, res) => {
   try {
+    const {name,brand,rating,price,quantity,description}=req.body
     const categorys = await category.findOne({ name: req.body.category });
+
+    if(!name||!brand||!rating||!price||!quantity||!description||!req.body.category){
+      req.flash('message1','All Fields Are Require!');
+      return res.redirect('/admin/add-products')
+    }
+
+    const quantityValue = parseFloat(quantity);
+    const priceValue = parseFloat(price);
+    if(isNaN(quantityValue)||quantity<0||isNaN(priceValue)||price<0){
+      req.flash('message1','Quantity must be a positive number!');
+      return res.redirect('/admin/add-products');
+    }  
+
+    if (!req.files || req.files.length === 0) {
+      req.flash('message1', 'Add Images At Least One!');
+      return res.redirect(`/admin/add-products`);
+    }
+
+    const {}=req.body
 
     const images = [];
     const files = req.files;
@@ -56,27 +63,27 @@ const verifyAddProducts = async (req, res) => {
     });
 
     const addProduct = new product({
-      name: req.body.name,
-      brand: req.body.brand,
+      name: name,
+      brand: brand,
       categoryId: categorys._id,
-      rating: req.body.rating,
-      price: req.body.price,
-      quantity: req.body.quantity,
+      rating: rating,
+      price: price,
+      quantity: quantity,
       image: images,
-      description: req.body.description,
+      description: description,
     });
 
     const existingProduct = await product.findOne({ name: addProduct.name });
 
     if (existingProduct) {
-      req.session.exitProduct = true;
-      res.redirect("/admin/add-products");
-    } else {
+      req.flash('message1','Product Already Exist!')
+      return res.redirect("/admin/add-products");
+    } 
       await product.insertMany(addProduct);
 
-      req.session.addProduct = true;
+      req.flash('message','Product Added');
       res.redirect("/admin/add-products");
-    }
+    
   } catch (error) {
     console.log(error.message);
   }
@@ -87,14 +94,12 @@ const loadEditProduct = async (req,res) => {
   try{
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const categorys = await category.find();
+    const {message,message1}=req.flash()
     const id = req.query.id;
     const productId = await product.findById({_id:id}).populate('categoryId');
-    if(req.session.editProduct){
-      req.session.editProduct=false;
-    res.render('editProduct',{admins:adminData,message:'Product Edited',category:categorys,product:productId});
-    }else{
-      res.render('editProduct',{admins:adminData,category:categorys,product:productId});
-    }
+
+    res.render('editProduct',{admins:adminData,category:categorys,product:productId,message,message1});
+    
   }catch(error){
     console.log(error.message);
   }
@@ -104,6 +109,33 @@ const loadEditProduct = async (req,res) => {
 const verifyEditProduct = async (req,res) => {
   try{
 
+    const {name,brand,rating,price,quantity,description}=req.body
+    const id = req.query.id;
+
+    const existingProduct = await product.findOne({name:name ,_id:{$ne:id}});
+
+    if(existingProduct){
+      req.flash('message1','Product Already Exist');
+      return res.redirect(`/admin/edit-products?id=${id}`);
+    }
+
+    if(!name||!brand||!rating||!price||!quantity||!description||!req.body.category){
+      req.flash('message1','All Fields Are Require!');
+      return res.redirect(`/admin/edit-products?id=${id}`)
+    }
+
+    const quantityValue = parseFloat(quantity);
+    const priceValue = parseFloat(price);
+    if(isNaN(quantityValue)||quantity<0||isNaN(priceValue)||price<0){
+      req.flash('message1','Quantity must be a positive number!');
+      return res.redirect(`/admin/edit-products?id=${id}`);
+    }  
+
+    if (!req.files || req.files.length === 0) {
+      req.flash('message1', 'Add Images At Least One!');
+      return res.redirect(`/admin/edit-products?id=${id}`);
+    }
+
     const images = [];
     const files = req.files;
 
@@ -111,24 +143,23 @@ const verifyEditProduct = async (req,res) => {
       images.push(files.filename);
     });
 
-
     const categorys = await category.findOne({name:req.body.category});
-    const id = req.query.id;
+    
     const update = {
-      name: req.body.name,
-      brand: req.body.brand,
+      name: name,
+      brand: brand,
       categoryId: categorys._id,
-      rating: req.body.rating,
-      price: req.body.price,
-      quantity: req.body.quantity,
+      rating: rating,
+      price: price,
+      quantity: quantity,
       image: images,
-      description: req.body.description,
+      description: description,
     }
 
 
 
     await product.findByIdAndUpdate({_id:id},{$set:update});
-    req.session.editProduct=true;
+    req.flash('message','Product Added');
     res.redirect(`/admin/edit-products?id=${id}`);
   }catch(error){
     console.log(error.message);

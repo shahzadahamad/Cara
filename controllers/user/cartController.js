@@ -142,7 +142,6 @@ const verifyAddToCart = async (req, res) => {
 const verifyRemoveCart = async (req, res) => {
   try {
     const id = req.query.id;
-    const totalCart = await totalCartPrice(req.session.user._id);
     const removeProduct = await cart.updateOne(
       { userId: req.session.user._id },
       { $pull: { products: { _id: id } } }
@@ -151,6 +150,7 @@ const verifyRemoveCart = async (req, res) => {
       userId: req.session.user._id,
       products: { $eq: [] },
     });
+    const totalCart = await totalCartPrice(req.session.user._id);
     if (removeProduct) {
       res.send({ totalCart, cartDelete });
     }
@@ -197,11 +197,14 @@ const verifyCoupon = async (req, res) => {
   try {
     const { couponCode } = req.body;
     if(req.session.coupon){
-      return res.json({msg:'Coupon Already Applied'})
+      return res.json({msg1:'Coupon Already Applied'})
     }
     const coupon = await Coupon.findOne({ couponCode: couponCode });
     if (coupon) {
       req.session.coupon = coupon;
+    }
+    if(coupon.quantity<=0){
+      return res.json({msg:'Coupon limited'})
     }
     const appliedCoupon = await Coupon.findOne({ couponCode: couponCode });
     if (!couponCode) {

@@ -76,19 +76,19 @@
           <span>Add Products</span>
         </div>
         <% if( locals.message ){ %>
-          <div style="color: green;" class="detials" id="hide">
+          <div style="color: green; font-weight: 900;" class="detials" id="hide">
             <%=message%>
           </div>
           <% } %>
         <% if( locals.message1 ){ %>
-          <div style="color: red;" class="detials" id="hide">
+          <div style="color: red; font-weight: 900;" class="detials" id="hide">
             <%=message1%>
           </div>
           <% } %>
         <form action="/admin/add-category" method="post">
           <div class="row">
             <i class="fa-solid fa-signature"></i>
-            <input type="text" name="name" placeholder="Name" required>
+            <input type="text" name="name" placeholder="Name">
           </div>
           <div class="row button">
             <input type="submit" value="Add">

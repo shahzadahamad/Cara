@@ -388,11 +388,32 @@
               const couponCode = document.getElementById('inputVal').value;
               const responce = await axios.post('/apply-coupon', { couponCode });
 
-              if (responce.data.msg === 'Coupon Already Applied') {
-                errorMsg.style.color = 'green'
-              } else {
-                errorMsg.style.color = 'red'
+              if (responce.data.msg1) {
+
+                Swal.fire({
+                  title: "Are you sure?",
+                  text: "Do You Want To Remove Coupon!",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "Yes, delete it!"
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    Swal.fire({
+                      title: "Removed!",
+                      text: "Coupon has been removed.",
+                      icon: "success",
+                      showConfirmButton: false,
+                      timer: 1000,
+                    }).then((result)=>{
+                      window.location.reload()
+                    })
+                  }
+                });
+
               }
+
 
               if (responce.data.msg) {
                 errorMsg.innerHTML = responce.data.msg
@@ -408,7 +429,7 @@
                 discountbox.style.display = 'contents'
                 if (responce.data.total[0].total < 500) {
                   total.innerHTML = "₹" + Number(responce.data.total[0].total + 40 - responce.data.status);
-                  console.log(total.innerHTML)
+
                 } else {
                   total.innerHTML = "₹" + Number(responce.data.total[0].total - responce.data.status);
                 }
@@ -476,28 +497,28 @@
 
 
 
-                    cartSubtotal.innerHTML = '₹' + Number(data.totalCart[0].total - value);
+                    cartSubtotal.innerHTML = '₹' + Number(data.totalCart[0].total);
 
 
 
 
                     if (data.totalCart[0].total < 500) {
-                      shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
-                      shipping.innerHTML = data.totalCart[0].total - value === 0 ? "Free" : "₹" + 40
-                      total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
-                      if (discount && discounts!=undefined) {
-                        console.log('lasdf;')
-                        total.innerHTML = data.totalCart[0].total - value === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value - discounts);
+                      shipping.innerHTML = '₹' + 40;
+                      if (data.totalCart[0].total === 0) {
+                        shipping.innerHTML = 'Free'
+                      }
+                      total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
+                      if (discount && discounts != undefined) {
+                        total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - discounts);
                       } else {
-                        total.innerHTML = data.totalCart[0].total - value === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - value);
+                        total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
                       }
                     } else {
-                      shipping.innerHTML = lastOne ? 'Free' : '₹' + 40
-                      if (discount && discounts!=undefined) {
-                        console.log('lasdf;')
-                        total.innerHTML = '₹' + Number(data.totalCart[0].total - value-discounts);
+                      shipping.innerHTML = 'Free'
+                      if (discount && discounts != undefined) {
+                        total.innerHTML = '₹' + Number(data.totalCart[0].total - discounts);
                       } else {
-                        total.innerHTML = '₹' + Number(data.totalCart[0].total - value);
+                        total.innerHTML = '₹' + Number(data.totalCart[0].total);
                       }
                     }
 
@@ -570,14 +591,14 @@
 
                   if (data.totalCart[0].total < 500) {
                     shipping.innerHTML = '₹' + 40;
-                    if (discount && discounts!=undefined) {
+                    if (discount && discounts != undefined) {
                       total.innerHTML = '₹' + Number(data.totalCart[0].total + 40 - discounts)
                     } else {
                       total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
                     }
                   } else {
                     shipping.innerHTML = 'Free';
-                    if (discount && discounts!=undefined) {
+                    if (discount && discounts != undefined) {
                       total.innerHTML = '₹' + Number(data.totalCart[0].total - discounts);
                     } else {
                       total.innerHTML = '₹' + Number(data.totalCart[0].total);

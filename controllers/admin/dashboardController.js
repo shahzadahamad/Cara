@@ -44,13 +44,13 @@ const gettotalRevenue = async (req, res) => {
 
 const getDailyData = async (req, res) => {
   try {
-    const startOfDay = moment().startOf("day");
-    const endOfDay = moment().endOf("day");
+    const startOfDay = moment().startOf("day").set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toISOString();
+    const endOfDay = moment().endOf("day").set({ hour: 23, minute: 59, second: 59, millisecond: 999 }).toISOString();
 
     const dailyOrder = await Order.find({
       orderDate: {
-        $gte: startOfDay.toDate(),
-        $lte: endOfDay.toDate(),
+        $gte: startOfDay,
+        $lte: endOfDay,
       },
     });
 
@@ -76,13 +76,13 @@ const getDailyData = async (req, res) => {
 
 const getWeeklyData = async (req, res) => {
   try {
-    const startOfWeek = moment().startOf("week");
-    const endOfWeek = moment().endOf("week");
+    const startOfWeek = moment().startOf("week").set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toISOString();
+    const endOfWeek = moment().endOf("week").set({ hour: 23, minute: 59, second: 59, millisecond: 999 }).toISOString();
 
     const weeklyOrder = await Order.find({
       orderDate: {
-        $gte: startOfWeek.toDate(),
-        $lte: endOfWeek.toDate(),
+        $gte: startOfWeek,
+        $lte: endOfWeek,
       },
     });
 
@@ -110,13 +110,13 @@ const getWeeklyData = async (req, res) => {
 
 const getMonthlyData = async (req, res) => {
   try {
-    const startOfMouth = moment().startOf("month");
-    const endOfMouth = moment().endOf("month");
+    const startOfMouth = moment().startOf("month").set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toISOString();
+    const endOfMouth = moment().endOf("month").set({ hour: 23, minute: 59, second: 59, millisecond: 999 }).toISOString();
 
     const monthlyOrder = await Order.find({
       orderDate: {
-        $gte: startOfMouth.toDate(),
-        $lte: endOfMouth.toDate(),
+        $gte: startOfMouth,
+        $lte: endOfMouth,
       },
     });
 
@@ -144,13 +144,13 @@ const getMonthlyData = async (req, res) => {
 
 const getYearlyData = async (req, res) => {
   try {
-    const startOfYear = moment().startOf("year");
-    const endOfYear = moment().endOf("year");
+    const startOfYear = moment().startOf("year").set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toISOString();
+    const endOfYear = moment().endOf("year").set({ hour: 23, minute: 59, second: 59, millisecond: 999 }).toISOString();
 
     const yearlyOrder = await Order.find({
       orderDate: {
-        $gte: startOfYear.toDate(),
-        $lte: endOfYear.toDate(),
+        $gte: startOfYear,
+        $lte: endOfYear,
       },
     });
 
