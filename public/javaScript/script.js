@@ -88,6 +88,7 @@ const Toast = Swal.mixin({
       title: "Product Added To Cart"
     });
   }
+  
   event.stopPropagation();
   fetch(`/add-to-cart?id=${id}`, {
     method: "POST",

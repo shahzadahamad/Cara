@@ -203,7 +203,7 @@ const verifyCoupon = async (req, res) => {
     if (coupon) {
       req.session.coupon = coupon;
     }
-    if(coupon.quantity<=0){
+    if(coupon && coupon.quantity<=0){
       return res.json({msg:'Coupon limited'})
     }
     const appliedCoupon = await Coupon.findOne({ couponCode: couponCode });

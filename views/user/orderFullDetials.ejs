@@ -326,7 +326,7 @@
                           <%= order[0].deliveryAddress.state %>
                         </p>
                         <div>
-                          <% if(order[0].orderStatus !== 'Cancelled'){ %>
+                          <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Returned' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way'){ %>
                           <button onclick="window.location.href='/change-address?id=<%= order[0]._id %>'" style="background-color: #088178; color: #fff;"
                             class="normal edit-btn">Change</button>  
                             <% } %>           
