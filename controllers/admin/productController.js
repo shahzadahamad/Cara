@@ -53,10 +53,9 @@ const verifyAddProducts = async (req, res) => {
       return res.redirect(`/admin/add-products`);
     }
 
-    const {}=req.body
-
     const images = [];
     const files = req.files;
+    console.log(files);
 
     files.forEach((files) => {
       images.push(files.filename);
@@ -166,6 +165,18 @@ const verifyEditProduct = async (req,res) => {
   }
 }
 
+// edit image
+const verifyEditImage = async (req,res) => {
+  try{
+    const {i}=req.body;
+    console.log(i);
+    console.log('alsdkfjsa;df')
+    res.json({status:true});
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
 // deleteProduct
 const verifyDeleteProduct = async (req, res) => {
   try {
@@ -186,4 +197,5 @@ module.exports = {
   verifyDeleteProduct,
   loadEditProduct,
   verifyEditProduct,
+  verifyEditImage,
 }

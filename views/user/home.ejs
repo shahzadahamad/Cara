@@ -1,5 +1,21 @@
 <%- include('../layouts/header.ejs') -%>
 
+<style>
+      #wishlist {
+      position: absolute;
+      right: 12px;
+      color: #088178;
+      background-color: #cce7d0;
+      padding: 8px;
+      border-radius: 40px;
+      transition: 0.3s ease-in-out
+    }
+
+    #wishlist:hover {
+      color: #fff;
+      background-color: #088178;
+    }
+</style>
 
   <header id="header">
     <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
@@ -67,6 +83,7 @@
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
+            <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist" class="fa-solid fa-heart"></i></a>
             <img src="images/productImages/<%= product[i].image[0] %>" alt="">
             <div class="des">
               <span>
@@ -107,6 +124,7 @@
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
+            <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist" class="fa-solid fa-heart"></i></a>
             <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>"
               alt="">
             <div class="des">
@@ -241,9 +259,10 @@
 
   </script>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@latest"></script>
 
 
   <script src="/javaScript/script.js"></script>

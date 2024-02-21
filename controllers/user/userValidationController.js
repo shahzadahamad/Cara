@@ -68,10 +68,8 @@ const generateVerificationCode = async (userData) => {
 const scheduleDocumentDeletion = async (userId, expirationTime, otpId) => {
   const currentTime = new Date();
   const timeUntilExpiration = expirationTime - currentTime;
-  console.log("in");
   setTimeout(async () => {
     try {
-      console.log("done");
       await userOTPVerification.deleteOne({ _id: otpId, userId: userId });
     } catch (error) {
       console.log(error.message);

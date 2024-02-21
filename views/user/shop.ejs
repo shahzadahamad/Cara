@@ -72,6 +72,21 @@
     .dropdown {
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     }
+
+    #wishlist {
+      position: absolute;
+      right: 12px;
+      color: #088178;
+      background-color: #cce7d0;
+      padding: 8px;
+      border-radius: 40px;
+      transition: 0.3s ease-in-out
+    }
+
+    #wishlist:hover {
+      color: #fff;
+      background-color: #088178;
+    }
   </style>
 
   <header id="header">
@@ -85,6 +100,7 @@
         <li><a href="<%= locals.login ? '/profile' : '/login' %>">
             <%= locals.login ? 'Profile' : 'Login' %>
           </a></li>
+        <li id="lg-bag"><a href="/wishlist"><i style="font-size: 20px;" class="fa-solid fa-heart"></i></a></li>
         <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
         <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
       </ul>
@@ -105,51 +121,52 @@
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
 
         <% if(!locals.selectedSearch){ %>
-        <select class="dropdown" onchange="selectedCategory(this)" style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
+          <select class="dropdown" onchange="selectedCategory(this)"
+            style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
 
             <option>
               <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
             </option>
-  
 
-                <% if(locals.product.length>0){ %>
-                  <% if(!locals.id&&locals.product[0].categoryId.name){ %>
-                    <option value="allCategory">All Category</option>
-                    <% } %>
-                      <% }%>
 
-                        <% if(locals.category.length> 0){ %>
-                          <% for(let i=0; i< category.length; i++){ %>
-                            <% if(locals.product.length>0 && locals.product[0].categoryId.name !==category[i].name){ %>
-                              <option value="<%= category[i]._id %>">
-                                <%= category[i].name %>
-                              </option>
-                              <% }%>
+            <% if(locals.product.length>0){ %>
+              <% if(!locals.id&&locals.product[0].categoryId.name){ %>
+                <option value="allCategory">All Category</option>
+                <% } %>
+                  <% }%>
+
+                    <% if(locals.category.length> 0){ %>
+                      <% for(let i=0; i< category.length; i++){ %>
+                        <% if(locals.product.length>0 && locals.product[0].categoryId.name !==category[i].name){ %>
+                          <option value="<%= category[i]._id %>">
+                            <%= category[i].name %>
+                          </option>
+                          <% }%>
+                            <% } %>
+                              <% } else { %>
+                                <option>No Category</option>
                                 <% } %>
-                                  <% } else { %>
-                                    <option>No Category</option>
-                                    <% } %>
-        </select>
-        <% }else{ %>
-          <select class="dropdown"
-          style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
-            <option>Sort By</option>
-            <option>Aa to Zz</option>
-            <option>Zz to Aa</option>
-            <option>Low to High</option>
-            <option>Hign to Low</option>
           </select>
-          <% } %>
-        <form action="/shop-search" method="post">
-          <div class="search--box">
+          <% }else{ %>
+            <select class="dropdown"
+              style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
+              <option>Sort By</option>
+              <option>Aa to Zz</option>
+              <option>Zz to Aa</option>
+              <option>Low to High</option>
+              <option>Hign to Low</option>
+            </select>
+            <% } %>
+              <form action="/shop-search" method="post">
+                <div class="search--box">
 
 
-            <i class="fa-solid fa-search"></i>
-            <input type="text" name="value" id="searchInput" value="<%= locals.selectedSearch %>" oninput="search()"
-              placeholder="Search" />
+                  <i class="fa-solid fa-search"></i>
+                  <input type="text" name="value" id="searchInput" value="<%= locals.selectedSearch %>"
+                    oninput="search()" placeholder="Search" />
 
-          </div>
-        </form>
+                </div>
+              </form>
 
       </div>
       <div id="suggestion">
@@ -171,30 +188,31 @@
           <div class="pro-container">
             <% if(product.length>0){%>
               <% for(let i=0;i< product.length ;i++){ %>
-
                 <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-                  <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"alt="">
+                 <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist" class="fa-solid fa-heart"></i></a>
+                  <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"
+                    alt="">
                   <% if(locals.selectedSearch && product[i].quantity===0){ %>
                     <p style="color: red; font-weight: 700;">Out Of Stock</p>
                     <% } %>
-                  <div class="des">
-                    <span>
-                      <%= product[i].brand %>
-                    </span>
-                    <h5>
-                      <%= product[i].name %>
-                    </h5>
-                    <div class="star">
-                      <% for(let j=0;j< product[i].rating; j++){ %>
-                        <i class="ri-star-fill"></i>
-                        <% } %>
-                    </div>
-                    <h4>
-                      ₹<%= product[i].price %>
-                    </h4>
-                  </div>
-                  <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
-                      class="ri-shopping-cart-2-line cart"></i></a>
+                      <div class="des">
+                        <span>
+                          <%= product[i].brand %>
+                        </span>
+                        <h5>
+                          <%= product[i].name %>
+                        </h5>
+                        <div class="star">
+                          <% for(let j=0;j< product[i].rating; j++){ %>
+                            <i class="ri-star-fill"></i>
+                            <% } %>
+                        </div>
+                        <h4>
+                          ₹<%= product[i].price %>
+                        </h4>
+                      </div>
+                      <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
+                          class="ri-shopping-cart-2-line cart"></i></a>
                 </div>
                 <% } %>
                   <% } else { %>
@@ -204,9 +222,9 @@
   </section>
 
   <section id="pagination" class="section-p1">
+    <a href="#"><i class="fa-solid fa-arrow-left"></i></a>
     <a href="#">1</a>
-    <a href="#">2</a>
-    <a href="#"><i class="fa-solid fa-arrow-right"></i></i></a>
+    <a href="#"><i class="fa-solid fa-arrow-right"></i></a>
   </section>
 
   <section id="newsletter" class="section-p1 section-m1">
@@ -275,9 +293,12 @@
 
 
   <script>
+
+
     function selectedCategory(id) {
       window.location.href = `/shop?id=${id.value}`
     }
+
 
     async function search() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
@@ -304,7 +325,7 @@
             const li = document.createElement('li');
             const link = document.createElement('a');
 
-            
+
 
             link.textContent = element.brand;
             link.href = `/shop?brandSearch=${element.brand}`
@@ -340,6 +361,7 @@
     }
   </script>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/javaScript/script.js"></script>
 

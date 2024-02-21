@@ -3,25 +3,34 @@
   <link rel="stylesheet" href="/styleSheet/admin.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
 
-    <style>
-      input[type="number"]::-webkit-inner-spin-button,
-      input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-      }
-      .preview-container {
-      display: flex;
+  <style>
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .preview-container {
+      display: none;
       flex-wrap: wrap;
       gap: 10px;
     }
+
     .preview-image {
-      width: 80px;
+      width: 100px;
       height: auto;
       object-fit: cover;
-      margin-left: 10px;
+      margin-left: 30px;
       margin-bottom: 10px;
     }
-    </style>
+
+    @media (max-width: 553) {
+      .preview-container {
+        justify-content: center;
+      }
+    }
+  </style>
 
   <div class="sidebar">
     <br>
@@ -92,86 +101,97 @@
     <section style="border-radius: 10px; height: 1000px;" id="forms">
       <div style="width: 80%;" id="wrapper">
         <div class="title">
-          <span><%= locals.edit ? 'Edit Products' : 'Add Products'  %></span>
+          <span>
+            <%= locals.edit ? 'Edit Products' : 'Add Products' %>
+          </span>
         </div>
         <% if( locals.message ){ %>
           <div style="color: green; text-align: center; font-weight: 900;" class="detials" id="hide">
             <%=message%>
           </div>
           <% } %>
-        <% if( locals.message1 ){ %>
-          <div style="color: red; text-align: center; font-weight: 900;" class="detials" id="hide">
-            <%=message1%>
-          </div>
-          <% } %>
-        <form action="/admin/add-products" method="post" enctype="multipart/form-data">
-          <div class="row">
-            <i class="fa-solid fa-signature"></i>
-            <input type="text" name="name" placeholder="Name" >
-          </div>
-          <div class="row">
-            <i class="fa-solid fa-b"></i>
-            <input type="text" name="brand" placeholder="Brand" >
-          </div>
-          <div class="row">
-            <i class="fa-solid fa-list"></i>
-            <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category" >
-              <option>Category</option>
-              <% if(category.length > 0){ %>
-              <% for(let i=0; i< category.length; i++){ %>
-              <option><%= category[i].name %></option>
+            <% if( locals.message1 ){ %>
+              <div style="color: red; text-align: center; font-weight: 900;" class="detials" id="hide">
+                <%=message1%>
+              </div>
               <% } %>
-              <% } else { %>
-                <option>No Category</option>
-                <% } %> 
-            </select>  
-          </div>
-          <div class="row">
-            <i class="fa-solid fa-dollar-sign"></i>
-            <input type="number" name="price" placeholder="Price" >
-          </div>
-          <div class="row">
-            <i class="fa-solid fa-star"></i>
-            <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating" >
-              <option>Rating</option>
-              <% for(let i=1; i<= 5; i++){ %>
-              <option><%= i %></option>
-                <% } %>
-            </select>  
-          </div>
-          <div class="row">
-            <i class="fa-solid fa-c"></i>
-            <input type="number" name="quantity" placeholder="Quantity" >
-          </div>
-          <div id="previewContainer" style="display: none;"></div>
-          <div class="row">
-            <i class="fa-solid fa-image"></i>
-            <input style="font-size: 20px; color: #787978;" id="imageInput"  type="file" class="form-control" name="img" multiple accept="image/*" >
-          </div>
-          <div class="row-des">
-            <label for="">Description</label>
-            <textarea name="description" id="" cols="30" rows="5"></textarea>
-          </div>
-          <div class="row button">
-            <input type="submit" value="Add">
-          </div>
-          <div class="signup-link"> <a href="/admin/products">Go Back</a></div>
-        </form>
+                <form action="/admin/add-products" method="post" enctype="multipart/form-data">
+                  <div class="row">
+                    <i class="fa-solid fa-signature"></i>
+                    <input type="text" name="name" placeholder="Name">
+                  </div>
+                  <div class="row">
+                    <i class="fa-solid fa-b"></i>
+                    <input type="text" name="brand" placeholder="Brand">
+                  </div>
+                  <div class="row">
+                    <i class="fa-solid fa-list"></i>
+                    <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category">
+                      <option>Category</option>
+                      <% if(category.length> 0){ %>
+                        <% for(let i=0; i< category.length; i++){ %>
+                          <option>
+                            <%= category[i].name %>
+                          </option>
+                          <% } %>
+                            <% } else { %>
+                              <option>No Category</option>
+                              <% } %>
+                    </select>
+                  </div>
+                  <div class="row">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <input type="number" name="price" placeholder="Price">
+                  </div>
+                  <div class="row">
+                    <i class="fa-solid fa-star"></i>
+                    <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating">
+                      <option>Rating</option>
+                      <% for(let i=1; i<=5; i++){ %>
+                        <option>
+                          <%= i %>
+                        </option>
+                        <% } %>
+                    </select>
+                  </div>
+                  <div class="row">
+                    <i class="fa-solid fa-c"></i>
+                    <input type="number" name="quantity" placeholder="Quantity">
+                  </div>
+                  <div id="previewContainer"></div>
+                  <div class="row">
+                    <i class="fa-solid fa-image"></i>
+                    <input style="font-size: 20px; color: #787978;" id="imageInput" type="file" class="form-control"
+                      name="img" multiple accept="image/*">
+                  </div>
+                  <div class="row-des">
+                    <label for="">Description</label>
+                    <textarea name="description" id="" cols="30" rows="5"></textarea>
+                  </div>
+                  <div class="row button">
+                    <input type="submit" value="Add">
+                  </div>
+                  <div class="signup-link"> <a href="/admin/products">Go Back</a></div>
+                </form>
       </div>
     </section>
 
   </div>
 
-  <script>
-  const imageInput = document.getElementById('imageInput');
-    const previewContainer = document.getElementById('previewContainer');
 
-    imageInput.addEventListener('change', handleImageUpload);
+
+
+
+  <script>
+
+    const previewContainer = document.getElementById('previewContainer');
+    const imageInput = document.getElementById('imageInput');
+
 
     function handleImageUpload(event) {
       const files = event.target.files;
-      
-      previewContainer.innerHTML = ''; // Clear existing previews
+
+      previewContainer.innerHTML = '';
 
       Array.from(files).forEach(file => {
         const reader = new FileReader();
@@ -179,12 +199,15 @@
           const previewImage = document.createElement('img');
           previewImage.classList.add('preview-image');
           previewImage.src = reader.result;
-          previewContainer.style.display='flex'
+          previewContainer.style.display = 'flex';
+          previewContainer.style.justifyContent = 'space-between';
+          previewContainer.style.flexWrap = 'wrap';
           previewContainer.appendChild(previewImage);
         };
         reader.readAsDataURL(file);
       });
     }
+    imageInput.addEventListener('change', handleImageUpload);
 
 
   </script>
@@ -194,7 +217,7 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
 
-    <script src="/javaScript/script.js"></script>
+  <script src="/javaScript/script.js"></script>
 
 
   <%- include('../layouts/footer.ejs') -%>

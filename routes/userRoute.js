@@ -166,4 +166,12 @@ userRouter.get('/wallet',auth.isLogin,auth.isBlocked,walletController.loadWallet
 userRouter.post('/add-to-wallet',walletController.verifyAddMoney);
 userRouter.patch('/waller-add-success',walletController.verifySuccessAddMoney);
 
+// <--------------Order Controller-------------->
+const wishlistController = require('../controllers/user/wishlistController');
+// <--------------Order Controller-------------->
+
+userRouter.get('/wishlist',auth.isLoginCart,wishlistController.loadWishlist);
+userRouter.post('/add-to-wishlist',wishlistController.verifyWishlist)
+userRouter.patch('/remove-products-wishlist',wishlistController.removeProduct);
+
 module.exports = userRouter;

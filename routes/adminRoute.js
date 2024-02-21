@@ -63,6 +63,9 @@ adminRouter.post('/add-products',upload.array('img',4),productController.verifyA
 adminRouter.get('/edit-products',auth.isLogin,productController.loadEditProduct);
 adminRouter.post('/edit-products',upload.array('img',4),productController.verifyEditProduct);
 
+//edit Image
+adminRouter.patch('/edit-images',productController.verifyEditImage)
+
 // deleteProduct
 adminRouter.delete('/delete-product',productController.verifyDeleteProduct);
 

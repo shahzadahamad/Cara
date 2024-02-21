@@ -67,41 +67,80 @@ otpInputs.forEach((input, index) => {
 });
 
 // Add to cart
-function addToCart(id,isLogin) {
-  
-// alert cart sweet akert 
-const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 800,
-  timerProgressBar: true,
-  didOpen: (toast) => {
-    toast.onmouseenter = Swal.stopTimer;
-    toast.onmouseleave = Swal.resumeTimer;
-  }
-});
+function addToCart(id, isLogin) {
+  // alert cart sweet akert
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 800,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
 
-  if(isLogin){
+  if (isLogin) {
     Toast.fire({
       icon: "success",
-      title: "Product Added To Cart"
+      title: "Product Added To Cart",
     });
   }
-  
+
   event.stopPropagation();
   fetch(`/add-to-cart?id=${id}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id : id }),
-  }).then((res) => res.json())
+    body: JSON.stringify({ id: id }),
+  })
+    .then((res) => res.json())
     .then((data) => {
-      if(!data.status){
-        window.location.href='/login';
+      if (!data.status) {
+        window.location.href = "/login";
       }
     })
     .catch((error) => console.log(error.message));
-};
+}
 
+// add to wishlist
+async function addToWishlist(id) {
+  event.stopPropagation();
+
+  console.log('fal;sfjlksa')
+  try {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 800,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+
+    const response = await axios.post("/add-to-wishlist", { id });
+
+    if (response.data.status) {
+      Toast.fire({
+        icon: "success",
+        title: "Product Added To Wishlist",
+      });
+    }else{
+      Toast.fire({
+        icon: "error",
+        title: "Product exist In Washlist",
+    });
+    }
+
+    if(response.data.login){
+      window.location.href = "/login";
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}

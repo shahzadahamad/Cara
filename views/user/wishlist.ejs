@@ -1,0 +1,246 @@
+<%- include('../layouts/header.ejs') -%>
+
+
+
+  <style>
+    #crusor {
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 13px;
+      padding: 18px 0;
+    }
+
+    .style {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+      background-color: #088178;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%;
+      max-height: 80%;
+      overflow-y: auto;
+      position: fixed;
+      left: 345px;
+      top: -16%;
+    }
+
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .coupon-container {
+      margin-bottom: 20px;
+    }
+
+    .coupon {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 5px;
+    }
+
+    .normal1 {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      background-color: #088178;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+    }
+  </style>
+
+  <header id="header">
+    <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
+
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="<%= locals.login ? '/profile' : '/login' %>">
+            <%= locals.login ? 'Profile' : 'Login' %>
+          </a></li>
+        <li id="lg-bag"><a class="active" href="/wishlist"><i style="font-size: 20px;"
+              class="fa-solid fa-heart"></i></a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
+    </div>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
+    </div>
+  </header>
+
+  <section id="page-header" class="about-header">
+    <h2>#Cart</h2>
+    <p>Add your coupon code & SAVE upto 70%!</p>
+  </section>
+
+  <% if( locals.message ){ %>
+    <div style="color: red; font-weight: 700; text-align: center;" class="detials" id="hide">
+      <%=message%>
+    </div>
+    <% } %>
+
+      <section id="cart" class="section-p1">
+
+        <table width="100%">
+          <% if(locals.wishlist && wishlist.products && wishlist.products.length>0){ %>
+            <thead>
+              <tr>
+                <td>Remove</td>
+                <td>Image</td>
+                <td>Product Name</td>
+                <td>Price</td>
+                <td>Actions</td>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i=0 ; i<wishlist.products.length;i++){ %>
+                <tr id="row<%= i %>">
+                  <td>
+                    <a onclick="removeProduct('<%= wishlist.products[i]._id %>','<%= i %>')"><i
+                        class="far fa-times-circle"></i></a>
+                  </td>
+                  <td>
+                    <img src="images/productImages/<%= wishlist.products[i].productId.image[0] %>"
+                      onclick="window.location.href='/sproduct?id=<%= wishlist.products[i].productId._id %>'" alt="">
+                  </td>
+                  <td>
+                    <%= wishlist.products[i].productId.name %>
+                  </td>
+                  <td>
+                    ₹<%= wishlist.products[i].productId.price %>
+                  </td>
+                  <td>
+                    <button class="normal1"
+                      onclick="addToCart('<%= wishlist.products[i].productId._id  %>','<%= locals.login %>')">Add To
+                      Cart</button>
+                  </td>
+                  <% } %>
+            </tbody>
+            <% }else{ %>
+              <td id="crusor" onclick="window.location.href='/shop'" id="foot" colspan="7">Add Products To Wishlist</td>
+              <% } %>
+        </table>
+      </section>
+
+
+
+
+      <footer class="section-p1">
+        <div class="col">
+          <img class="logo" src="images/logo.png" alt="">
+          <h4>Contact</h4>
+          <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
+          <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
+          <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
+          <div class="follow">
+            <h4>Follow us</h4>
+            <div class="icon">
+              <i class="fab fa-facebook-f"></i>
+              <i class="fab fa-twitter"></i>
+              <i class="fab fa-instagram"></i>
+              <i class="fab fa-pinterest-p"></i>
+              <i class="fab fa-youtube"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <h4>About</h4>
+          <a href="#">About us</a>
+          <a href="#">Delivery Information</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Contact Us</a>
+        </div>
+
+        <div class="col">
+          <h4>My Account</h4>
+          <a href="#">Sign In</a>
+          <a href="#">View Cart</a>
+          <a href="#">My Wishlist</a>
+          <a href="#">Track My Order</a>
+          <a href="#">Help</a>
+        </div>
+
+        <div class="col install">
+          <h4>Install App</h4>
+          <p>From App Store or Google Play</p>
+          <div class="row">
+            <img src="images/pay/app.jpg" alt="">
+            <img src="images/pay/play.jpg" alt="">
+          </div>
+          <p>Secured Payment Gateways</p>
+          <img src="images/pay/pay.png" alt="">
+        </div>
+
+        <div class="copyright">
+          <p>© 2024, Tech2 etc - Ecommerce Website</p>
+        </div>
+      </footer>
+
+      <script>
+        async function removeProduct(id, i) {
+          try {
+            console.log(id)
+            const row = document.getElementById(`row${i}`);
+            const response = await axios.patch('/remove-products-wishlist',{id});
+            if(response.data.status){
+              row.remove();
+            }
+          } catch (error) {
+            console.log(error.message);
+          }
+        }
+      </script>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+      <script src="/javaScript/script.js"></script>
+
+      <%- include('../layouts/footer.ejs') -%>
