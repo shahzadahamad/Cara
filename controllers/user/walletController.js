@@ -56,8 +56,9 @@ const verifySuccessAddMoney = async (req, res) => {
         $inc: { totalAmount: amount },
         $push: {
           transactions: {
-            type: "credit",
+            type: "Credit",
             amount: amount,
+            reason:'Add Money To Wallet',
             transactionDate: new Date(),
           },
         },

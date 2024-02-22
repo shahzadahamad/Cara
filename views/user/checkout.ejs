@@ -348,8 +348,13 @@
             <h4 style="border-bottom: 1px solid black; text-align: center;">Payment Method</h4>
 
             <div style=" margin-top: 20px;">
-              <input type="radio" name="selectedPaymentMethod" value="COD" id="COD">
-              <label for="COD">Cash On Delivery</label>
+              <% if(locals.total>1000) {%>
+                <input type="radio" name="selectedPaymentMethod" value="COD" id="COD" disabled>
+                <label for="COD" >Cash On Delivery</label>
+              <% }else{ %>
+                <input type="radio" name="selectedPaymentMethod" value="COD" id="COD">
+                <label for="COD">Cash On Delivery</label>
+                <% } %>
               <br><br>
               <input type="radio" name="selectedPaymentMethod" value="Online" id="Online">
               <label for="Online">Online Payment</label>

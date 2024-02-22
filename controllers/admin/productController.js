@@ -55,7 +55,6 @@ const verifyAddProducts = async (req, res) => {
 
     const images = [];
     const files = req.files;
-    console.log(files);
 
     files.forEach((files) => {
       images.push(files.filename);

@@ -279,7 +279,7 @@
               <%= locals.wallet ? wallet.totalAmount : 0 %>
             </span></p>
         </div>
-        <p style="color: red;margin: 0px;font-size: 15px; margin-bottom: 5px;" class="checking"></p>
+        <p style="color: red;margin: 0px;font-size: 15px; margin-bottom: 5px; font-weight: 900;" class="checking"></p>
         <input type="number" id="add-amount" placeholder="Enter Amount">
         <button class="add-money-btn" onclick="addMoney()">Add Money</button>
       </div>
@@ -364,7 +364,11 @@
               inputEmtpy.textContent = 'Enter a valied amount'
               inputEmtpy.style.display = 'block'
               return
-            } else {
+            } else if(amount<100){
+              inputEmtpy.textContent = 'Minimum 100 required'
+                inputEmtpy.style.display = 'block'
+                return
+            }else{
               inputEmtpy.style.display = 'none'
             }
 

@@ -67,6 +67,12 @@
           <span>Coupons</span>
         </a>
       </li>
+      <li>
+        <a href="/admin/offer">
+          <i class="fa-solid fa-percent"></i>
+          <span>Offers</span>
+        </a>
+      </li>
       <li class="logout">
         <a href="/admin/logout">
           <i class="fas fa-sign-out-alt"></i>
@@ -107,7 +113,7 @@
               </div>
 
               <div class="modal-body">
-                <p style="display: none; color: red; margin: 0px; text-align: center;" id="errorMsg"></p>
+                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;" id="errorMsg"></p>
                 <div class="form-group">
                   <label for="couponCode">Coupon Code</label>
                   <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Coupon Code">
@@ -156,7 +162,7 @@
               </div>
 
               <div class="modal-body">
-                <p style="display: none; color: red; margin: 0px; text-align: center;" id="editErrorMsg"></p>
+                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;" id="editErrorMsg"></p>
                 <div class="form-group">
                   <label for="couponCode">Coupon Code</label>
                   <input type="text" class="form-control" id="editCouponCode" name="couponCode"
@@ -198,7 +204,7 @@
 
       <div class="d-flex flex-wrap: wrap; pb-3 justify-content-end">
         <button class="btn btn-outline-dark" data-target="#addCouponModal" data-toggle="modal"
-          onclick="generateCode()"><i class="fa-solid fa-circle-plus"></i>Add Coupons</button>
+          onclick="generateCode()"><i class="fa-solid fa-circle-plus"></i> Add Coupons</button>
       </div>
 
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
@@ -262,7 +268,7 @@
                 <% } %>
                   <% }else{ %>
                     <tr>
-                      <td style="font-size: 20px; padding: 15px;" colspan="7">User Not Found</td>
+                      <td style="font-size: 20px; padding: 15px;" colspan="7">Coupons Not Found</td>
                     </tr>
                     <% } %>
           </tbody>

@@ -6,6 +6,9 @@ const category = new mongoose.Schema({
     unique: true,
     required: true
   },
+  offer:{
+    type:mongoose.Schema.ObjectId,
+  }
 });
 
 module.exports = mongoose.model('category',category);

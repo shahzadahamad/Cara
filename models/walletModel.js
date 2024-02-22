@@ -12,11 +12,15 @@ const walletSchema = new mongoose.Schema({
   transactions: [{
     type: {
       type: String,
-      enum:['debit','credit'],
+      enum:['Debit','Credit'],
       required: true,
     },
     amount: {
       type: Number,
+      required: true,
+    },
+    reason: {
+      type:String,
       required: true,
     },
     transactionDate:{

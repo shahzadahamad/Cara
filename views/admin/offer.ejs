@@ -1,0 +1,547 @@
+<%- include('../layouts/header.ejs') -%>
+
+  <link rel="stylesheet" href="/styleSheet/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    table tbody tr td {
+      font-weight: 900;
+    }
+
+    .menu li a {
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .modal-lg {
+      max-width: 900px !important;
+    }
+
+    select.form-control {
+      -webkit-appearance: menulist-button;
+      appearance: menulist-button;
+    }
+  </style>
+
+  <div class="sidebar">
+    <br>
+    <ul class="menu">
+      <li>
+        <a href="/admin/dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/user-detials">
+          <i class="fa-solid fa-users"></i>
+          <span>Users</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/order-detials">
+          <i class="fa-solid fa-check"></i>
+          <span>Order</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/products">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span>Products</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/category">
+          <i class="fa-solid fa-list"></i>
+          <span>Category</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/coupon">
+          <i class="fa-solid fa-ticket"></i>
+          <span>Coupons</span>
+        </a>
+      </li>
+      <li class="active">
+        <a href="/admin/offer">
+          <i class="fa-solid fa-percent"></i>
+          <span>Offers</span>
+        </a>
+      </li>
+      <li class="logout">
+        <a href="/admin/logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="main--content">
+
+    <div class="header--wrapper">
+      <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
+      <div class="user--info">
+        <img src="/images/admin.png" alt="">
+        <h4 style="font-weight: 900; margin-top: 10px;">
+          <%= admins.username %>
+        </h4>
+      </div>
+    </div>
+
+
+    <div class="tabular--wrapper">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <form id="addOfferData">
+        <div class="modal fade" id="addOfferModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Offer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <!-- Inputs -->
+                    <div class="form-group">
+                      <label for="input1">Offer Title</label>
+                      <input type="text" class="form-control" name="offerTitle" id="input1" placeholder="Enter Offer Title">
+                    </div>
+                    <div class="form-group">
+                      <label>Offer Type</label><br>
+                      <!-- Category radio button -->
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" onclick="categoryOrProduct('category')" type="radio"
+                          name="offerType" id="categoryRadio" value="category">
+                        <label class="form-check-label" for="categoryRadio">Category</label>
+                      </div>
+                      <!-- Product radio button -->
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" onclick="categoryOrProduct('product')" type="radio"
+                          name="offerType" id="productRadio" value="product">
+                        <label class="form-check-label" for="productRadio">Product</label>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group" id="categorySelectGroup" style="display: none;">
+                      <label for="categorySelect">Select Category</label>
+                      <select name="category" class="form-control" id="categorySelect">
+                      </select>
+                    </div>
+
+                  
+                    <div class="form-group" id="productSelectGroup" style="display: none;">
+                      <label for="productSelect">Select Product</label>
+                      <select name="product" class="form-control" id="productSelect">
+                      </select>
+                    </div>
+
+
+                    <div class="form-group">
+                      <label for="input3">Discount Percentage</label>
+                      <input type="number" class="form-control" name="discountPercentage" id="input3" placeholder="Enter Discount Percentage">
+                    </div>
+
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="input4">Start Date</label>
+                      <input type="date" name="startDate" class="form-control" id="input4">
+                    </div>
+                    <div class="form-group">
+                      <label for="input5">End Date</label>
+                      <input type="date" name="endDate" class="form-control" id="input5">
+                    </div>
+                    <div class="form-group">
+                      <label for="textarea">Description</label>
+                      <textarea class="form-control" name="description" id="textarea" rows="3" placeholder="Description"></textarea>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <p id="errorMsg" style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;"></p>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addOffer()">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+
+
+
+
+
+
+ <!-- edit modal  -->
+      <form id="editOfferData">
+        <div class="modal fade" id="editOfferModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Offer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <!-- Inputs -->
+                    <div class="form-group">
+                      <label for="editOfferTitle">Offer Title</label>
+                      <input type="text" class="form-control" name="editOfferTitle" id="editOfferTitle" placeholder="Enter Offer Title">
+                    </div>
+
+
+                    <div class="form-group">
+                      <label for="editDicountPercentage">Discount Percentage</label>
+                      <input type="number" class="form-control" name="editDiscountPercentage" id="editDicountPercentage" placeholder="Enter Discount Percentage">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="startDate">Start Date</label>
+                      <input type="date" name="editStartDate" class="form-control" id="startDate">
+                    </div>
+
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="endDate">End Date</label>
+                      <input type="date" name="editEndDate" class="form-control" id="endDate">
+                    </div>
+                    <div class="form-group">
+                      <label for="editDescription">Description</label>
+                      <textarea class="form-control" name="editDescription" id="editDescription" rows="3" placeholder="Description"></textarea>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <p id="editErrorMsg" style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;"></p>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="edit-Offer">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <div class="d-flex flex-wrap: wrap; pb-3 justify-content-end">
+        <button class="btn btn-outline-dark" data-target="#addOfferModal" data-toggle="modal"><i
+            class="fa-solid fa-circle-plus"></i> Add Offers</button>
+      </div>
+
+      <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
+        <div>
+          <h3 style="font-size: 30px;" class="main--title">Offers</h3>
+        </div>
+        <div class="search--box">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="search" placeholder="Search" />
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;" class="table--container">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Offer Title</th>
+              <th>Discount Percentage</th>
+              <th>Offer Type</th>
+              <th>Discription</th>
+              <th>Dates</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if( locals.offer.length>0){ %>
+              <% for(let i=0;i<locals.offer.length;i++){ %>
+                <tr id="row<%= i %>">
+                <td>
+                  <%= i+1 %>
+                </td>
+                <td>
+                  <%= offer[i].offerTitle %>
+                </td>
+                <td>
+                  <%= offer[i].discountPercentage %>%
+                </td>
+                <td>
+                  <%= offer[i].offerType %>
+                </td>
+                <td>
+                  <%= offer[i].description %>
+                </td>
+                <td>
+                  
+                  StartDate:
+                  <br>
+                  <P style="margin: 0px; color: green; font-size: 12px;">
+                    <%= offer[i].startDate.toString().split(' ').slice(0,4) %></P>
+              EndDate:
+              <br>
+              <P style="margin: 0px; color: red; font-size: 12px;"><%= offer[i].endDate.toString().split(' ').slice(0,4) %></P>
+            </td>
+            <td>
+              <button onclick="editOffer('<%=offer[i]._id %>')" class="btn btn-outline-primary"
+                data-target="#editOfferModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
+                  class="btn btn-outline-danger"
+                  onclick="deleteOffer('<%= offer[i]._id %>','<%= i %>')">Delete</button>
+            </td>
+          </tr>
+                <% } %>
+                <% }else{ %>
+                  <tr>
+                    <td style="font-size: 20px; padding: 15px;" colspan="7">Offers Not Found</td>
+                  </tr>
+                  <% } %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td id="totalCategory" colspan="8">Total offers: <span id="total"><%= locals.offer.length %></span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+  <script>
+
+
+    async function categoryOrProduct(value) {
+      const responce = await axios.patch('/admin/offer-category', { value });
+      const productSelect = document.getElementById('productSelect');
+      const categorySelect = document.getElementById('categorySelect');
+
+
+      if (responce.data.category) {
+        categorySelectGroup.style.display = 'block';
+        productSelectGroup.style.display = 'none';
+        if (responce.data.category.length > 0) {
+          categorySelect.innerHTML = '';
+          responce.data.category.forEach(category => {
+            const option = document.createElement('option');
+            option.textContent = category.name;
+            option.value = category.name;
+            categorySelect.appendChild(option);
+          })
+        }
+      } else if (responce.data.product) {
+        categorySelectGroup.style.display = 'none';
+        productSelectGroup.style.display = 'block';
+        if (responce.data.product.length > 0) {
+          productSelect.innerHTML = '';
+          responce.data.product.forEach(product => {
+            const option = document.createElement('option');
+            option.textContent = product.name;
+            option.value = product.name;
+            productSelect.appendChild(option);
+          })
+        } else {
+
+        }
+      }
+    }
+
+
+
+    async function addOffer() {
+
+      const errorMsg = document.getElementById('errorMsg');
+
+      const offerData = document.getElementById('addOfferData');
+      const formData = new FormData(offerData);
+      const jsonData = {};
+      formData.forEach((value, key) => {
+        jsonData[key] = value;
+      });
+
+      const responce = await axios.post('/admin/add-offer', jsonData);
+      console.log(responce.data.message);
+      if (responce.data.message) {
+        errorMsg.innerHTML = responce.data.message
+        errorMsg.style.display = 'block'
+      } else {
+        errorMsg.style.display = 'none'
+      }
+
+      if (responce.data.status) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Offer Added!',
+          showConfirmButton: false,
+          timer: 1000,
+        }).then((result) => {
+          window.location.href = '/admin/offer';
+        })
+      }
+
+    }
+
+
+
+
+    function deleteOffer(id, i) {
+      const row = document.getElementById(`row${i}`);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const response = await axios.delete(`/admin/offer-delete?id=${id}`);
+          if (response) {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Coupon has been deleted.",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1000,
+            })
+            row.remove();
+          }
+        }
+      });
+    }
+
+    async function editOffer(id) {
+      const response = await axios.patch('/admin/edit-offer', { id });
+      const offerData = response.data.data;
+
+      const date = new Date(offerData.startDate);
+      const date1 = new Date(offerData.endDate)
+      const year = date.getUTCFullYear();
+      const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = date.getUTCDate().toString().padStart(2, '0');
+      const year1 = date1.getUTCFullYear();
+      const month1 = (date1.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day1 = date1.getUTCDate().toString().padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      const formattedDate1 = `${year1}-${month1}-${day1}`;
+
+      document.getElementById('editOfferTitle').value = offerData.offerTitle;
+      document.getElementById('editDicountPercentage').value = offerData.discountPercentage;
+      document.getElementById('editDescription').value = offerData.description;
+      document.getElementById('startDate').value = formattedDate;
+      document.getElementById('endDate').value = formattedDate1;
+
+      document.getElementById('edit-Offer').addEventListener('click', async () => {
+        const errorMessage = document.getElementById('editErrorMsg');
+        const offerFrom = document.getElementById('editOfferData');
+        const formData = new FormData(offerFrom);
+        const jsonData = {};
+        formData.forEach((value, key) => {
+          jsonData[key] = value;
+        });
+        const response = await axios.patch('/admin/edit-offer-confirm', { id, jsonData });
+        console.log(response.data)
+        if (response.data.message) {
+          errorMessage.innerHTML = response.data.message
+          errorMessage.style.display = 'block'
+        } else {
+          errorMessage.style.display = 'none'
+        }
+
+        if (response.data.status) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Offer Edited!',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then((result) => {
+            window.location.href = '/admin/offer';
+          })
+        }
+      })
+    }
+
+
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <%- include('../layouts/footer.ejs') -%>

@@ -92,9 +92,9 @@ adminRouter.get('/user-detials',auth.isLogin,userController.loadUserDetials);
 // block
 adminRouter.patch('/block-user',userController.verifyBlockUser);
 
-// <--------------Order Controller-------------->
+// <--------------Coupon Controller-------------->
 const couponController = require('../controllers/admin/couponController');
-// <--------------Order Controller-------------->
+// <--------------Coupon Controller-------------->
 
 
 //add coupon
@@ -107,6 +107,17 @@ adminRouter.patch('/edit-coupon-confirm',couponController.verifyEditCouponConfir
 
 // delete coupon 
 adminRouter.delete('/coupon-delete',couponController.deleteCoupon);
+
+// <--------------Offer Controller-------------->
+const offerController = require('../controllers/admin/offerController');
+// <--------------Offer Controller-------------->
+
+adminRouter.get('/offer',auth.isLogin,offerController.loadOffers);
+adminRouter.patch('/offer-category',auth.isLogin,offerController.getCategoriesAndProduct);
+adminRouter.post('/add-offer',offerController.verifyOffer);
+adminRouter.delete('/offer-delete',offerController.deleteOffer);
+adminRouter.patch('/edit-offer',offerController.editOffer);
+adminRouter.patch('/edit-offer-confirm',offerController.verifyEditOffer);
 
 
 module.exports = adminRouter;

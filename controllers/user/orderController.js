@@ -35,8 +35,9 @@ const refundToWallet = async (id, userId) => {
         $inc: { totalAmount: order.orderAmount },
         $push: {
           transactions: {
-            type: "credit",
+            type: "Credit",
             amount: order.orderAmount,
+            reason: 'Refund',
             transactionDate: new Date(),
           },
         },

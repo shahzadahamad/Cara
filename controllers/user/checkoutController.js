@@ -235,13 +235,18 @@ const verifyCheckout = async (req, res) => {
     }else if(selectedPaymentMethod==='Wallet'){
 
       const balaceWallat = await Wallet.findOne({userId:req.session.user._id});
-      if(balaceWallat.totalAmount<order.orderAmount){
+      if(!balaceWallat){
+        req.flash('message','No Balace in Wallat');
+        return res.redirect('/checkout');
+      }
+      if(balaceWallat && balaceWallat.totalAmount<order.orderAmount){
          req.flash('message','No Balace in Wallat');
          return res.redirect('/checkout');
       }else{
         const update = {
-          type:'debit',
+          type:'Debit',
           amount:order.orderAmount,
+          reason:'Purchase Product',
           transactionDate:new Date(),
         }
         await Wallet.updateOne({userId:req.session.user._id},{$inc:{totalAmount:-order.orderAmount}});
