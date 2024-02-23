@@ -2,6 +2,7 @@ const user = require("../../models/userModel");
 const userOTPVerification = require("../../models/userOTPVerificationModel");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
+const Referral = require('../../models/refferalModel')
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
 const { render, name } = require("ejs");
@@ -202,6 +203,29 @@ const verifyEditUser = async (req, res) => {
   }
 };
 
+const loadRefer = async (req,res) => {
+  try{
+    const refferal = await Referral.findOne({userId:req.session.user._id});
+    const userData = await user.findOne({ _id: req.session.user._id });
+    res.render('refer',{user:userData,refferal:refferal})
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+const verifyRefferal = async (req,res) => {
+  try{
+    const {ref}=req.query;
+    if(ref){
+      res.redirect(`/signup?ref=${ref}`)
+    }else{
+      res.redirect('/home');
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
 module.exports = {
   loadPage,
   loadHome,
@@ -213,4 +237,6 @@ module.exports = {
   verifyEditUser,
   loadSearch,
   verifyShopSearch,
+  loadRefer,
+  verifyRefferal,
 };

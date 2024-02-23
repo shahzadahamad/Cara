@@ -1,4 +1,6 @@
 const user = require("../../models/userModel");
+const refferal = require("../../models/refferalModel");
+const Wallet = require("../../models/walletModel");
 const userOTPVerification = require("../../models/userOTPVerificationModel");
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
@@ -126,8 +128,9 @@ const verifyLogin = async (req, res) => {
 // loadSignUp
 const loadSignup = (req, res) => {
   try {
+    const { ref } = req.query;
     const message = req.flash("message");
-    res.render("signup", { message });
+    res.render("signup", { message, ref: ref ? ref : false });
   } catch (error) {
     console.log(error.message);
   }
@@ -136,6 +139,7 @@ const loadSignup = (req, res) => {
 // verifySignUp
 const verifySignUp = async (req, res) => {
   try {
+    const { ref } = req.query;
     const { name, email, mobile, password, cpassword } = req.body;
 
     if (!name || !email || !mobile || !password || !cpassword) {
@@ -168,7 +172,7 @@ const verifySignUp = async (req, res) => {
 
     if (existingUser) {
       req.flash("message", "You are already registered. Please log in");
-      res.redirect("/signup");
+      res.redirect(`/signup?ref=${ref}`);
     } else {
       if (addUser.password === cpassword) {
         const spassword = await securePassword(password);
@@ -179,10 +183,10 @@ const verifySignUp = async (req, res) => {
         req.session.otp = true;
         generateVerificationCode(addUser);
 
-        res.redirect("/otp");
+        res.redirect(`/otp?ref=${ref}`);
       } else {
         req.flash("message", "Passwords are not same");
-        res.redirect("/signup");
+        res.redirect(`/signup?ref=${ref}`);
       }
     }
   } catch (error) {
@@ -291,15 +295,19 @@ const verifyResetPassword = async (req, res) => {
 // loadOtp
 const loadOtp = async (req, res) => {
   try {
+    const { ref } = req.query;
     if (req.session.otp) {
       if (req.session.otpError) {
         req.session.otpError = false;
-        res.render("otp", { message: "Invalied otp" });
+        res.render("otp", { message: "Invalied otp", ref: ref ? ref : false });
       } else if (req.session.otpExpries) {
         req.session.otpExpries = false;
-        res.render("otp", { message: "otp expired please resend" });
+        res.render("otp", {
+          message: "otp expired please resend",
+          ref: ref ? ref : "none",
+        });
       } else {
-        res.render("otp");
+        res.render("otp", { ref: ref ? ref : "none" });
       }
     } else {
       res.redirect("/");
@@ -313,12 +321,13 @@ const loadOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     if (req.session.userData) {
+      const { ref } = req.query;
       const otpDataAdd = await userOTPVerification.findOne({
         userId: req.session.userData._id,
       });
       if (!otpDataAdd) {
         req.session.otpExpries = true;
-        res.redirect("/otp");
+        res.redirect(`/otp?ref=${ref}`);
         return;
       }
       const otp = req.body.otp.join("");
@@ -328,11 +337,43 @@ const verifyOtp = async (req, res) => {
           userId: req.session.userData._id,
         });
         await user.insertMany(req.session.userData);
+
+        if (ref!=='false') {
+
+        const refferalUser = await user.findOne({ _id: ref });
+
+          await refferal.updateOne(
+            { userId: refferalUser._id },
+            {
+              $push: {
+                history: { name: req.session.userData.fullname, amount: 100,referDate:new Date() },
+              },
+            },
+            { upsert: true }
+          );
+
+          await Wallet.updateOne(
+            { userId: refferalUser._id },
+            { $inc: {totalAmount:100},
+              $push: {
+                transactions: {
+                  type: "Credit",
+                  amount: 100,
+                  reason: `Refferal reward`,
+                  transactionDate: new Date(),
+                },
+              },
+            },
+            {
+              upsert: true
+            }
+          );
+        }
         req.session.user = req.session.userData;
         res.redirect("/home?status=true");
       } else {
         req.session.otpError = true;
-        res.redirect("/otp");
+        res.redirect(`/otp?ref=${ref}`);
       }
     } else if (req.session.resetEmail) {
       const otpDataChangePass = await userOTPVerification.findOne({

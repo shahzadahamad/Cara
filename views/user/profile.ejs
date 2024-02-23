@@ -15,6 +15,11 @@
       height: 100%;
       background-color: #042331;
       transition: all .5s ease;
+      overflow: scroll;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 0;
     }
 
     .sidebar header {
@@ -112,10 +117,11 @@
 
     #user-detials {
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
       margin: 40px 0;
       padding: 10px;
+      flex-wrap: wrap;
     }
 
     #user-detials #user-detials-container {
@@ -171,10 +177,12 @@
     </header>
     <ul>
       <li><a href="/profile" class="active"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="/refer"><i class="fa-solid fa-dollar-sign"></i>Refer & Earn</a></li>
       <li><a href="/Wallet"><i class="fa-solid fa-wallet"></i>Wallet</a></li>
       <li><a href="/order"><i class="fa-solid fa-check"></i>Order</a></li>
       <li><a href="/address"><i class="fa-solid fa-location-dot"></i>Address</a></li>
       <li><a href="/forget"><i class="fa-solid fa-lock"></i></i>Change Password</a></li>
+      <li><a id="logout"><i class="fas fa-sign-out"></i>Logout</a></li>
       <li><a id="logout"><i class="fas fa-sign-out"></i>Logout</a></li>
     </ul>
   </div>
@@ -185,111 +193,113 @@
   </section>
 
   <% if( locals.message ){ %>
-    <div style="color: green; text-align: center; margin-top: 20px;"  id="hide">
+    <div style="color: green; text-align: center; margin-top: 20px;" id="hide">
       <%=message%>
     </div>
     <% } %>
 
-  <section id="user-detials">
-    <div id="user-detials-container">
-      <h2>
-        <%= user.fullname %>
-      </h2>
-      <p>Email: <%= user.email %>
-      </p>
-      <p>Phone: <%= user.mobile %>
-      </p>
-        <div>
-          <button onclick="window.location.href='/edit-user'" style="background-color: #088178; color: #fff;" class="normal edit-btn">Edit</button>
+      <section id="user-detials">
+        <div id="user-detials-container">
+          <h2>
+            <%= user.fullname %>
+          </h2>
+          <p>Email: <%= user.email %>
+          </p>
+          <p>Phone: <%= user.mobile %>
+          </p>
+          <div>
+            <button onclick="window.location.href='/edit-user'" style="background-color: #088178; color: #fff;"
+              class="normal edit-btn">Edit</button>
+          </div>
         </div>
-    </div>
-  </section>
+      </section>
 
-  <section id="newsletter" class="section-p1 section-m1">
-    <div class="newstext">
-      <h4>Sign Up For Newsletters</h4>
-      <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
-    </div>
-    <div class="form">
-      <input type="text" placeholder="Your email address">
-      <button class="normal">Sign Up</button>
-    </div>
-  </section>
 
-  <footer class="section-p1">
-    <div class="col">
-      <img class="logo" src="images/logo.png" alt="">
-      <h4>Contact</h4>
-      <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
-      <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
-      <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
-      <div class="follow">
-        <h4>Follow us</h4>
-        <div class="icon">
-          <i class="fab fa-facebook-f"></i>
-          <i class="fab fa-twitter"></i>
-          <i class="fab fa-instagram"></i>
-          <i class="fab fa-pinterest-p"></i>
-          <i class="fab fa-youtube"></i>
+      <section id="newsletter" class="section-p1 section-m1">
+        <div class="newstext">
+          <h4>Sign Up For Newsletters</h4>
+          <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
         </div>
-      </div>
-    </div>
+        <div class="form">
+          <input type="text" placeholder="Your email address">
+          <button class="normal">Sign Up</button>
+        </div>
+      </section>
 
-    <div class="col">
-      <h4>About</h4>
-      <a href="#">About us</a>
-      <a href="#">Delivery Information</a>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms & Conditions</a>
-      <a href="#">Contact Us</a>
-    </div>
+      <footer class="section-p1">
+        <div class="col">
+          <img class="logo" src="images/logo.png" alt="">
+          <h4>Contact</h4>
+          <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
+          <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
+          <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
+          <div class="follow">
+            <h4>Follow us</h4>
+            <div class="icon">
+              <i class="fab fa-facebook-f"></i>
+              <i class="fab fa-twitter"></i>
+              <i class="fab fa-instagram"></i>
+              <i class="fab fa-pinterest-p"></i>
+              <i class="fab fa-youtube"></i>
+            </div>
+          </div>
+        </div>
 
-    <div class="col">
-      <h4>My Account</h4>
-      <a href="#">Sign In</a>
-      <a href="#">View Cart</a>
-      <a href="#">My Wishlist</a>
-      <a href="#">Track My Order</a>
-      <a href="#">Help</a>
-    </div>
+        <div class="col">
+          <h4>About</h4>
+          <a href="#">About us</a>
+          <a href="#">Delivery Information</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Contact Us</a>
+        </div>
 
-    <div class="col install">
-      <h4>Install App</h4>
-      <p>From App Store or Google Play</p>
-      <div class="row">
-        <img src="images/pay/app.jpg" alt="">
-        <img src="images/pay/play.jpg" alt="">
-      </div>
-      <p>Secured Payment Gateways</p>
-      <img src="images/pay/pay.png" alt="">
-    </div>
+        <div class="col">
+          <h4>My Account</h4>
+          <a href="#">Sign In</a>
+          <a href="#">View Cart</a>
+          <a href="#">My Wishlist</a>
+          <a href="#">Track My Order</a>
+          <a href="#">Help</a>
+        </div>
 
-    <div class="copyright">
-      <p>© 2024, Tech2 etc - Ecommerce Website</p>
-    </div>
-  </footer>
+        <div class="col install">
+          <h4>Install App</h4>
+          <p>From App Store or Google Play</p>
+          <div class="row">
+            <img src="images/pay/app.jpg" alt="">
+            <img src="images/pay/play.jpg" alt="">
+          </div>
+          <p>Secured Payment Gateways</p>
+          <img src="images/pay/pay.png" alt="">
+        </div>
+
+        <div class="copyright">
+          <p>© 2024, Tech2 etc - Ecommerce Website</p>
+        </div>
+      </footer>
 
 
-  <script>
-    const logout = document.getElementById('logout');
-    logout.addEventListener('click', () => {
-      Swal.fire({
-        title: "Are you sure?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Logout"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = '/logout'
-        }
-      });
-    })
-  </script>
+      <script>
+        const logout = document.getElementById('logout');
+        logout.addEventListener('click', () => {
+          Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Logout"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = '/logout'
+            }
+          });
+        })
+      </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script src="/javaScript/script.js"></script>
+      <script src="/javaScript/script.js"></script>
 
-  <%- include('../layouts/footer.ejs') -%>
+      <%- include('../layouts/footer.ejs') -%>

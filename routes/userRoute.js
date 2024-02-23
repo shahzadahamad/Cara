@@ -37,6 +37,10 @@ userRouter.get('/sproduct',auth.isBlocked,userController.loadSingleProduct);
 // profile
 userRouter.get('/profile',auth.isBlocked,auth.isLogin,userController.loadProfile);
 
+// refer 
+userRouter.get('/refer',auth.isBlocked,auth.isLogin,userController.loadRefer)
+userRouter.get('/refferal',userController.verifyRefferal);
+
 // user-edit
 userRouter.get('/edit-user',auth.isLogin,auth.isBlocked,userController.loadEditUser);
 userRouter.post('/edit-user',userController.verifyEditUser);
@@ -170,7 +174,7 @@ userRouter.patch('/waller-add-success',walletController.verifySuccessAddMoney);
 const wishlistController = require('../controllers/user/wishlistController');
 // <--------------Order Controller-------------->
 
-userRouter.get('/wishlist',auth.isLoginCart,wishlistController.loadWishlist);
+userRouter.get('/wishlist',auth.isLoginCart,auth.isBlocked,wishlistController.loadWishlist);
 userRouter.post('/add-to-wishlist',wishlistController.verifyWishlist)
 userRouter.patch('/remove-products-wishlist',wishlistController.removeProduct);
 

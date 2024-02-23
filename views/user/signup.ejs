@@ -29,7 +29,7 @@
               <%=message%>
             </div>
             <% } %>
-          <form action="/signup" method="post">
+          <form action="/signup?ref=<%= locals.ref %>" method="post">
             <div class="row">
               <i class="fas fa-user"></i>
               <input type="text" name="name" placeholder="Full Name" >

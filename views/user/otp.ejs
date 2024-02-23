@@ -44,7 +44,7 @@
             <p>We have sent a 4 digit verification code to your email address</p>
           </div>
 
-          <form style="padding: 30px 25px 0px 25px;" action="/otp" method="post">
+          <form style="padding: 30px 25px 0px 25px;" action="/otp?ref=<%= ref %>" method="post">
             <div class="input-field">
               <input type="number" name="otp" required>
               <input type="number" name="otp" required>
