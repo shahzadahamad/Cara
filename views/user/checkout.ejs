@@ -158,7 +158,7 @@
     th,
     td {
       border: 1px solid #ddd;
-      padding: 15px;
+      padding: 10px;
       text-align: left;
     }
 
@@ -627,8 +627,12 @@
               const discount = document.getElementById('discount')
               const discountAmount = document.getElementById('discountAmount');
               const btn = document.getElementById('btn-coupon');
+              const totalAmount = document.getElementById('totalAmount');
+              const t = totalAmount.innerHTML.replace('₹','')
               discount.style.display = 'table-row';
               discountAmount.textContent = '-₹' + responce.data.amount;
+              totalAmount.innerHTML= '₹' + (Number(t) - responce.data.amount);
+              console.log(totalAmount.innerHTML)
               btn.innerHTML = 'Remove'
             }
           }

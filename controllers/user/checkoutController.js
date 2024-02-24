@@ -37,7 +37,12 @@ const decrementProductQuatity = async (id) => {
       );
     });
 
-    return cartPro;
+    // for (let i = 0; i < cartPro.products.length; i++) {
+    //   const price = cartPro.products[i].productId.price
+    //   cartPro.products[i].price = price;
+    // }
+
+    return cartPro
   } catch (error) {
     console.log(error.message);
   }
@@ -218,6 +223,7 @@ const verifyCheckout = async (req, res) => {
       ? shipping - req.session.coupon.discountAmount
       : shipping;
 
+  
     const order = new Order({
       userId: req.session.user._id,
       orderAmount: discount,
@@ -228,6 +234,7 @@ const verifyCheckout = async (req, res) => {
       orderStatus: selectedPaymentMethod === "COD" ? "Placed" : "Pending",
       orderDate: new Date(),
     });
+
 
     if (!req.session.coupon) {
       delete order.couponApplied;

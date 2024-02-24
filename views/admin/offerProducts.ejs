@@ -120,7 +120,7 @@
                   <th>$<%= product[i].price %>
                   </th>
                   <td>
-                    <input type="checkbox" id="checkbox" <%= product[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= product[i]._id %>','product','<%= locals.id %>')">
+                    <input type="checkbox" id="checkbox<%= i %>" <%= product[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= product[i]._id %>','product','<%= locals.id %>','<%= i %>')">
                   </td>
                 </tr>
                 <% } %>
@@ -134,7 +134,7 @@
                           <%= category[i].name %>
                         </td>
                         <td>
-                          <input type="checkbox" id="checkbox" <%= category[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= category[i]._id %>','category','<%= locals.id %>')">
+                          <input type="checkbox" id="checkbox<%= i %>" <%= category[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= category[i]._id %>','category','<%= locals.id %>','<%= i %>')">
                         </td>
                       </tr>
                       <% } %>
@@ -156,8 +156,8 @@
 
   <script>
 
-   async function offerAdded(_id,type,id){
-      const checkbox = document.getElementById('checkbox').checked;
+   async function offerAdded(_id,type,id,i){
+      const checkbox = document.getElementById(`checkbox${i}`).checked;
       const response = await axios.patch('/admin/adding-offers',{_id,type,id,checkbox});
     }
 

@@ -21,8 +21,8 @@ const loadPage = (req, res) => {
 // loadHome
 const loadHome = async (req, res) => {
   try {
-    const productData = await product.find().limit(8);
-    const latestProducts = await product.find().sort({ _id: -1 }).limit(8);
+    const productData = await product.find().limit(8).populate('offer')
+    const latestProducts = await product.find().sort({ _id: -1 }).limit(8).populate('offer');
     res.render("home", {
       login: req.session.user,
       product: productData,

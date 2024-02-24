@@ -400,7 +400,7 @@
               </tbody>
             </table>
             <br>
-            <h5>Payment Method : <%= locals.order[0].paymentMethod==='COD' ? 'Cash On Delivery' : 'Online Payment' %>
+            <h5>Payment Method: <%= locals.order[0].paymentMethod === 'COD' ? 'Cash On Delivery' : locals.order[0].paymentMethod === 'Wallet' ? 'Wallet' : 'Online Payment' %>
             </h5>
 
           </div>
