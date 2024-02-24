@@ -26,6 +26,12 @@
       border: 1px solid black;
       padding: 8px;
     }
+
+    table tfoot tr td {
+      /* border: 1px solid black; */
+      padding: 8px;
+    }
+    
   </style>
 
 
@@ -161,8 +167,14 @@
                       </td>
                   </tr>
                   <% } %>
-
-
+                  <tfoot>
+                    <tr style="text-align: center;">
+                      <td colspan="2">Total</td>
+                      <td><%= locals.total.totalOrders %></td>
+                      <td><%= locals.total.totalRevenue %></td>
+                      <td><%= locals.total.totalCancelledOrders %></td>
+                    </tr>
+                  </tfoot>
                 </tbody>
               </table>
               <% }else{ %>
