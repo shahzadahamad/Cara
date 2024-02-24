@@ -1,0 +1,171 @@
+<%- include('../layouts/header.ejs') -%>
+
+  <link rel="stylesheet" href="/styleSheet/admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+  <div class="sidebar">
+    <br>
+    <ul class="menu">
+      <li>
+        <a href="/admin/dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fas fa-user"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/user-detials">
+          <i class="fa-solid fa-users"></i>
+          <span>Users</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/order-detials">
+          <i class="fa-solid fa-check"></i>
+          <span>Order</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/products">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span>Products</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/category">
+          <i class="fa-solid fa-list"></i>
+          <span>Category</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/coupon">
+          <i class="fa-solid fa-ticket"></i>
+          <span>Coupons</span>
+        </a>
+      </li>
+      <li class="active">
+        <a href="/admin/offer">
+          <i class="fa-solid fa-percent"></i>
+          <span>Offers</span>
+        </a>
+      </li>
+      <li class="logout">
+        <a href="/admin/logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="main--content">
+
+    <div class="header--wrapper">
+      <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
+      <div class="user--info">
+        <img src="/images/admin.png" alt="">
+        <h4>
+          <%= admins.username %>
+        </h4>
+      </div>
+    </div>
+
+    <div class="tabular--wrapper">
+
+      <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
+        <div>
+          <h3 style="font-size: 30px;" class="main--title">Products</h3>
+        </div>
+        <div class="search--box">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="search" placeholder="Search" />
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;" class="table--container">
+        <table>
+          <thead>
+            <% if(locals.product){ %>
+            <tr>
+              <th>No</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Actions</th>      
+            </tr>
+            <% }else if(locals.category){ %>
+              <th>No</th>
+              <th>Name</th>
+              <th>Actions</th>      
+              <% } %>
+          </thead>
+          <tbody>
+            <% if(locals.product && product.length>0){%>
+              <% for(let i=0; i< product.length;i++){ %>
+                <tr id="row<%=i%>">
+                  <td>
+                    <%= i+1 %>
+                  </td>
+                  <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
+                  <td>
+                    <%= product[i].name %>
+                  </td>
+                  <th>$<%= product[i].price %>
+                  </th>
+                  <td>
+                    <input type="checkbox" id="checkbox" <%= product[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= product[i]._id %>','product','<%= locals.id %>')">
+                  </td>
+                </tr>
+                <% } %>
+                  <% } else if(locals.category && category.length>0){ %>
+                    <% for(let i=0; i< category.length;i++){ %>
+                      <tr id="row<%=i%>">
+                        <td>
+                          <%= i+1 %>
+                        </td>
+                        <td>
+                          <%= category[i].name %>
+                        </td>
+                        <td>
+                          <input type="checkbox" id="checkbox" <%= category[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= category[i]._id %>','category','<%= locals.id %>')">
+                        </td>
+                      </tr>
+                      <% } %>
+                    <% }else{ %>
+                      <tr>
+                        <td colspan="7"><% locals.product ? 'Products Not Found' : 'Category Not Found' %>  Products Not Found</td>
+                      </tr>
+                      <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+
+   async function offerAdded(_id,type,id){
+      const checkbox = document.getElementById('checkbox').checked;
+      const response = await axios.patch('/admin/adding-offers',{_id,type,id,checkbox});
+    }
+
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+  <%- include('../layouts/footer.ejs') -%>

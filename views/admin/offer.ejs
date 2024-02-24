@@ -5,6 +5,7 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
+
   <style>
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
@@ -145,13 +146,13 @@
                       <label>Offer Type</label><br>
                       <!-- Category radio button -->
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" onclick="categoryOrProduct('category')" type="radio"
+                        <input class="form-check-input" type="radio"
                           name="offerType" id="categoryRadio" value="category">
                         <label class="form-check-label" for="categoryRadio">Category</label>
                       </div>
                       <!-- Product radio button -->
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" onclick="categoryOrProduct('product')" type="radio"
+                        <input class="form-check-input" type="radio"
                           name="offerType" id="productRadio" value="product">
                         <label class="form-check-label" for="productRadio">Product</label>
                       </div>
@@ -303,9 +304,10 @@
           <thead>
             <tr>
               <th>No</th>
-              <th>Offer Title</th>
-              <th>Discount Percentage</th>
+              <th>Title</th>
+              <th>Discount</th>
               <th>Offer Type</th>
+              <th>Add</th>
               <th>Discription</th>
               <th>Dates</th>
               <th>Action</th>
@@ -328,6 +330,9 @@
                   <%= offer[i].offerType %>
                 </td>
                 <td>
+                  <i style="font-size: 25px;" onclick="window.location.href='/admin/choose-offer?id=<%= offer[i]._id %>'" class="fa-solid fa-circle-plus"></i>
+                </td>
+                <td>
                   <%= offer[i].description %>
                 </td>
                 <td>
@@ -345,6 +350,7 @@
                 data-target="#editOfferModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
                   class="btn btn-outline-danger"
                   onclick="deleteOffer('<%= offer[i]._id %>','<%= i %>')">Delete</button>
+                  
             </td>
           </tr>
                 <% } %>
@@ -377,41 +383,6 @@
   <script>
 
 
-    async function categoryOrProduct(value) {
-      const responce = await axios.patch('/admin/offer-category', { value });
-      const productSelect = document.getElementById('productSelect');
-      const categorySelect = document.getElementById('categorySelect');
-
-
-      if (responce.data.category) {
-        categorySelectGroup.style.display = 'block';
-        productSelectGroup.style.display = 'none';
-        if (responce.data.category.length > 0) {
-          categorySelect.innerHTML = '';
-          responce.data.category.forEach(category => {
-            const option = document.createElement('option');
-            option.textContent = category.name;
-            option.value = category.name;
-            categorySelect.appendChild(option);
-          })
-        }
-      } else if (responce.data.product) {
-        categorySelectGroup.style.display = 'none';
-        productSelectGroup.style.display = 'block';
-        if (responce.data.product.length > 0) {
-          productSelect.innerHTML = '';
-          responce.data.product.forEach(product => {
-            const option = document.createElement('option');
-            option.textContent = product.name;
-            option.value = product.name;
-            productSelect.appendChild(option);
-          })
-        } else {
-
-        }
-      }
-    }
-
 
 
     async function addOffer() {
@@ -426,7 +397,6 @@
       });
 
       const responce = await axios.post('/admin/add-offer', jsonData);
-      console.log(responce.data.message);
       if (responce.data.message) {
         errorMsg.innerHTML = responce.data.message
         errorMsg.style.display = 'block'
