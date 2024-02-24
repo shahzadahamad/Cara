@@ -166,8 +166,91 @@
       background-color: #f2f2f2;
     }
 
+    #crusor {
+      cursor: pointer;
+    }
+
+    .style {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 15px 30px;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.2s;
+      background-color: #088178;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%;
+      max-height: 80%;
+      overflow-y: auto;
+      position: fixed;
+      left: 345px;
+      top: -16%;
+    }
+
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .coupon-container {
+      margin-bottom: 20px;
+    }
+
+    .coupon {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 5px;
+    }
+
+    #couponPosition {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #couponPosition input {
+      width: 30vw;
+    }
 
 
+    @media (max-width:775px) {
+      #couponPosition input {
+        width: 250px;
+        margin-bottom: 10px;
+      }
+
+    }
 
     @media (max-width:699px) {
       #user-detials .user-detials-container {
@@ -184,6 +267,16 @@
         width: 100%;
         box-sizing: border-box;
         margin-bottom: 10px;
+      }
+    }
+
+    @media (max-width:477px) {
+      #couponPosition {
+        flex-direction: column;
+      }
+
+      #coupon {
+        width: 100%;
       }
     }
 
@@ -227,6 +320,50 @@
       <%=message%>
     </div>
     <% } %>
+
+      <div id="couponModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <% if(locals.coupons && locals.coupons.length>0){ %>
+            <h4>Coupons Available</h4>
+            <br>
+            <% for(let i=0;i<coupons.length;i++){ %>
+              <% if(coupons[i].discountAmount<=(total < 500 ? total + 40 : total) && coupons[i].quantity>0 ){ %>
+                <div class="coupon-container">
+                  <div class="coupon">
+                    <p style="font-weight: 700; color: #000;">Coupon Code : <span
+                        style="font-weight: 900; color: #088178;" id="textToCopy<%= i %>">
+                        <%= coupons[i].couponCode %>
+                      </span></p>
+                    <p style="font-weight: 700; color: #000;">Detials : <%= coupons[i].description %>
+                    </p>
+                  </div>
+                  <button class="style" onclick="myFunction('<%= i %>')">Copy Code</button>
+                </div>
+                <% } %>
+                  <% } %>
+                    <% }else{ %>
+                      <h5>No Coupon Available</h5>
+                      <% } %>
+        </div>
+      </div>
+
+      <section id="couponPosition">
+        <div id="coupon">
+          <h3>Apply Coupon</h3>
+          <p style="display: none; font-weight: 800; font-size: 12px; color: red; margin: 0px; text-align: start; "
+            id="errorMsg"></p>
+          <div>
+            <form>
+              <input type="text" id="inputVal" placeholder="Enter Your Coupon Code">
+              <button class="normal" id="btn-coupon" onclick="CouponApply()">Apply</button>
+            </form>
+            <br>
+            <a style="padding: 8px;" class="style" id="openModalBtn">Show Coupon</a>
+          </div>
+        </div>
+      </section>
+
       <h4 style="text-align: center; margin-top: 20px;">
         <%= locals.address ? 'Choose your address' : 'Please Add Address' %>
       </h4>
@@ -317,31 +454,25 @@
                       <% } %>
                         <tr>
                           <td data-label="Product">Subtotal</td>
-                          <td data-label="Total">₹<%= discount ? total + discount.discountAmount : total %>
+                          <td data-label="Total">₹<%= total %>
                           </td>
                         </tr>
-               
-
-                            <tr>
-                              <td data-label="Product">Shipping</td>
-                              <td data-label="Total">
-                                <%= total<500? '₹40' : 'Free' %>
-                              </td>
-                            </tr>
-                            <% if(locals.discount){ %>
-
-                              <tr>
-                                <td data-label="Product">Discount</td>
-                                <td data-label="Totol">-₹<%= discount.discountAmount %>
-                                </td>
-                              </tr>
-                              <% } %>
-                            <tr>
-                              <td style="font-weight: 700;" data-label="Product">Total</td>
-                              <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹
-                                <%=total<500?total+40:total%>
-                              </td>
-                            </tr>
+                        <tr>
+                          <td data-label="Product">Shipping</td>
+                          <td data-label="Total">
+                            <%= total<500? '₹40' : 'Free' %>
+                          </td>
+                        </tr>
+                        <tr style="display: none;" id="discount">
+                          <td data-label="Product">Discount</td>
+                          <td data-label="Total" id="discountAmount">
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight: 700;" data-label="Product">Total</td>
+                          <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹<%=total<500?total+40:total%>
+                          </td>
+                        </tr>
               </tbody>
             </table>
             <br>
@@ -350,17 +481,17 @@
             <div style=" margin-top: 20px;">
               <% if(locals.total>1000) {%>
                 <input type="radio" name="selectedPaymentMethod" value="COD" id="COD" disabled>
-                <label for="COD" >Cash On Delivery</label>
-              <% }else{ %>
-                <input type="radio" name="selectedPaymentMethod" value="COD" id="COD">
                 <label for="COD">Cash On Delivery</label>
-                <% } %>
-              <br><br>
-              <input type="radio" name="selectedPaymentMethod" value="Online" id="Online">
-              <label for="Online">Online Payment</label>
-              <br><br>
-              <input type="radio" name="selectedPaymentMethod" value="Wallet" id="Wallet">
-              <label for="Wallet">Wallet</label>
+                <% }else{ %>
+                  <input type="radio" name="selectedPaymentMethod" value="COD" id="COD">
+                  <label for="COD">Cash On Delivery</label>
+                  <% } %>
+                    <br><br>
+                    <input type="radio" name="selectedPaymentMethod" value="Online" id="Online">
+                    <label for="Online">Online Payment</label>
+                    <br><br>
+                    <input type="radio" name="selectedPaymentMethod" value="Wallet" id="Wallet">
+                    <label for="Wallet">Wallet</label>
             </div>
             <br>
             <button style="width: 100%; background-color: #088178; color: #fff;" type="submit" id="payButton"
@@ -437,8 +568,120 @@
         </div>
       </footer>
 
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
       <script>
+
+        window.addEventListener('load', () => {
+          axios.delete('/destory-coupon');
+        })
+
+        async function CouponApply() {
+          event.preventDefault();
+          const errorMsg = document.getElementById('errorMsg');
+          const inputVal = document.getElementById('inputVal').value;
+          if (inputVal === '') {
+            errorMsg.style.display = 'block'
+            errorMsg.innerHTML = 'Enter a Code'
+          } else {
+            errorMsg.style.display = 'none'
+            discount.style.display = 'none';
+            const responce = await axios.post('/coupon', { inputVal });
+            if (responce.data.remove) {
+              Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to remove Coupon",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.fire({
+                    title: "Removed!",
+                    text: "Your Coupon has been removed.",
+                    icon: "success",
+                    timer: 800, 
+                    showConfirmButton: false 
+                  }).then(()=>{
+                    window.location.reload();
+                  })
+                }
+              });
+            }
+            if (responce.data.status) {
+              errorMsg.style.display = 'block';
+              errorMsg.innerHTML = responce.data.status;
+              discount.style.display = 'none';
+            } else if (responce.data.amount) {
+              errorMsg.style.display = 'block';
+              errorMsg.innerText = 'Coupon Applied';
+              errorMsg.style.color = 'green';
+              Swal.fire({
+                icon: 'success',
+                title: 'Coupon Applied!',
+                showConfirmButton: false,
+                timer: 800,
+              })
+              const discount = document.getElementById('discount')
+              const discountAmount = document.getElementById('discountAmount');
+              const btn = document.getElementById('btn-coupon');
+              discount.style.display = 'table-row';
+              discountAmount.textContent = '-₹' + responce.data.amount;
+              btn.innerHTML = 'Remove'
+            }
+          }
+        }
+
+
+        function myFunction(index) {
+
+          const element = document.getElementById(`textToCopy${index}`);
+          const modal = document.getElementById('couponModal');
+
+
+          var range = document.createRange();
+          range.selectNode(element);
+
+
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+
+          document.execCommand("copy");
+
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Code Copied!',
+            showConfirmButton: false,
+            timer: 800,
+          }).then((result) => {
+            modal.style.display = 'none'
+          })
+        }
+
+        // modal for available coupon
+        document.addEventListener('DOMContentLoaded', function () {
+          const openModalBtn = document.getElementById('openModalBtn');
+          const modal = document.getElementById('couponModal');
+          const closeModalBtn = modal.querySelector('.close');
+
+          openModalBtn.addEventListener('click', function () {
+            modal.style.display = 'block';
+          });
+
+          closeModalBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+          });
+
+          window.addEventListener('click', function (event) {
+            if (event.target === modal) {
+              modal.style.display = 'none';
+            }
+          });
+        });
+        // modal for available coupon
 
         document.getElementById('paymentForm').onsubmit = function (event) {
           const selectedPaymentMethod = document.querySelector('input[name="selectedPaymentMethod"]:checked').value;

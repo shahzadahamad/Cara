@@ -1,76 +1,6 @@
 <%- include('../layouts/header.ejs') -%>
 
 
-
-  <style>
-    #crusor {
-      cursor: pointer;
-    }
-
-    .style {
-      font-size: 14px;
-      font-weight: 600;
-      padding: 15px 30px;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      outline: none;
-      transition: 0.2s;
-      background-color: #088178;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 50%;
-      max-height: 80%;
-      overflow-y: auto;
-      position: fixed;
-      left: 345px;
-      top: -16%;
-    }
-
-    .close {
-      color: #aaaaaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-      color: #000;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .coupon-container {
-      margin-bottom: 20px;
-    }
-
-    .coupon {
-      background-color: #f9f9f9;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 5px;
-    }
-  </style>
-
   <header id="header">
     <a href="#"><img src="/images/logo.png" class="logo" alt=""></a>
 
@@ -148,7 +78,7 @@
                       <input type="number" id="inputTag<%= i %>"
                         oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
                         value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity ? product[i].quantity : product[i].quantity+1 %>"
-                        onkeydown="return false" min="1">
+                        onkeydown="return false" min="1" max="<%= product[i].productId.quantity %>">
                       <% } %>
                   </td>
                   <% if(product[i].productId.quantity>0){ %>
@@ -174,50 +104,9 @@
         </table>
       </section>
 
-
-      <div id="couponModal" class="modal">
-        <div class="modal-content">
-          <span class="close">&times;</span>
-          <% if(locals.coupons && locals.coupons.length>0){ %>
-            <h4>Coupons Available</h4>
-            <br>
-            <% for(let i=0;i<coupons.length;i++){ %>
-              <% if(coupons[i].discountAmount<=(total < 500 ? total + 40 : total) && coupons[i].quantity>0 ){ %>
-                <div class="coupon-container">
-                  <div class="coupon">
-                    <p style="font-weight: 700; color: #000;">Coupon Code : <span
-                        style="font-weight: 900; color: #088178;" id="textToCopy<%= i %>">
-                        <%= coupons[i].couponCode %>
-                      </span></p>
-                    <p style="font-weight: 700; color: #000;">Detials : <%= coupons[i].description %>
-                    </p>
-                  </div>
-                  <button class="style" onclick="myFunction('<%= i %>')">Copy Code</button>
-                </div>
-                <% } %>
-                  <% } %>
-                    <% }else{ %>
-                      <h5>No Coupon Available</h5>
-                      <% } %>
-        </div>
-      </div>
-
       <% if(locals.product){%>
         <form action="/verify-cart-checkout" method="post">
           <section id="cart-add" class="section-p1">
-            <div id="coupon">
-              <h3>Apply Coupon</h3>
-              <p style="display: none; font-weight: 800; font-size: 12px; color: red; margin: 0px; text-align: start; "
-                id="errorMsg"></p>
-              <div>
-                <form>
-                  <input type="text" id="inputVal" placeholder="Enter Your Coupon Code">
-                  <button class="normal" onclick="CouponApply()">Apply</button>
-                </form>
-                <br><br>
-                <a style="padding: 8px;" class="style" id="openModalBtn">Show Coupon</a>
-              </div>
-            </div>
             <div id="subtotal">
               <h3>Cart Totals</h3>
               <table>
@@ -239,10 +128,6 @@
                     <% } else { %>
                       <td id="shipping">Free</td>
                       <% } %>
-                </tr>
-                <tr style="display: none" id="discountbox">
-                  <td>Discount</td>
-                  <td id="discount">-</td>
                 </tr>
                 <tr>
                   <td><strong>Total</strong></td>
@@ -324,139 +209,6 @@
 
           <script>
 
-            function myFunction(index) {
-
-              const element = document.getElementById(`textToCopy${index}`);
-              const modal = document.getElementById('couponModal');
-
-
-              var range = document.createRange();
-              range.selectNode(element);
-
-
-              window.getSelection().removeAllRanges();
-              window.getSelection().addRange(range);
-
-              document.execCommand("copy");
-
-
-              Swal.fire({
-                icon: 'success',
-                title: 'Code Copied!',
-                showConfirmButton: false,
-                timer: 800,
-              }).then((result) => {
-                modal.style.display = 'none'
-              })
-            }
-
-            // modal for available coupon
-            document.addEventListener('DOMContentLoaded', function () {
-              const openModalBtn = document.getElementById('openModalBtn');
-              const modal = document.getElementById('couponModal');
-              const closeModalBtn = modal.querySelector('.close');
-
-              openModalBtn.addEventListener('click', function () {
-                modal.style.display = 'block';
-              });
-
-              closeModalBtn.addEventListener('click', function () {
-                modal.style.display = 'none';
-              });
-
-              window.addEventListener('click', function (event) {
-                if (event.target === modal) {
-                  modal.style.display = 'none';
-                }
-              });
-            });
-            // modal for available coupon
-
-            window.addEventListener('DOMContentLoaded', () => {
-              deleteSession();
-            })
-
-
-            let discounts;
-
-
-            async function CouponApply() {
-              event.preventDefault()
-              const errorMsg = document.getElementById('errorMsg');
-              const discount = document.getElementById('discount');
-              const discountbox = document.getElementById('discountbox');
-              const total = document.getElementById('total');
-              const couponCode = document.getElementById('inputVal').value;
-              const responce = await axios.post('/apply-coupon', { couponCode });
-
-              if (responce.data.msg1) {
-
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "Do You Want To Remove Coupon!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!"
-                }).then(async (result) => {
-                  if (result.isConfirmed) {
-                    Swal.fire({
-                      title: "Removed!",
-                      text: "Coupon has been removed.",
-                      icon: "success",
-                      showConfirmButton: false,
-                      timer: 1000,
-                    }).then((result)=>{
-                      window.location.reload()
-                    })
-                  }
-                });
-
-              }
-
-
-              if (responce.data.msg) {
-                errorMsg.innerHTML = responce.data.msg
-                errorMsg.style.display = 'block'
-              } else {
-                errorMsg.style.display = 'none'
-              }
-
-              discounts = responce.data.status;
-
-              if (responce.data.status) {
-                discount.innerHTML = "-₹" + responce.data.status
-                discountbox.style.display = 'contents'
-                if (responce.data.total[0].total < 500) {
-                  total.innerHTML = "₹" + Number(responce.data.total[0].total + 40 - responce.data.status);
-
-                } else {
-                  total.innerHTML = "₹" + Number(responce.data.total[0].total - responce.data.status);
-                }
-                errorMsg.innerHTML = 'Coupon Applied',
-                  errorMsg.style.display = 'block'
-                errorMsg.style.color = 'green'
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Coupen Applied!',
-                  showConfirmButton: false,
-                  timer: 1000,
-                })
-              }
-
-            }
-
-            async function deleteSession() {
-              try {
-                await axios.post('/clear-coupon');
-              } catch (error) {
-                console.log(error.message);
-              }
-            }
-
-
-
             function removeProduct(id, i) {
               const row = document.getElementById(`row${i}`);
               const subTotalRow = document.getElementById(`subTotal${i}`);
@@ -509,18 +261,11 @@
                         shipping.innerHTML = 'Free'
                       }
                       total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
-                      if (discount && discounts != undefined) {
-                        total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40 - discounts);
-                      } else {
-                        total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
-                      }
+                      total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
+  
                     } else {
                       shipping.innerHTML = 'Free'
-                      if (discount && discounts != undefined) {
-                        total.innerHTML = '₹' + Number(data.totalCart[0].total - discounts);
-                      } else {
-                        total.innerHTML = '₹' + Number(data.totalCart[0].total);
-                      }
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total); 
                     }
 
                   }
@@ -592,18 +337,12 @@
 
                   if (data.totalCart[0].total < 500) {
                     shipping.innerHTML = '₹' + 40;
-                    if (discount && discounts != undefined) {
-                      total.innerHTML = '₹' + Number(data.totalCart[0].total + 40 - discounts)
-                    } else {
+              
                       total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
-                    }
+            
                   } else {
-                    shipping.innerHTML = 'Free';
-                    if (discount && discounts != undefined) {
-                      total.innerHTML = '₹' + Number(data.totalCart[0].total - discounts);
-                    } else {
-                      total.innerHTML = '₹' + Number(data.totalCart[0].total);
-                    }
+                    shipping.innerHTML = 'Free';        
+                    total.innerHTML = '₹' + Number(data.totalCart[0].total);
                   }
 
                   if (data.totalCart[0].total === 0) {

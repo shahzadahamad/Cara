@@ -937,7 +937,7 @@ footer .copyright {
 #cart-add {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: end;
 }
 
 #coupon {
@@ -1243,13 +1243,6 @@ footer .copyright {
   }
 
   /* Cart Page */
-  #cart-add {
-    flex-direction: column;
-  }
-
-  #coupon {
-    width: 100%;
-  }
 
   #subtotal {
     width: 100%;
