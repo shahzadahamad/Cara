@@ -2,8 +2,7 @@ const admin = require("../../models/adminModel");
 const multer = require("../../middleware/multer");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 // loadProducts
 const loadProducts = async (req, res) => {
@@ -19,12 +18,16 @@ const loadProducts = async (req, res) => {
 // loadAddProducts
 const loadAddProducts = async (req, res) => {
   try {
-    const {message,message1} = req.flash();
+    const { message, message1 } = req.flash();
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const categorys = await category.find();
 
-      res.render("addProducts", { admins: adminData, category: categorys ,message,message1});
-    
+    res.render("addProducts", {
+      admins: adminData,
+      category: categorys,
+      message,
+      message1,
+    });
   } catch (error) {
     console.log(error.message);
   }
@@ -33,23 +36,36 @@ const loadAddProducts = async (req, res) => {
 // verifyAddProducts
 const verifyAddProducts = async (req, res) => {
   try {
-    const {name,brand,rating,price,quantity,description}=req.body
+    const { name, brand, rating, price, quantity, description } = req.body;
     const categorys = await category.findOne({ name: req.body.category });
 
-    if(!name||!brand||!rating||!price||!quantity||!description||!req.body.category){
-      req.flash('message1','All Fields Are Require!');
-      return res.redirect('/admin/add-products')
+    if (
+      !name ||
+      !brand ||
+      !rating ||
+      !price ||
+      !quantity ||
+      !description ||
+      !req.body.category
+    ) {
+      req.flash("message1", "All Fields Are Require!");
+      return res.redirect("/admin/add-products");
     }
 
     const quantityValue = parseFloat(quantity);
     const priceValue = parseFloat(price);
-    if(isNaN(quantityValue)||quantity<0||isNaN(priceValue)||price<0){
-      req.flash('message1','Quantity must be a positive number!');
-      return res.redirect('/admin/add-products');
-    }  
+    if (
+      isNaN(quantityValue) ||
+      quantity < 0 ||
+      isNaN(priceValue) ||
+      price < 0
+    ) {
+      req.flash("message1", "Quantity must be a positive number!");
+      return res.redirect("/admin/add-products");
+    }
 
     if (!req.files || req.files.length === 0) {
-      req.flash('message1', 'Add Images At Least One!');
+      req.flash("message1", "Add Images At Least One!");
       return res.redirect(`/admin/add-products`);
     }
 
@@ -74,75 +90,84 @@ const verifyAddProducts = async (req, res) => {
     const existingProduct = await product.findOne({ name: addProduct.name });
 
     if (existingProduct) {
-      req.flash('message1','Product Already Exist!')
+      req.flash("message1", "Product Already Exist!");
       return res.redirect("/admin/add-products");
-    } 
-      await product.insertMany(addProduct);
+    }
+    await product.insertMany(addProduct);
 
-      req.flash('message','Product Added');
-      res.redirect("/admin/add-products");
-    
+    req.flash("message", "Product Added");
+    res.redirect("/admin/add-products");
   } catch (error) {
     console.log(error.message);
   }
 };
 
 // loadEditProduct
-const loadEditProduct = async (req,res) => {
-  try{
+const loadEditProduct = async (req, res) => {
+  try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const categorys = await category.find();
-    const {message,message1}=req.flash()
+    const { message, message1 } = req.flash();
     const id = req.query.id;
-    const productId = await product.findById({_id:id}).populate('categoryId');
+    const productId = await product
+      .findById({ _id: id })
+      .populate("categoryId");
 
-    res.render('editProduct',{admins:adminData,category:categorys,product:productId,message,message1});
-    
-  }catch(error){
+    res.render("editProduct", {
+      admins: adminData,
+      category: categorys,
+      product: productId,
+      message,
+      message1,
+    });
+  } catch (error) {
     console.log(error.message);
   }
 };
 
 // verifyEditProduct
-const verifyEditProduct = async (req,res) => {
-  try{
-
-    const {name,brand,rating,price,quantity,description}=req.body
+const verifyEditProduct = async (req, res) => {
+  try {
+    const { name, brand, rating, price, quantity, description } = req.body;
     const id = req.query.id;
 
-    const existingProduct = await product.findOne({name:name ,_id:{$ne:id}});
+    const existingProduct = await product.findOne({
+      name: name,
+      _id: { $ne: id },
+    });
 
-    if(existingProduct){
-      req.flash('message1','Product Already Exist');
+    if (existingProduct) {
+      req.flash("message1", "Product Already Exist");
       return res.redirect(`/admin/edit-products?id=${id}`);
     }
 
-    if(!name||!brand||!rating||!price||!quantity||!description||!req.body.category){
-      req.flash('message1','All Fields Are Require!');
-      return res.redirect(`/admin/edit-products?id=${id}`)
+    if (
+      !name ||
+      !brand ||
+      !rating ||
+      !price ||
+      !quantity ||
+      !description ||
+      !req.body.category
+    ) {
+      req.flash("message1", "All Fields Are Require!");
+      return res.redirect(`/admin/edit-products?id=${id}`);
     }
 
     const quantityValue = parseFloat(quantity);
     const priceValue = parseFloat(price);
-    if(isNaN(quantityValue)||quantity<0||isNaN(priceValue)||price<0){
-      req.flash('message1','Quantity must be a positive number!');
-      return res.redirect(`/admin/edit-products?id=${id}`);
-    }  
-
-    if (!req.files || req.files.length === 0) {
-      req.flash('message1', 'Add Images At Least One!');
+    if (
+      isNaN(quantityValue) ||
+      quantity < 0 ||
+      isNaN(priceValue) ||
+      price < 0
+    ) {
+      req.flash("message1", "Quantity must be a positive number!");
       return res.redirect(`/admin/edit-products?id=${id}`);
     }
 
-    const images = [];
-    const files = req.files;
+    const categorys = await category.findOne({ name: req.body.category });
 
-    files.forEach((files) => {
-      images.push(files.filename);
-    });
-
-    const categorys = await category.findOne({name:req.body.category});
-    
     const update = {
       name: name,
       brand: brand,
@@ -150,31 +175,31 @@ const verifyEditProduct = async (req,res) => {
       rating: rating,
       price: price,
       quantity: quantity,
-      image: images,
       description: description,
-    }
+    };
 
-
-
-    await product.findByIdAndUpdate({_id:id},{$set:update});
-    req.flash('message','Product Added');
+    await product.findByIdAndUpdate({ _id: id }, { $set: update });
+    req.flash("message", "Product Added");
     res.redirect(`/admin/edit-products?id=${id}`);
-  }catch(error){
+  } catch (error) {
     console.log(error.message);
   }
-}
+};
 
-// edit image
-const verifyEditImage = async (req,res) => {
-  try{
-    const {i}=req.body;
-    console.log(i);
-    console.log('alsdkfjsa;df')
-    res.json({status:true});
-  }catch(error){
+// Edite iamge
+const verifyEditImage = async (req, res) => {
+  try {
+    const file = req.file;
+    const { index, id } = req.query;
+    await product.updateOne(
+      { _id: id },
+      { $set: { ["image." + index]: file.filename } }
+    );
+    res.json({ status: true });
+  } catch (error) {
     console.log(error.message);
   }
-}
+};
 
 // deleteProduct
 const verifyDeleteProduct = async (req, res) => {
@@ -189,6 +214,26 @@ const verifyDeleteProduct = async (req, res) => {
   }
 };
 
+// Delete image
+const deleteImages = async (req, res) => {
+  try {
+    const { i, id } = req.body;
+
+    const findImage = await product.findOne({ _id: id });
+
+    if (findImage.image.length === 1) {
+      return res.json({ status: false });
+    }
+
+    const imageToRevmove = findImage.image[i];
+    await product.updateOne({ _id: id }, { $pull: { image: imageToRevmove } });
+
+    res.json({ status: true });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadProducts,
   loadAddProducts,
@@ -197,4 +242,5 @@ module.exports = {
   loadEditProduct,
   verifyEditProduct,
   verifyEditImage,
-}
+  deleteImages,
+};

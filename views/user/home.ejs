@@ -119,7 +119,7 @@
                   <% } %>
                     &nbsp;&nbsp;
                     <h4>
-                      ₹<%= product[i].offer ? Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100))  : product[i].price %>
+                      ₹<%= product[i].offer ? product[i].price - Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100))  : product[i].price %>
                     </h4>
               </div>
             </div>
@@ -146,6 +146,9 @@
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
+            <p id="offerPecen">
+              <%= latestProducts[i].offer ? latestProducts[i].offer.discountPercentage+'% Off' : '' %>
+            </p>
             <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
                 class="fa-solid fa-heart"></i></a>
             <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>"
@@ -162,9 +165,17 @@
                   <i class="ri-star-fill"></i>
                   <% } %>
               </div>
-              <h4>
-                ₹<%= latestProducts[i].price %>
-              </h4>
+              <div style="display: flex; flex-direction: row;">
+                <% if(latestProducts[i].offer){ %>
+                  <h4 style="color: #99a6be; text-decoration: line-through;">
+                    ₹<%= latestProducts[i].price %>
+                  </h4>
+                  <% } %>
+                    &nbsp;&nbsp;
+                    <h4>
+                      ₹<%= latestProducts[i].offer ? latestProducts[i].price - Math.round(latestProducts[i].price*(Number(latestProducts[i].offer.discountPercentage)/100))  : latestProducts[i].price %>
+                    </h4>
+              </div>
             </div>
             <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i
                 class="ri-shopping-cart-2-line cart"></i></a>
