@@ -27,6 +27,7 @@ const loadHome = async (req, res) => {
       login: req.session.user,
       product: productData,
       latestProducts: latestProducts,
+      data: new Date(),
     });
   } catch (error) {
     console.log(error.message);
@@ -37,10 +38,10 @@ const loadHome = async (req, res) => {
 const searchFillter = async (name, brand) => {
   try {
     if (name) {
-      const fillteredProducts = await product.find({ name: name });
+      const fillteredProducts = await product.find({ name: name }).populate('offer');
       return fillteredProducts;
     } else if (brand) {
-      const fillteredProducts = await product.find({ brand: brand });
+      const fillteredProducts = await product.find({ brand: brand }).populate('offer');
       return fillteredProducts;
     }
   } catch (error) {
@@ -61,6 +62,7 @@ const loadShop = async (req, res) => {
         product: decodedProducts,
         category: categorys,
         selectedSearch: value,
+        date:new Date()
       })
     }
 
@@ -71,25 +73,28 @@ const loadShop = async (req, res) => {
         product: filltered,
         category: categorys,
         selectedSearch: nameSearch ? nameSearch : brandSearch,
+        date:new Date(),
       });
     }
 
     if (id && id !== "allCategory") {
       const selectedCategory = await product
         .find({ categoryId: id })
-        .populate("categoryId");
+        .populate("categoryId offer");
       return res.render("shop", {
         login: req.session.user,
         product: selectedCategory,
         category: categorys,
+        date:new Date(),
       });
     } else {
-      const productData = await product.find();
+      const productData = await product.find().populate('offer');
       return res.render("shop", {
         login: req.session.user,
         product: productData,
         category: categorys,
         id: id,
+        date:new Date(),
       });
     }
   } catch (error) {
@@ -103,7 +108,7 @@ const verifyShopSearch = async (req, res) => {
     const {value}=req.body;
 
     const regex = new RegExp(value, 'i');
-    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0})
+    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0}).populate('offer')
     const encodedProducts = Buffer.from(JSON.stringify(products)).toString('base64');
 
     res.redirect(`/shop?value=${value}&results=${encodeURIComponent(encodedProducts)}`);

@@ -87,6 +87,16 @@
       color: #fff;
       background-color: #088178;
     }
+
+    #offerPecen {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      margin: 0px;
+      color: #388e3c;
+      font-weight: 900;
+      font-size: 12px;
+    }
   </style>
 
   <header id="header">
@@ -189,7 +199,12 @@
             <% if(product.length>0){%>
               <% for(let i=0;i< product.length ;i++){ %>
                 <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-                 <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist" class="fa-solid fa-heart"></i></a>
+                  <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
+                      class="fa-solid fa-heart"></i></a>
+                  <p id="offerPecen">
+                    <%= product[i].offer && product[i].offer.startDate>=locals.date && product[i].offer.endDate
+                      <=locals.date ? product[i].offer.discountPercentage+'% Off' : '' %>
+                  </p>
                   <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"
                     alt="">
                   <% if(locals.selectedSearch && product[i].quantity===0){ %>
@@ -207,9 +222,21 @@
                             <i class="ri-star-fill"></i>
                             <% } %>
                         </div>
-                        <h4>
-                          ₹<%= product[i].price %>
-                        </h4>
+                        <div style="display: flex; flex-direction: row;">
+                          <% if(product[i].offer && product[i].offer.startDate>=locals.date && product[i].offer.endDate
+                            <=locals.date){ %>
+                              <h4 style="color: #99a6be; text-decoration: line-through;">
+                                ₹<%= product[i].price %>
+                              </h4>
+                              <% } %>
+                                &nbsp;&nbsp;
+                                <h4>
+                                  ₹<%= product[i].offer && product[i].offer.startDate>=locals.date &&
+                                    product[i].offer.endDate<=locals.date ? product[i].price -
+                                      Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100)) :
+                                      product[i].price %>
+                                </h4>
+                        </div>
                       </div>
                       <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
                           class="ri-shopping-cart-2-line cart"></i></a>
@@ -361,7 +388,7 @@
     }
   </script>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/javaScript/script.js"></script>
 
