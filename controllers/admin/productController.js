@@ -65,7 +65,7 @@ const verifyAddProducts = async (req, res) => {
     }
 
     if (!req.files || req.files.length === 0) {
-      req.flash("message1", "Add Images At Least One!");
+      req.flash("message1", "Images are required!");
       return res.redirect(`/admin/add-products`);
     }
 
@@ -75,6 +75,11 @@ const verifyAddProducts = async (req, res) => {
     files.forEach((files) => {
       images.push(files.filename);
     });
+
+    if(images.length<4){
+      req.flash('message1','4 Images are required!');
+      return res.redirect('/admin/add-products')
+    }
 
     const addProduct = new product({
       name: name,
@@ -214,26 +219,6 @@ const verifyDeleteProduct = async (req, res) => {
   }
 };
 
-// Delete image
-const deleteImages = async (req, res) => {
-  try {
-    const { i, id } = req.body;
-
-    const findImage = await product.findOne({ _id: id });
-
-    if (findImage.image.length === 1) {
-      return res.json({ status: false });
-    }
-
-    const imageToRevmove = findImage.image[i];
-    await product.updateOne({ _id: id }, { $pull: { image: imageToRevmove } });
-
-    res.json({ status: true });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
 module.exports = {
   loadProducts,
   loadAddProducts,
@@ -242,5 +227,4 @@ module.exports = {
   loadEditProduct,
   verifyEditProduct,
   verifyEditImage,
-  deleteImages,
 };

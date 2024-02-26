@@ -144,6 +144,7 @@
                     <th>Date</th>
                     <th>Orders</th>
                     <th>Revenue</th>
+                    <th>Coupon</th>
                     <th>Cancel or Rtn Orders</th>
                   </tr>
                 </thead>
@@ -164,6 +165,9 @@
                         <%= info.customReport[i].totalRevenue %>
                       </td>
                       <td>
+                        <%= info.customReport[i].couponAppliedCount %>
+                      </td>
+                      <td>
                         <%= info.customReport[i].cancelledOrdersCount %>
                       </td>
                   </tr>
@@ -173,6 +177,7 @@
                       <td colspan="2">Total</td>
                       <td><%= locals.total.totalOrders %></td>
                       <td><%= locals.total.totalRevenue %></td>
+                      <td><%= locals.total.totalCouponApplied %></td>
                       <td><%= locals.total.totalCancelledOrders %></td>
                     </tr>
                   </tfoot>

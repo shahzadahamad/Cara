@@ -45,7 +45,6 @@ adminRouter.post('/add-products',upload.array('img',4),productController.verifyA
 adminRouter.get('/edit-products',auth.isLogin,productController.loadEditProduct);
 adminRouter.post('/edit-products',upload.array('img',4),productController.verifyEditProduct);
 adminRouter.patch('/edit-images',upload.single('img'),productController.verifyEditImage);
-adminRouter.delete('/deleteImage',productController.deleteImages);
 adminRouter.delete('/delete-product',productController.verifyDeleteProduct);
 
 // <--------------Order Controller-------------->

@@ -251,161 +251,185 @@
     </div>
     <% } %>
 
-        <section id="user-detials">
-          <div id="div" style="width: 80%; margin-bottom: 30px; margin-top: 70px;" class="user-detials-container">
-            <h4 style="border-bottom: 1px solid black; text-align: center; ">Your Order Status</h4>
-            <br><br>
-            <div style="display: flex;">
-              <table>
-                <% if(locals.order){ %>
-                  <thead>
-                    <tr>
-                      <th>Products</th>
-                      <th>Order Status</th>
-                      <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way' && order[0].orderStatus !== 'Returned'&& order[0].orderStatus!=='Return Requasted'){ %>           
+
+
+
+      <section id="user-detials">
+        <div id="div" style="width: 80%; margin-bottom: 30px; margin-top: 70px;" class="user-detials-container">
+          <button
+            style="cursor: pointer; padding: 10px; color: white; background-color: #088178; border:1px solid white; border-radius: 10px;"
+            onclick="downloadInvoice('<%= order[0]._id %>')">Download Invoice</button>
+          <h4 style="border-bottom: 1px solid black; text-align: center; ">Your Order Status</h4>
+          <br><br>
+          <div style="display: flex;">
+            <table>
+              <% if(locals.order){ %>
+                <thead>
+                  <tr>
+                    <th>Products</th>
+                    <th>Order Status</th>
+                    <% if(order[0].orderStatus !=='Cancelled' && order[0].orderStatus !=='Delivered' &&
+                      order[0].orderStatus !=='On The Way' && order[0].orderStatus !=='Returned' &&
+                      order[0].orderStatus!=='Return Requasted' ){ %>
                       <th>Cancel Order</th>
-                      <% }else if(order[0].orderStatus==='Delivered'&&!locals.status){ %>
+                      <% }else if(order[0].orderStatus==='Delivered' &&!locals.status){ %>
                         <th>Return Order</th>
                         <% } %>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <% for(let j=0;j<order[0].orderItems.length;j++){ %>
-                        <img onclick="window.location.href='/sproduct?id=<%=order[0].orderItems[j].productId._id %>'" style="width: 70px; height: auto;" src="/images/productImages/<%= order[0].orderItems[j].productId.image[0] %>" alt="">
-                          <p style="font-weight: 600; color: #000;">
-                            <%= order[0].orderItems[j].productId.name %>  -  <span style="font-weight: 700;"><%= order[0].orderItems[j].quantity %></span>
-                          </p>
-                          <% } %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <% for(let j=0;j<order[0].orderItems.length;j++){ %>
+                        <img onclick="window.location.href='/sproduct?id=<%=order[0].orderItems[j].productId._id %>'"
+                          style="width: 70px; height: auto;border-radius: 10px;"
+                          src="/images/productImages/<%= order[0].orderItems[j].productId.image[0] %>" alt="">
+                        <p style="font-weight: 600; color: #000;">
+                          <%= order[0].orderItems[j].productId.name %> - <span style="font-weight: 700;">
+                              <%= order[0].orderItems[j].quantity %>
+                            </span>
+                        </p>
+                        <% } %>
 
-                       <% if(order[0].orderStatus === 'Cancelled' || order[0].orderStatus==='Returned' || order[0].orderStatus==='Return Requasted'){ %>
-                      <td style="color: red; font-weight: 800; text-align: center;">
+                          <% if(order[0].orderStatus==='Cancelled' || order[0].orderStatus==='Returned' ||
+                            order[0].orderStatus==='Return Requasted' ){ %>
+                    <td style="color: red; font-weight: 800; text-align: center;">
+                      <%= order[0].orderStatus %>
+                    </td>
+                    <% }else{ %>
+                      <td style="color: green; font-weight: 800; text-align: center;">
                         <%= order[0].orderStatus %>
                       </td>
-                      <% }else{ %>
-                        <td style="color: green; font-weight: 800; text-align: center;">
-                          <%= order[0].orderStatus %>
-                        </td>
-                        <% } %>
-                        <% if(order[0].orderStatus !== 'Cancelled'&&order[0].orderStatus !== 'Delivered'&& order[0].orderStatus !== 'On The Way'&&order[0].orderStatus !== 'Returned'&&order[0].orderStatus!=='Return Requasted'){ %>
-                      <td>
-                        <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"  href="/cancel-order?id=<%= order[0]._id %>&type=cancel&method=<%= order[0].paymentMethod %>">Cancel</a>
-                      </td>
-                      <% }else if(order[0].orderStatus==='Delivered' && !locals.status){ %>
-                        <td>
-                          <a style="display: flex; justify-content: center; background-color: red; color: #fff;" class="normal"   href="/cancel-order?id=<%= order[0]._id %>&type=return">Return</a>
-                        </td>
-                        <% } %>
-                    </tr>
-                    <% }else{ %>
-                      <tr>
-                        <td colspan="4">No Order Placed</td>
-                      </tr>
                       <% } %>
-                  </tbody>
-              </table>
-            </div>
-            <div>
-              <h4 style="border-bottom: 1px solid black; text-align: center; margin-bottom: 20px;">Your Address</h4>
-              <br><br>
-              <section id="user-detials">
-                    <div id="div" style="padding: 50px; margin-bottom: 30px;" class="user-detials-container">
-                      <div id="p">
-                        <p>
-                          <%= order[0].deliveryAddress.name %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.email %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.mobile %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.address %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.pincode %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.city %>
-                        </p>
-                        <p>
-                          <%= order[0].deliveryAddress.state %>
-                        </p>
-                        <div>
-                          <% if(order[0].orderStatus !== 'Cancelled' && order[0].orderStatus !== 'Returned' && order[0].orderStatus !== 'Delivered' && order[0].orderStatus !== 'On The Way'){ %>
-                          <button onclick="window.location.href='/change-address?id=<%= order[0]._id %>'" style="background-color: #088178; color: #fff;"
-                            class="normal edit-btn">Change</button>  
-                            <% } %>           
-                        </div>
-                      </div>
-                    </div>
-              </section>
-                </div>
-            <h4 style="border-bottom: 1px solid black; text-align: center;">Your Bill</h4>
-            <br><br>
-            <table>
-              <thead>
-                <tr>
-                  <th data-label="Product">Product</th>
-                  <th data-label="Total">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if(locals.order){ %>
+                        <% if(order[0].orderStatus !=='Cancelled' &&order[0].orderStatus !=='Delivered' &&
+                          order[0].orderStatus !=='On The Way' &&order[0].orderStatus !=='Returned'
+                          &&order[0].orderStatus!=='Return Requasted' ){ %>
+                          <td>
+                            <a style="display: flex; justify-content: center; background-color: red; color: #fff;"
+                              class="normal"
+                              href="/cancel-order?id=<%= order[0]._id %>&type=cancel&method=<%= order[0].paymentMethod %>">Cancel</a>
+                          </td>
+                          <% }else if(order[0].orderStatus==='Delivered' && !locals.status){ %>
+                            <td>
+                              <a style="display: flex; justify-content: center; background-color: red; color: #fff;"
+                                class="normal" href="/cancel-order?id=<%= order[0]._id %>&type=return">Return</a>
+                            </td>
+                            <% } %>
+                  </tr>
+                  <% }else{ %>
                     <tr>
-                      <td data-label="Product">
-                        <% for(let i=0;i<order[0].orderItems.length;i++){ %>
-                       <p><%= order[0].orderItems[i].productId.name %><span style="font-weight: 500;"> - </span><span style="font-weight: 800; color: #000;"
-                        style="font-weight: 500;">
-                        <%= order[0].orderItems[i].quantity%>
-                      </span></p> 
-                          <% } %>
-                      </td>
-      
-                      <% let subtotal = 0; %>
-                      <td data-label="Total">
+                      <td colspan="4">No Order Placed</td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="border-bottom: 1px solid black; text-align: center; margin-bottom: 20px;">Your Address</h4>
+            <br><br>
+            <section id="user-detials">
+              <div id="div" style="padding: 50px; margin-bottom: 30px;" class="user-detials-container">
+                <div id="p">
+                  <p>
+                    <%= order[0].deliveryAddress.name %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.email %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.mobile %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.address %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.pincode %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.city %>
+                  </p>
+                  <p>
+                    <%= order[0].deliveryAddress.state %>
+                  </p>
+                  <div>
+                    <% if(order[0].orderStatus !=='Cancelled' && order[0].orderStatus !=='Returned' &&
+                      order[0].orderStatus !=='Delivered' && order[0].orderStatus !=='On The Way' ){ %>
+                      <button onclick="window.location.href='/change-address?id=<%= order[0]._id %>'"
+                        style="background-color: #088178; color: #fff;" class="normal edit-btn">Change</button>
+                      <% } %>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <h4 style="border-bottom: 1px solid black; text-align: center;">Your Bill</h4>
+          <br><br>
+          <table>
+            <thead>
+              <tr>
+                <th data-label="Product">Product</th>
+                <th data-label="Total">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if(locals.order){ %>
+                <tr>
+                  <td data-label="Product">
+                    <% for(let i=0;i<order[0].orderItems.length;i++){ %>
+                      <p>
+                        <%= order[0].orderItems[i].productId.name %><span style="font-weight: 500;"> - </span><span
+                            style="font-weight: 800; color: #000;" style="font-weight: 500;">
+                            <%= order[0].orderItems[i].quantity%>
+                          </span>
+                      </p>
+                      <% } %>
+                  </td>
+
+                  <% let subtotal=0; %>
+                    <td data-label="Total">
                       <% for(let i=0;i<order[0].orderItems.length;i++){ %>
 
-                      <p>₹<%= order[0].orderItems[i].price * order[0].orderItems[i].quantity %></p>
-                      <% subtotal+= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %>
-                        <% } %>
-                      </td>            
-                    </tr>
-                        <tr>
-                          <td data-label="Product">Subtotal</td>
-                          <td data-label="Total">₹<%= subtotal %>
-                          </td>
-
-                        </tr>
-                        <tr>
-                          <td data-label="Product">Shipping</td>
-                          <td data-label="Total"><%= subtotal<500 ? "₹"+40 : 'Free' %>
-                          </td>
-                        </tr>
-                        <% if(locals.order[0].couponApplied){ %>
-                          <tr>
-                            <td data-label="Product">Discount</td>
-                            <td data-label="Total">-₹<%= order[0].couponApplied %>
-                            </td>
-                          </tr>
+                        <p>₹<%= order[0].orderItems[i].price * order[0].orderItems[i].quantity %>
+                        </p>
+                        <% subtotal+=order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %>
                           <% } %>
-                        <tr>
-                          <td style="font-weight: 700;" data-label="Product">Total</td>
-                          <td style="font-weight: 700;" data-label="Total">₹<%= order[0].orderAmount %>
-                          </td>
-                        </tr>
-                        <% } %>
-              </tbody>
-            </table>
-            <br>
-            <h5>Payment Method: <%= locals.order[0].paymentMethod === 'COD' ? 'Cash On Delivery' : locals.order[0].paymentMethod === 'Wallet' ? 'Wallet' : 'Online Payment' %>
-            </h5>
+                    </td>
+                </tr>
+                <tr>
+                  <td data-label="Product">Subtotal</td>
+                  <td data-label="Total">₹<%= subtotal %>
+                  </td>
 
-          </div>
+                </tr>
+                <tr>
+                  <td data-label="Product">Shipping</td>
+                  <td data-label="Total">
+                    <%= subtotal<500 ? "₹" +40 : 'Free' %>
+                  </td>
+                </tr>
+                <% if(locals.order[0].couponApplied){ %>
+                  <tr>
+                    <td data-label="Product">Discount</td>
+                    <td data-label="Total">-₹<%= order[0].couponApplied %>
+                    </td>
+                  </tr>
+                  <% } %>
+                    <tr>
+                      <td style="font-weight: 700;" data-label="Product">Total</td>
+                      <td style="font-weight: 700;" data-label="Total">₹<%= order[0].orderAmount %>
+                      </td>
+                    </tr>
+                    <% } %>
+            </tbody>
+          </table>
+          <br>
+          <h5>Payment Method: <%= locals.order[0].paymentMethod==='COD' ? 'Cash On Delivery' :
+              locals.order[0].paymentMethod==='Wallet' ? 'Wallet' : 'Online Payment' %>
+          </h5>
 
-        </section>
+        </div>
+
+      </section>
 
 
       <section id="newsletter" class="section-p1 section-m1">
@@ -472,6 +496,8 @@
         </div>
       </footer>
 
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://unpkg.com/easyinvoice/dist/easyinvoice.min.js"></script>
 
       <script>
         const logout = document.getElementById('logout');
@@ -489,6 +515,69 @@
             }
           });
         });
+
+        function base64_encode(imgPath) {
+          let png = f
+        }
+
+        async function downloadInvoice(order) {
+
+          const response = await axios.post('/invoice-download', { order });
+          const data = response.data.data;
+
+          console.log(data)
+
+
+          const products = data.orderItems.map((e, i) => {
+            return ({
+              description: e.productId.name,
+              quantity: e.quantity,
+              price: e.price,
+            })
+          });
+
+          console.log(products)
+
+          const date = data.orderDate.slice(0, 10);
+
+
+          const obj = {
+            apiKey: "M5iCmS6hKzbBiBOneRijlIvzsgFiDwT4rGlce4VGM2gY8BVj43qlseCsKSj8QLuj",
+            images: {
+              logo: "",
+            },
+            sender: {
+              company: "Cara",
+              address: 'Kerala',
+              zip: 676309,
+              city: 'Kochi',
+              country: "India"
+            },
+            client: {
+              company: data.userId.fullname,
+              address: data.deliveryAddress.address,
+              zip: data.deliveryAddress.pincode,
+              city: data.deliveryAddress.city,
+              state: data.deliveryAddress.state,
+              country: "India"
+            },
+            information: {
+              number: data.deliveryAddress.mobile,
+              date: date,
+            },
+            products: products,
+            bottomNotice: "Thank You For Purchasing",
+            settings: {
+              currency: "INR",
+            },
+
+          };
+
+          easyinvoice.createInvoice(obj, function (result) {
+            easyinvoice.download('invoice.pdf');
+          });
+
+        }
 
         function removeAddress(id, i) {
           const div = document.getElementById(`div${i}`);

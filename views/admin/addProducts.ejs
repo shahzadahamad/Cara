@@ -23,6 +23,7 @@
       object-fit: cover;
       margin-left: 30px;
       margin-bottom: 10px;
+      border-radius: 10px;
     }
 
     @media (max-width: 553) {
@@ -104,7 +105,7 @@
       </div>
     </div>
 
-    <section style="border-radius: 10px; height: 1000px;" id="forms">
+    <section style="border-radius: 10px; height: 1010px;" id="forms">
       <div style="width: 80%;" id="wrapper">
         <div class="title">
           <span>
@@ -118,6 +119,7 @@
           <% } %>
             <% if( locals.message1 ){ %>
               <div style="color: red; text-align: center; font-weight: 900;" class="detials" id="hide">
+                <p style="display: none; font-weight: 900; color: red; margin: 0px;" id="errMsg"></p>
                 <%=message1%>
               </div>
               <% } %>
@@ -175,7 +177,7 @@
                     <textarea name="description" id="" cols="30" rows="5"></textarea>
                   </div>
                   <div class="row button">
-                    <input type="submit" value="Add">
+                    <input id="val" type="submit" value="Add">
                   </div>
                   <div class="signup-link"> <a href="/admin/products">Go Back</a></div>
                 </form>
@@ -192,10 +194,17 @@
 
     const previewContainer = document.getElementById('previewContainer');
     const imageInput = document.getElementById('imageInput');
-
+    const errMsg = document.getElementById('errMsg');
 
     function handleImageUpload(event) {
       const files = event.target.files;
+
+      if (files.length > 4) {
+        previewContainer.style.display='none'
+        alert('Only 4 images are allowed.')
+        imageInput.value=''
+        return;
+      }
 
       previewContainer.innerHTML = '';
 

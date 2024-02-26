@@ -76,6 +76,7 @@ userRouter.get('/order',auth.isLogin,auth.isBlocked,orderController.loadOrder);
 userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.loadOrderDetials);
 userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
+userRouter.post('/invoice-download',orderController.invoice);
 
 // <--------------Checkout Controller-------------->
 const checkoutController = require('../controllers/user/checkoutController');

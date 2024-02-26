@@ -3,6 +3,8 @@ const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
 const Wallet = require("../../models/walletModel");
 const moment = require('moment');
+const easyinvoice = require('easyinvoice');
+const fs = require('fs');
 
 // increment the cancelled order data in products
 const incrementProductQuatity = async (id) => {
@@ -24,6 +26,16 @@ const incrementProductQuatity = async (id) => {
     console.log(error.message);
   }
 };
+
+const invoice = async (req,res) => {
+  try{
+    const {order}=req.body;
+    const orderId = await Order.findOne({_id:order}).populate('userId orderItems.productId')
+    res.json({data:orderId});
+  }catch(error){
+    console.log(error.message)
+  }
+}
 
 // refunding to the wallet
 const refundToWallet = async (id, userId) => {
@@ -151,4 +163,5 @@ module.exports = {
   verifyCancelPage,
   incrementProductQuatity,
   refundToWallet,
+  invoice
 };

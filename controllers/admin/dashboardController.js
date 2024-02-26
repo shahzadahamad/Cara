@@ -100,43 +100,43 @@ const top10ProductsCategoryAndBrand = async (req, res) => {
 
     const topBrands = [
       {
-          $match: { orderStatus: "Delivered" } 
+        $match: { orderStatus: "Delivered" },
       },
       {
-          $unwind: "$orderItems"
+        $unwind: "$orderItems",
       },
       {
-          $lookup: {
-              from: "products",
-              localField: "orderItems.productId",
-              foreignField: "_id",
-              as: "product"
-          }
+        $lookup: {
+          from: "products",
+          localField: "orderItems.productId",
+          foreignField: "_id",
+          as: "product",
+        },
       },
       {
-          $unwind: "$product"
+        $unwind: "$product",
       },
       {
-          $group: {
-              _id: "$product.brand",
-              totalQuantity: { $sum: "$orderItems.quantity" }
-          }
+        $group: {
+          _id: "$product.brand",
+          totalQuantity: { $sum: "$orderItems.quantity" },
+        },
       },
       {
-          $sort: { totalQuantity: -1 }
+        $sort: { totalQuantity: -1 },
       },
       {
-          $limit: 10
+        $limit: 10,
       },
       {
-          $project: {
-              _id: 0,
-              brandName: "$_id",
-              totalQuantity: 1
-          }
-      }
-  ];
-  
+        $project: {
+          _id: 0,
+          brandName: "$_id",
+          totalQuantity: 1,
+        },
+      },
+    ];
+
     const top10Products = await Order.aggregate(topProducts);
     const top10Categories = await Order.aggregate(topCategories);
     const top10Brands = await Order.aggregate(topBrands);
@@ -160,14 +160,13 @@ const loadDashboard = async (req, res) => {
     const yearlyRevenue = await getYearlyData();
     const adminData = await admin.findById({ _id: req.session.admin_id });
     const top10 = await top10ProductsCategoryAndBrand();
-    console.log(top10)
     res.render("dashboard", {
       admins: adminData,
       dailyRevenue: dailyRevenue.revenue,
       monthlyRevenue: monthlyRevenue.revenue,
       yearlyRevenue: yearlyRevenue.revenue,
       totalRevenue: totalRevenue,
-      top10:top10,
+      top10: top10,
     });
   } catch (error) {
     console.log(error.message);
@@ -391,6 +390,21 @@ const customReport = async (fromDate, toDate) => {
           },
         },
         totalOrders: { $sum: 1 },
+        couponAppliedCount: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $eq: ["$isReturned", false] },
+                  { $eq: ["$isCancelled", false] },
+                  { $ne: ["$couponApplied", null] },
+                ],
+              },
+              1,
+              0,
+            ],
+          },
+        },
       },
     },
     {
@@ -400,6 +414,7 @@ const customReport = async (fromDate, toDate) => {
         totalRevenue: 1,
         cancelledOrdersCount: 1,
         totalOrders: 1,
+        couponAppliedCount: 1,
       },
     },
     {
@@ -412,9 +427,15 @@ const customReport = async (fromDate, toDate) => {
       acc.totalOrders += curr.totalOrders;
       acc.totalRevenue += curr.totalRevenue;
       acc.totalCancelledOrders += curr.cancelledOrdersCount;
+      acc.totalCouponApplied += curr.couponAppliedCount;
       return acc;
     },
-    { totalOrders: 0, totalRevenue: 0, totalCancelledOrders: 0 }
+    {
+      totalOrders: 0,
+      totalRevenue: 0,
+      totalCancelledOrders: 0,
+      totalCouponApplied: 0,
+    }
   );
 
   return { result, data };
@@ -669,6 +690,21 @@ const custsomMonthYearWeekDaily = async (data) => {
               },
             },
             totalOrders: { $sum: 1 },
+            couponAppliedCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ["$isReturned", false] },
+                      { $eq: ["$isCancelled", false] },
+                      { $ne: ["$couponApplied", null] },
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
           },
         },
         {
@@ -677,6 +713,7 @@ const custsomMonthYearWeekDaily = async (data) => {
             date: "$_id",
             totalRevenue: 1,
             cancelledOrdersCount: 1,
+            couponAppliedCount: 1,
             totalOrders: 1,
           },
         },
@@ -689,9 +726,16 @@ const custsomMonthYearWeekDaily = async (data) => {
           acc.totalOrders += curr.totalOrders;
           acc.totalRevenue += curr.totalRevenue;
           acc.totalCancelledOrders += curr.cancelledOrdersCount;
+          acc.totalCouponApplied += curr.couponAppliedCount;
+
           return acc;
         },
-        { totalOrders: 0, totalRevenue: 0, totalCancelledOrders: 0 }
+        {
+          totalOrders: 0,
+          totalRevenue: 0,
+          totalCancelledOrders: 0,
+          totalCouponApplied: 0,
+        }
       );
 
       console.log(result, data);

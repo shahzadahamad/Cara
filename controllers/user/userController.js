@@ -62,7 +62,7 @@ const loadShop = async (req, res) => {
         product: decodedProducts,
         category: categorys,
         selectedSearch: value,
-        date:new Date()
+        data:new Date()
       })
     }
 
@@ -73,7 +73,7 @@ const loadShop = async (req, res) => {
         product: filltered,
         category: categorys,
         selectedSearch: nameSearch ? nameSearch : brandSearch,
-        date:new Date(),
+        data:new Date(),
       });
     }
 
@@ -85,7 +85,7 @@ const loadShop = async (req, res) => {
         login: req.session.user,
         product: selectedCategory,
         category: categorys,
-        date:new Date(),
+        data:new Date(),
       });
     } else {
       const productData = await product.find().populate('offer');
@@ -94,7 +94,7 @@ const loadShop = async (req, res) => {
         product: productData,
         category: categorys,
         id: id,
-        date:new Date(),
+        data:new Date(),
       });
     }
   } catch (error) {

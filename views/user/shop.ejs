@@ -202,8 +202,8 @@
                   <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
                       class="fa-solid fa-heart"></i></a>
                   <p id="offerPecen">
-                    <%= product[i].offer && product[i].offer.startDate>=locals.date && product[i].offer.endDate
-                      <=locals.date ? product[i].offer.discountPercentage+'% Off' : '' %>
+                    <%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=product[i].offer.endDate.setHours(23,59,59,999) ? product[i].offer.discountPercentage+'% Off' : '' %>
                   </p>
                   <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"
                     alt="">
@@ -223,16 +223,16 @@
                             <% } %>
                         </div>
                         <div style="display: flex; flex-direction: row;">
-                          <% if(product[i].offer && product[i].offer.startDate>=locals.date && product[i].offer.endDate
-                            <=locals.date){ %>
+                          <% if(product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                            <=product[i].offer.endDate.setHours(23,59,59,999)){ %>
                               <h4 style="color: #99a6be; text-decoration: line-through;">
                                 ₹<%= product[i].price %>
                               </h4>
                               <% } %>
                                 &nbsp;&nbsp;
                                 <h4>
-                                  ₹<%= product[i].offer && product[i].offer.startDate>=locals.date &&
-                                    product[i].offer.endDate<=locals.date ? product[i].price -
+                                  ₹<%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                    <=product[i].offer.endDate.setHours(23,59,59,999) ? product[i].price -
                                       Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100)) :
                                       product[i].price %>
                                 </h4>
