@@ -5,6 +5,152 @@ const User = require("../../models/userModel");
 const Product = require("../../models/productsModel");
 const mongoose = require("mongoose");
 
+const top10ProductsCategoryAndBrand = async (req, res) => {
+  try {
+    const topProducts = [
+      {
+        $match: { orderStatus: "Delivered" },
+      },
+      {
+        $unwind: "$orderItems",
+      },
+      {
+        $group: {
+          _id: "$orderItems.productId",
+          totalQuantity: { $sum: "$orderItems.quantity" },
+        },
+      },
+      {
+        $sort: { totalQuantity: -1 },
+      },
+      {
+        $limit: 10,
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: "$product",
+      },
+      {
+        $project: {
+          _id: 0,
+          productName: "$product.name",
+          productImage: "$product.image",
+          totalQuantity: 1,
+        },
+      },
+    ];
+
+    const topCategories = [
+      {
+        $match: { orderStatus: "Delivered" },
+      },
+      {
+        $unwind: "$orderItems",
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItems.productId",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: "$product",
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "product.categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: "$category",
+      },
+      {
+        $group: {
+          _id: "$category._id",
+          categoryName: { $first: "$category.name" },
+          totalQuantity: { $sum: "$orderItems.quantity" },
+        },
+      },
+      {
+        $sort: { totalQuantity: -1 },
+      },
+      {
+        $limit: 10,
+      },
+      {
+        $project: {
+          _id: 0,
+          categoryName: 1,
+          totalQuantity: 1,
+        },
+      },
+    ];
+
+    const topBrands = [
+      {
+          $match: { orderStatus: "Delivered" } 
+      },
+      {
+          $unwind: "$orderItems"
+      },
+      {
+          $lookup: {
+              from: "products",
+              localField: "orderItems.productId",
+              foreignField: "_id",
+              as: "product"
+          }
+      },
+      {
+          $unwind: "$product"
+      },
+      {
+          $group: {
+              _id: "$product.brand",
+              totalQuantity: { $sum: "$orderItems.quantity" }
+          }
+      },
+      {
+          $sort: { totalQuantity: -1 }
+      },
+      {
+          $limit: 10
+      },
+      {
+          $project: {
+              _id: 0,
+              brandName: "$_id",
+              totalQuantity: 1
+          }
+      }
+  ];
+  
+    const top10Products = await Order.aggregate(topProducts);
+    const top10Categories = await Order.aggregate(topCategories);
+    const top10Brands = await Order.aggregate(topBrands);
+
+    return {
+      top10Products,
+      top10Categories,
+      top10Brands,
+    };
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 // loadDashboard
 const loadDashboard = async (req, res) => {
   try {
@@ -13,12 +159,15 @@ const loadDashboard = async (req, res) => {
     const monthlyRevenue = await getMonthlyData();
     const yearlyRevenue = await getYearlyData();
     const adminData = await admin.findById({ _id: req.session.admin_id });
+    const top10 = await top10ProductsCategoryAndBrand();
+    console.log(top10)
     res.render("dashboard", {
       admins: adminData,
       dailyRevenue: dailyRevenue.revenue,
       monthlyRevenue: monthlyRevenue.revenue,
       yearlyRevenue: yearlyRevenue.revenue,
       totalRevenue: totalRevenue,
+      top10:top10,
     });
   } catch (error) {
     console.log(error.message);
@@ -268,7 +417,7 @@ const customReport = async (fromDate, toDate) => {
     { totalOrders: 0, totalRevenue: 0, totalCancelledOrders: 0 }
   );
 
-  return {result,data}
+  return { result, data };
 };
 
 const graphDaily = async () => {
@@ -545,9 +694,9 @@ const custsomMonthYearWeekDaily = async (data) => {
         { totalOrders: 0, totalRevenue: 0, totalCancelledOrders: 0 }
       );
 
-      console.log(result, data)
+      console.log(result, data);
 
-      return {result,data}
+      return { result, data };
     }
   } catch (error) {
     console.log(error.message);

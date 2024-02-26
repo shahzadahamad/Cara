@@ -368,7 +368,7 @@
                       <td data-label="Total">
                       <% for(let i=0;i<order[0].orderItems.length;i++){ %>
 
-                      <p>₹<%= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %></p>
+                      <p>₹<%= order[0].orderItems[i].price * order[0].orderItems[i].quantity %></p>
                       <% subtotal+= order[0].orderItems[i].productId.price * order[0].orderItems[i].quantity %>
                         <% } %>
                       </td>            
@@ -387,7 +387,7 @@
                         <% if(locals.order[0].couponApplied){ %>
                           <tr>
                             <td data-label="Product">Discount</td>
-                            <td data-label="Total">-₹<%= order[0].couponApplied.discountAmount %>
+                            <td data-label="Total">-₹<%= order[0].couponApplied %>
                             </td>
                           </tr>
                           <% } %>

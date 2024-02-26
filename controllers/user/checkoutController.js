@@ -37,12 +37,19 @@ const decrementProductQuatity = async (id) => {
       );
     });
 
-    // for (let i = 0; i < cartPro.products.length; i++) {
-    //   const price = cartPro.products[i].productId.price
-    //   cartPro.products[i].price = price;
-    // }
+    for (let i = 0; i < cartPro.products.length; i++) {
+      const price = cartPro.products[i].productId.price;
+      const productId = cartPro.products[i]._id;
+      await cart.updateOne(
+        { userId: id, "products._id": productId },
+        { $set: { "products.$.price": price } }
+      );
+    }
 
-    return cartPro
+    const cartProducts = await cart
+      .findOne({ userId: id }, { products: 1 })
+      .populate("products.productId");
+    return cartProducts;
   } catch (error) {
     console.log(error.message);
   }
@@ -156,7 +163,9 @@ const razorpaySuccess = async (req, res) => {
     const order = new Order({
       userId: req.session.user._id,
       orderAmount: discount,
-      couponApplied: req.session.coupon,
+      couponApplied: req.session.coupon
+        ? req.session.coupon.discountAmount
+        : "",
       deliveryAddress: address.address[0],
       paymentMethod: "Online",
       orderItems: cartPro.products,
@@ -223,18 +232,18 @@ const verifyCheckout = async (req, res) => {
       ? shipping - req.session.coupon.discountAmount
       : shipping;
 
-  
     const order = new Order({
       userId: req.session.user._id,
       orderAmount: discount,
-      couponApplied: req.session.coupon,
+      couponApplied: req.session.coupon
+        ? req.session.coupon.discountAmount
+        : "",
       deliveryAddress: address.address[0],
       paymentMethod: selectedPaymentMethod,
       orderItems: cartPro.products,
       orderStatus: selectedPaymentMethod === "COD" ? "Placed" : "Pending",
       orderDate: new Date(),
     });
-
 
     if (!req.session.coupon) {
       delete order.couponApplied;
@@ -316,13 +325,14 @@ const loadOrder = async (req, res) => {
 const verifyCoupon = async (req, res) => {
   try {
     const { inputVal } = req.body;
-    if(req.session.coupon){
-      return res.json({remove:true});
+    if (req.session.coupon) {
+      return res.json({ remove: true });
     }
     const coupon = await Coupon.find({ couponCode: inputVal });
     if (coupon) {
       const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
-      const total = totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
+      const total =
+        totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
       if (total <= coupon[0].discountAmount) {
         return res.json({ status: "Invalied Coupon" });
       }
@@ -336,14 +346,14 @@ const verifyCoupon = async (req, res) => {
   }
 };
 
-const deleteSession = async (req,res) => {
-  try{
+const deleteSession = async (req, res) => {
+  try {
     delete req.session.coupon;
-    res.json({status:true});
-  }catch(error){
-    console.log(error)
+    res.json({ status: true });
+  } catch (error) {
+    console.log(error);
   }
-}
+};
 
 module.exports = {
   loadCheckout,

@@ -176,30 +176,87 @@
       </div>
     </div>
 
-    
+
     <div class="tabular--wrapper">
       <h3 class="main--title">Best Selling</h3>
 
-      <div class="border rounded p-3 ">
+      <div class="border rounded p-3 mb-3">
         <h4 class="main--title">Top 10 Products</h4>
-        <div>
-          <div style="overflow-x: auto;" class="table--container">
-           
-          </div>
+        <div class="table-responsive">
+          <table class="table">
+            <% if(locals.top10 && locals.top10.top10Products && locals.top10.top10Products.length>0){ %>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Image</th>
+                <th>Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i=0;i<top10.top10Products.length;i++){ %>
+              <tr>
+                <td style="font-weight: 900;"><%= top10.top10Products[i].productName %></td>
+                <td style="border-radius: 10px;"><img width="100px" height="auto" src="/images/productImages/<%= top10.top10Products[i].productImage[0] %>" alt="Product Image" class="img-fluid" style="max-width: 100px;"></td>
+                <td style="font-weight: 900; font-size: 30px;"><%= top10.top10Products[i].totalQuantity %></td>
+              </tr>
+              <% } %>
+            </tbody>
+            <% }else{ %>
+              <h4 style="font-weight: 900;">Not Found</h4>
+              <% } %>
+          </table>
         </div>
       </div>
-      <br>
-      <div class="border rounded p-3 ">
-        <h4 class="main--title">Top 10 Products</h4>
-        <div>
-          
+
+      <div class="border rounded p-3">
+        <h4 class="main--title">Top 10 Categories</h4>
+        <div class="table-responsive">
+          <table class="table">
+            <% if(locals.top10 && locals.top10.top10Brands && locals.top10.top10Brands.length>0){ %>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i=0;i<top10.top10Brands.length;i++){ %>
+              <tr>
+                <td style="font-weight: 900;"><%= top10.top10Brands[i].brandName %></td>
+                <td style="font-weight: 900; font-size: 30px;"><%= top10.top10Brands[i].totalQuantity %></td>
+              </tr>
+              <% } %>
+            </tbody>
+            <% }else{ %>
+              <h4 style="font-weight: 900;">Not Found</h4>
+              <% } %>
+          </table>
         </div>
       </div>
-      <br>
-      <div class="border rounded p-3 ">
-        <h4 class="main--title">Top 10 Products</h4>
-        <div>
-          
+
+      <div class="border rounded p-3 mb-3">
+        <h4 class="main--title">Top 10 Brands</h4>
+        <div class="table-responsive">
+          <table class="table">
+            <% if(locals.top10 && locals.top10.top10Categories && locals.top10.top10Categories.length>0){ %>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i=0;i<top10.top10Categories.length;i++){ %>
+              <tr>
+                <td style="font-weight: 900;"><%= top10.top10Categories[i].categoryName %></td>
+                <td style="font-weight: 900; font-size: 30px;"><%= top10.top10Categories[i].totalQuantity %></td>
+              </tr>
+              <% } %>
+            </tbody>
+            <% }else{ %>
+              <h4 style="font-weight: 900;">Not Found</h4>
+              <% } %>
+          </table>
         </div>
       </div>
 
@@ -242,7 +299,7 @@
         myChart.data.datasets[1].data.push(data[i].totalRevenue)
         myChart.data.datasets[2].data.push(data[i].cancelledOrReturnedOrders)
         myChart.data.labels.push(data[i].date)
-        myChart.options.scales.x.title.text=response.data.type;
+        myChart.options.scales.x.title.text = response.data.type;
         myChart.update();
       }
 

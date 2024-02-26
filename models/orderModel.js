@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema({
     type: Number,
   },
   couponApplied:{
-    type: mongoose.Schema.ObjectId,
+    type: Number,
     ref:'coupon'
   },
   deliveryAddress:{

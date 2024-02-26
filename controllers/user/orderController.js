@@ -70,7 +70,7 @@ const loadOrderDetials = async (req, res) => {
   try {
     const id = req.query.id;
     const order = await Order.find({ _id: id }).populate(
-      "userId orderItems.productId couponApplied"
+      "userId orderItems.productId"
     );
     if(order.deliveredDate){
       const expiredDate = moment().subtract(7,'days').toDate();
