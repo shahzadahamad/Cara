@@ -738,7 +738,6 @@ const custsomMonthYearWeekDaily = async (data) => {
         }
       );
 
-      console.log(result, data);
 
       return { result, data };
     }

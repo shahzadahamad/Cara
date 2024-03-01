@@ -10,7 +10,7 @@ const offerSchema  = new mongoose.Schema({
     required:true,
   },
   discountPercentage:{
-    type:String,
+    type:Number,
     required:true,
   },
   description:{

@@ -93,44 +93,93 @@
       <% if(product.length>0){%>
         <% for(let i=0;i< product.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-            <p id="offerPecen">
-              <%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-              <=product[i].offer.endDate.setHours(23,59,59,999) ?
-                  product[i].offer.discountPercentage+'% Off' : '' %>
-            </p>
-            <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
-                class="fa-solid fa-heart"></i></a>
-            <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>" alt="">
-            <div class="des">
-              <span>
-                <%= product[i].brand %>
-              </span>
-              <h5>
-                <%= product[i].name %>
-              </h5>
-              <div class="star">
-                <% for(let j=0;j< product[i].rating; j++){ %>
-                  <i class="ri-star-fill"></i>
+            <% if(product[i].offer && product[i].categoryId.offer &&
+              product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=product[i].offer.endDate.setHours(23,59,59,999) &&
+              product[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=product[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+              <p id="offerPecen">
+                <%= product[i].offer.discountPercentage>= product[i].categoryId.offer.discountPercentage ?
+                  product[i].offer.discountPercentage+'% Off' : product[i].categoryId.offer.discountPercentage+'% Off'
+                  %>
+              </p>
+              <% }else if(product[i].offer){ %>
+                <p id="offerPecen">
+                  <%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                    <=product[i].offer.endDate.setHours(23,59,59,999) ? product[i].offer.discountPercentage+'% Off' : ''
+                    %>
+                </p>
+                <% }else if(product[i].categoryId.offer){ %>
+                  <p id="offerPecen">
+                    <%= product[i].categoryId.offer &&
+                      product[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=product[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                      product[i].categoryId.offer.discountPercentage+'% Off' : '' %>
+                  </p>
                   <% } %>
-              </div>
-              <div style="display: flex; flex-direction: row;">
-                <% if(product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-                  <=product[i].offer.endDate.setHours(23,59,59,999)){ %>
-                  <h4 style="color: #99a6be; text-decoration: line-through;">
-                    ₹<%= product[i].price %>
-                  </h4>
-                  <% } %>
-                    &nbsp;&nbsp;
-                    <h4>
-                      ₹<%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-                  <=product[i].offer.endDate.setHours(23,59,59,999) ? product[i].price -
-                          Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100)) :
-                          product[i].price %>
-                    </h4>
-              </div>
-            </div>
-            <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
-                class="ri-shopping-cart-2-line cart"></i></a>
+                    <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
+                        class="fa-solid fa-heart"></i></a>
+                    <img style="width: 224px; height: 299px;" src="images/productImages/<%= product[i].image[0] %>"
+                      alt="">
+                    <div class="des">
+                      <span>
+                        <%= product[i].brand %>
+                      </span>
+                      <h5>
+                        <%= product[i].name %>
+                      </h5>
+                      <div class="star">
+                        <% for(let j=0;j< product[i].rating; j++){ %>
+                          <i class="ri-star-fill"></i>
+                          <% } %>
+                      </div>
+                      <div style="display: flex; flex-direction: row;">
+                        <% if(product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                          locals.data <=product[i].offer.endDate.setHours(23,59,59,999)||product[i].categoryId.offer &&
+                          product[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=product[i].categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                          <h4 style="color: #99a6be; text-decoration: line-through;">
+                            ₹<%= product[i].price %>
+                          </h4>
+                          <% } %>
+                            &nbsp;&nbsp;
+                            <h4>
+                              <% if(product[i].offer && product[i].categoryId.offer &&
+                                product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=product[i].offer.endDate.setHours(23,59,59,999) &&
+                                product[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=product[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+
+                                ₹<%= product[i].offer.discountPercentage>=
+                                  product[i].categoryId.offer.discountPercentage
+                                  ?
+                                  product[i].price -
+                                  Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100)) :
+                                  product[i].price -
+                                  Math.round(product[i].price*(Number(product[i].categoryId.offer.discountPercentage)/100))
+                                  %>
+
+                                  <% }else if(product[i].offer){ %>
+                                    ₹<%= product[i].offer && product[i].offer.startDate.setHours(0,0,0,0)<=locals.data
+                                      && locals.data <=product[i].offer.endDate.setHours(23,59,59,999) ?
+                                      product[i].price -
+                                      Math.round(product[i].price*(Number(product[i].offer.discountPercentage)/100)) :
+                                      product[i].price %>
+                                      <% }else if(product[i].categoryId.offer){ %>
+                                        ₹<%= product[i].categoryId.offer &&
+                                          product[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                          locals.data <=product[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                          product[i].price -
+                                          Math.round(product[i].price*(Number(product[i].categoryId.offer.discountPercentage)/100))
+                                          : product[i].price %>
+                                          <% }else{ %>
+                                            ₹<%=product[i].price %>
+                                              <% } %>
+                            </h4>
+                      </div>
+                    </div>
+                    <a onclick="addToCart('<%= product[i]._id %>','<%= locals.login %>')"><i
+                        class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>
@@ -152,45 +201,98 @@
       <% if(latestProducts.length>0){%>
         <% for(let i=0;i< latestProducts.length ;i++){ %>
           <div class="pro" onclick="window.location.href='/sproduct?id=<%= latestProducts[i]._id %>'">
-            <p id="offerPecen">
-              <%= latestProducts[i].offer && latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-                  <=latestProducts[i].offer.endDate.setHours(23,59,59,999) ? latestProducts[i].offer.discountPercentage+'% Off' : ''
+            <% if(latestProducts[i].offer && latestProducts[i].categoryId.offer &&
+              latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=latestProducts[i].offer.endDate.setHours(23,59,59,999) &&
+              latestProducts[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=latestProducts[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+              <p id="offerPecen">
+                <%= latestProducts[i].offer.discountPercentage>= latestProducts[i].categoryId.offer.discountPercentage ?
+                  latestProducts[i].offer.discountPercentage+'% Off' :
+                  latestProducts[i].categoryId.offer.discountPercentage+'% Off'
                   %>
-            </p>
-            <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
-                class="fa-solid fa-heart"></i></a>
-            <img style="width: 224px; height: 299px;" src="images/productImages/<%= latestProducts[i].image[0] %>"
-              alt="">
-            <div class="des">
-              <span>
-                <%= latestProducts[i].brand %>
-              </span>
-              <h5>
-                <%= latestProducts[i].name %>
-              </h5>
-              <div class="star">
-                <% for(let j=0;j< latestProducts[i].rating; j++){ %>
-                  <i class="ri-star-fill"></i>
+              </p>
+              <% }else if(latestProducts[i].offer){ %>
+                <p id="offerPecen">
+                  <%= latestProducts[i].offer && latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                    locals.data <=latestProducts[i].offer.endDate.setHours(23,59,59,999) ?
+                    latestProducts[i].offer.discountPercentage+'% Off' : '' %>
+                </p>
+                <% }else if(latestProducts[i].categoryId.offer){ %>
+                  <p id="offerPecen">
+                    <%= latestProducts[i].categoryId.offer &&
+                      latestProducts[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=latestProducts[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                      latestProducts[i].categoryId.offer.discountPercentage+'% Off' : '' %>
+                  </p>
                   <% } %>
-              </div>
-              <div style="display: flex; flex-direction: row;">
-                <% if(latestProducts[i].offer && latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-                  <=latestProducts[i].offer.endDate.setHours(23,59,59,999)){ %>
-                    <h4 style="color: #99a6be; text-decoration: line-through;">
-                      ₹<%= latestProducts[i].price %>
-                    </h4>
-                    <% } %>
-                      &nbsp;&nbsp;
-                      <h4>
-                        ₹<%= latestProducts[i].offer && latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
-                  <=latestProducts[i].offer.endDate.setHours(23,59,59,999) ? latestProducts[i].price -
-                            Math.round(latestProducts[i].price*(Number(latestProducts[i].offer.discountPercentage)/100))
-                            : latestProducts[i].price %>
-                      </h4>
-              </div>
-            </div>
-            <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i
-                class="ri-shopping-cart-2-line cart"></i></a>
+                    <a onclick="addToWishlist('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i id="wishlist"
+                        class="fa-solid fa-heart"></i></a>
+                    <img style="width: 224px; height: 299px;"
+                      src="images/productImages/<%= latestProducts[i].image[0] %>" alt="">
+                    <div class="des">
+                      <span>
+                        <%= latestProducts[i].brand %>
+                      </span>
+                      <h5>
+                        <%= latestProducts[i].name %>
+                      </h5>
+                      <div class="star">
+                        <% for(let j=0;j< latestProducts[i].rating; j++){ %>
+                          <i class="ri-star-fill"></i>
+                          <% } %>
+                      </div>
+                      <div style="display: flex; flex-direction: row;">
+                        <% if(latestProducts[i].offer &&
+                          latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=latestProducts[i].offer.endDate.setHours(23,59,59,999)||latestProducts[i].categoryId.offer
+                          && latestProducts[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=latestProducts[i].categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                          <h4 style="color: #99a6be; text-decoration: line-through;">
+                            ₹<%= latestProducts[i].price %>
+                          </h4>
+                          <% } %>
+                            &nbsp;&nbsp;
+                            <h4>
+                              <% if(latestProducts[i].offer && latestProducts[i].categoryId.offer &&
+                                latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=latestProducts[i].offer.endDate.setHours(23,59,59,999) &&
+                                latestProducts[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                locals.data <=latestProducts[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+
+                                ₹<%= latestProducts[i].offer.discountPercentage>=
+                                  latestProducts[i].categoryId.offer.discountPercentage
+                                  ?
+                                  latestProducts[i].price -
+                                  Math.round(latestProducts[i].price*(Number(latestProducts[i].offer.discountPercentage)/100))
+                                  :
+                                  latestProducts[i].price -
+                                  Math.round(latestProducts[i].price*(Number(latestProducts[i].categoryId.offer.discountPercentage)/100))
+                                  %>
+
+                                  <% }else if(latestProducts[i].offer){ %>
+                                    ₹<%= latestProducts[i].offer &&
+                                      latestProducts[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                      <=latestProducts[i].offer.endDate.setHours(23,59,59,999) ? latestProducts[i].price
+                                      -
+                                      Math.round(latestProducts[i].price*(Number(latestProducts[i].offer.discountPercentage)/100))
+                                      : latestProducts[i].price %>
+                                      <% }else if(latestProducts[i].categoryId.offer){ %>
+                                        ₹<%= latestProducts[i].categoryId.offer &&
+                                          latestProducts[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                          locals.data
+                                          <=latestProducts[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                          latestProducts[i].price -
+                                          Math.round(latestProducts[i].price*(Number(latestProducts[i].categoryId.offer.discountPercentage)/100))
+                                          : latestProducts[i].price %>
+                                          <% }else{ %>
+                                            ₹<%= latestProducts[i].price %>
+                                              <% } %>
+                            </h4>
+                      </div>
+                    </div>
+                    <a onclick="addToCart('<%= latestProducts[i]._id %>','<%= locals.login %>')"><i
+                        class="ri-shopping-cart-2-line cart"></i></a>
           </div>
           <% } %>
             <% } else { %>

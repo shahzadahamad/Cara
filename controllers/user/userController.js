@@ -21,8 +21,8 @@ const loadPage = (req, res) => {
 // loadHome
 const loadHome = async (req, res) => {
   try {
-    const productData = await product.find().limit(8).populate('offer')
-    const latestProducts = await product.find().sort({ _id: -1 }).limit(8).populate('offer');
+    const productData = await product.find().limit(8).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
+    const latestProducts = await product.find().sort({ _id: -1 }).limit(8).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
     res.render("home", {
       login: req.session.user,
       product: productData,
@@ -38,10 +38,10 @@ const loadHome = async (req, res) => {
 const searchFillter = async (name, brand) => {
   try {
     if (name) {
-      const fillteredProducts = await product.find({ name: name }).populate('offer');
+      const fillteredProducts = await product.find({ name: name }).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
       return fillteredProducts;
     } else if (brand) {
-      const fillteredProducts = await product.find({ brand: brand }).populate('offer');
+      const fillteredProducts = await product.find({ brand: brand }).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
       return fillteredProducts;
     }
   } catch (error) {
@@ -80,7 +80,7 @@ const loadShop = async (req, res) => {
     if (id && id !== "allCategory") {
       const selectedCategory = await product
         .find({ categoryId: id })
-        .populate("categoryId offer");
+        .populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
       return res.render("shop", {
         login: req.session.user,
         product: selectedCategory,
@@ -88,7 +88,7 @@ const loadShop = async (req, res) => {
         data:new Date(),
       });
     } else {
-      const productData = await product.find().populate('offer');
+      const productData = await product.find().populate('offer').populate({path:'categoryId',select: '-name',populate:{path:'offer'}});
       return res.render("shop", {
         login: req.session.user,
         product: productData,
@@ -108,7 +108,7 @@ const verifyShopSearch = async (req, res) => {
     const {value}=req.body;
 
     const regex = new RegExp(value, 'i');
-    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0}).populate('offer')
+    const products = await product.find({ $or: [{ name: regex }, { brand: regex }] },{description:0}).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
     const encodedProducts = Buffer.from(JSON.stringify(products)).toString('base64');
 
     res.redirect(`/shop?value=${value}&results=${encodeURIComponent(encodedProducts)}`);
@@ -151,15 +151,16 @@ const loadAbout = (req, res) => {
 const loadSingleProduct = async (req, res) => {
   try {
     const id = req.query.id;
-    const sproduct = await product.findById({ _id: id });
+    const sproduct = await product.findById({ _id: id }).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
     const relatedProduct = await product.find({
       categoryId: sproduct.categoryId,
       brand: sproduct.brand,
-    });
+    }).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
     res.render("sproduct", {
       login: req.session.user,
       sproduct: sproduct,
       related: relatedProduct,
+      data:new Date(),
     });
   } catch (error) {
     console.log(error.message);

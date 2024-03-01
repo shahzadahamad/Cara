@@ -8,6 +8,7 @@ const category = new mongoose.Schema({
   },
   offer:{
     type:mongoose.Schema.ObjectId,
+    ref:'offer'
   }
 });
 

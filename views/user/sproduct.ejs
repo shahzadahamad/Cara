@@ -2,198 +2,364 @@
 
 
 
-<style>
-  #zoomable-image {
+  <style>
+    #zoomable-image {
       transition: transform 0.3s ease-in-out;
-  }
+    }
 
-  #zoomable-image:hover {
+    #zoomable-image:hover {
       transform: scale(1.1);
-  }
-</style>
+    }
 
-<header id="header">
-  <a href="#"><img src="images/logo.png" class="logo" alt=""></a>
+    #wishlist {
+      position: absolute;
+      right: 12px;
+      color: #088178;
+      background-color: #cce7d0;
+      padding: 8px;
+      border-radius: 40px;
+      transition: 0.3s ease-in-out
+    }
 
-  <div>
-    <ul id="navbar">
-      <li><a href="/home">Home</a></li>
-      <li><a class="active" href="/shop">Shop</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="<%= locals.login ? '/profile' : '/login' %>" > <%= locals.login ? 'Profile' : 'Login' %></a></li>
-      <li id="lg-bag"><a href="/wishlist"><i style="font-size: 20px;" class="fa-solid fa-heart"></i></a></li>
-      <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
-      <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
-    </ul>
-  </div>
-  <div id="mobile">
-    <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
-    <i id="bar" class="fas fa-outdent"></i>
-  </div>
-</header>
+    #wishlist:hover {
+      color: #fff;
+      background-color: #088178;
+    }
 
-<section id="prodetails" class="section-p1">
-  <div  class="single-pro-image">
- 
-    <img src="images/productImages/<%= sproduct.image[0] %>" width="100%" id="MainImg" alt="">
+    #offerPecen {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      margin: 0px;
+      color: #388e3c;
+      font-weight: 900;
+      font-size: 12px;
+    }
 
-    <div class="small-img-group">
-    <%  for(let i=0; i< sproduct.image.length; i++) { %>
-      <div class="small-img-col">
-        <img style="border-radius: 10px;" src="images/productImages/<%= sproduct.image[i] %>" width="100%" class="small-img" alt="">
-      </div>
-      <% } %>
+    #offerPecenHead {
+      margin: 0px;
+      color: #388e3c;
+      font-weight: 900;
+      font-size: 20px;
+    }
+  </style>
+
+  <header id="header">
+    <a href="#"><img src="images/logo.png" class="logo" alt=""></a>
+
+    <div>
+      <ul id="navbar">
+        <li><a href="/home">Home</a></li>
+        <li><a class="active" href="/shop">Shop</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="<%= locals.login ? '/profile' : '/login' %>">
+            <%= locals.login ? 'Profile' : 'Login' %>
+          </a></li>
+        <li id="lg-bag"><a href="/wishlist"><i style="font-size: 20px;" class="fa-solid fa-heart"></i></a></li>
+        <li id="lg-bag"><a href="/cart"><i class="fa-solid fa-bag-shopping nav-cart"></i></a></li>
+        <a href="#" id="close"><i class="fa-solid fa-xmark"></i></a>
+      </ul>
     </div>
-  </div>
-
-  <div class="single-pro-details">
-    <h6>Brand: <%= sproduct.brand.charAt(0).toUpperCase() + sproduct.brand.slice(1) %></h6>
-    <h4 style="padding: 32px 0 20px 0;"><%= sproduct.name %></h4>
-    <h2>₹<%= sproduct.price %></h2>
-    <!-- <select>
-      <option>Select Size</option>
-      <option>XL</option>
-      <option>XXL</option>
-      <option>Small</option>
-      <option>Large</option>
-    </select> -->
-    <div style="margin-bottom: 10px;" class="star">
-      <% for(let j=0;j< sproduct.rating; j++){ %>
-        <i style="color: rgb(243, 181, 25); font-size: 15px;" class="ri-star-fill"></i>
-        <% } %>
+    <div id="mobile">
+      <a href="/cart"><i class="fa-solid fa-bag-shopping"></i></a>
+      <i id="bar" class="fas fa-outdent"></i>
     </div>
-    <input type="number" value="1" min="1" max="<%= sproduct.quantity %>">
-    <button class="normal" type="submit" onclick="addToCart('<%= sproduct._id %>','<%= locals.login %>')">Add To Cart</button>
-    <h4>Product Details</h4>
-    <span><%= sproduct.description %></span>
-  </div>
-</section>
+  </header>
 
-<section id="product1" class="section-p1">
-  <h2>Related Products</h2>
-  <p>Summer Collection New Morden Design</p>
-  <div class="pro-container">
-    <% if(related.length>0){%>
-      <% for(let i=0;i< related.length ;i++){ %>
+  <section id="prodetails" class="section-p1">
+    <div class="single-pro-image">
 
-        <div class="pro" onclick="window.location.href='/sproduct?id=<%= related[i]._id %>'">
-          <img src="images/productImages/<%= related[i].image[0] %>" alt="">
-          <div class="des">
-            <span>
-              <%= related[i].brand %>
-            </span>
-            <h5>
-              <%= related[i].name %>
-            </h5>
-            <div class="star">
-              <% for(let j=0;j< related[i].rating; j++){ %>
-                <i class="ri-star-fill"></i>
-                <% } %>
-            </div>
-            <h4>
-              $<%= related[i].price %>
-            </h4>
+      <img style="border-radius: 10px;" src="images/productImages/<%= sproduct.image[0] %>" width="100%" id="MainImg"
+        alt="">
+
+      <div class="small-img-group">
+        <% for(let i=0; i< sproduct.image.length; i++) { %>
+          <div class="small-img-col">
+            <img style="border-radius: 10px;" src="images/productImages/<%= sproduct.image[i] %>" width="100%"
+              class="small-img" alt="">
           </div>
-          <a onclick="addToCart('<%= related[i]._id %>','<%= locals.login %>')"><i class="ri-shopping-cart-2-line cart"></i></a>
-        </div>
-        <% } %>
-          <% } else { %>
-            <h2>Products Not Found</h2>
-            <% } %>
-  </div>
-</section>
-
-<section id="newsletter" class="section-p1 section-m1">
-  <div class="newstext">
-    <h4>Sign Up For Newsletters</h4>
-    <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
-  </div>
-  <div class="form">
-    <input type="text" placeholder="Your email address">
-    <button class="normal">Sign Up</button>
-  </div>
-</section>
-
-<footer class="section-p1">
-  <div class="col">
-    <img class="logo" src="images/logo.png" alt="">
-    <h4>Contact</h4>
-    <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
-    <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
-    <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
-    <div class="follow">
-      <h4>Follow us</h4>
-      <div class="icon">
-        <i class="fab fa-facebook-f"></i>
-        <i class="fab fa-twitter"></i>
-        <i class="fab fa-instagram"></i>
-        <i class="fab fa-pinterest-p"></i>
-        <i class="fab fa-youtube"></i>
+          <% } %>
       </div>
     </div>
-  </div>
 
-  <div class="col">
-    <h4>About</h4>
-    <a href="#">About us</a>
-    <a href="#">Delivery Information</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Terms & Conditions</a>
-    <a href="#">Contact Us</a>
-  </div>
+    <div class="single-pro-details">
+      <% if(sproduct.offer && sproduct.categoryId.offer && sproduct.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+        locals.data <=sproduct.offer.endDate.setHours(23,59,59,999) &&
+        sproduct.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+        <=sproduct.categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+        <p id="offerPecenHead">
+          <%= sproduct.offer.discountPercentage>= sproduct.categoryId.offer.discountPercentage ?
+            sproduct.offer.discountPercentage+'% Off' : sproduct.categoryId.offer.discountPercentage+'% Off'
+            %>
+        </p>
+        <% }else if(sproduct.offer){ %>
+          <p id="offerPecenHead">
+            <%= sproduct.offer && sproduct.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=sproduct.offer.endDate.setHours(23,59,59,999) ? sproduct.offer.discountPercentage+'% Off' : '' %>
+          </p>
+          <% }else if(sproduct.categoryId.offer){ %>
+            <p id="offerPecenHead">
+              <%= sproduct.categoryId.offer && sproduct.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                locals.data <=sproduct.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                sproduct.categoryId.offer.discountPercentage+'% Off' : '' %>
+            </p>
+            <% } %>
+              <br>
+              <h6>Brand: <%= sproduct.brand.charAt(0).toUpperCase() + sproduct.brand.slice(1) %>
+              </h6>
+              <h4 style="padding: 32px 0 20px 0;">
+                <%= sproduct.name %>
+              </h4>
+              <div style="display: flex;">
+                <% if(sproduct.offer && sproduct.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                  <=sproduct.offer.endDate.setHours(23,59,59,999)||sproduct.categoryId.offer &&
+                  sproduct.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                  <=sproduct.categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                  <h2 style="color: #99a6be; text-decoration: line-through;">
+                    ₹<%= sproduct.price %>
+                  </h2>
+                  &nbsp;&nbsp;
+                  <% } %>
+                    <h2>
+                      <% if(sproduct.offer && sproduct.categoryId.offer &&
+                        sproduct.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                        <=sproduct.offer.endDate.setHours(23,59,59,999) &&
+                        sproduct.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                        <=sproduct.categoryId.offer.endDate.setHours(23,59,59,999)){ %>
 
-  <div class="col">
-    <h4>My Account</h4>
-    <a href="#">Sign In</a>
-    <a href="#">View Cart</a>
-    <a href="#">My Wishlist</a>
-    <a href="#">Track My Order</a>
-    <a href="#">Help</a>
-  </div>
+                        ₹<%= sproduct.offer.discountPercentage>= sproduct.categoryId.offer.discountPercentage
+                          ?
+                          sproduct.price -
+                          Math.round(sproduct.price*(Number(sproduct.offer.discountPercentage)/100)) :
+                          sproduct.price -
+                          Math.round(sproduct.price*(Number(sproduct.categoryId.offer.discountPercentage)/100))
+                          %>
 
-  <div class="col install">
-    <h4>Install App</h4>
-    <p>From App Store or Google Play</p>
-    <div class="row">
-      <img src="images/pay/app.jpg" alt="">
-      <img src="images/pay/play.jpg" alt="">
+                          <% }else if(sproduct.offer){ %>
+                            ₹<%= sproduct.offer && sproduct.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                              locals.data <=sproduct.offer.endDate.setHours(23,59,59,999) ? sproduct.price -
+                              Math.round(sproduct.price*(Number(sproduct.offer.discountPercentage)/100)) :
+                              sproduct.price %>
+                              <% }else if(sproduct.categoryId.offer){ %>
+                                ₹<%= sproduct.categoryId.offer &&
+                                  sproduct.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                  <=sproduct.categoryId.offer.endDate.setHours(23,59,59,999) ? sproduct.price -
+                                  Math.round(sproduct.price*(Number(sproduct.categoryId.offer.discountPercentage)/100))
+                                  : sproduct.price %>
+                                  <% }else{ %>
+                                    ₹<%= sproduct.price %>
+                                      <% } %>
+                    </h2>
+              </div>
+              <div style="margin-bottom: 10px;" class="star">
+                <% for(let j=0;j< sproduct.rating; j++){ %>
+                  <i style="color: rgb(243, 181, 25); font-size: 15px;" class="ri-star-fill"></i>
+                  <% } %>
+              </div>
+              <button class="normal" type="submit" onclick="addToCart('<%= sproduct._id %>','<%= locals.login %>')">Add
+                To
+                Cart</button>
+              <h4>Product Details</h4>
+              <span>
+                <%= sproduct.description %>
+              </span>
     </div>
-    <p>Secured Payment Gateways</p>
-    <img src="images/pay/pay.png" alt="">
-  </div>
+  </section>
 
-  <div class="copyright">
-    <p>© 2024, Tech2 etc - Ecommerce Website</p>
-  </div>
-</footer>
+  <section id="product1" class="section-p1">
+    <h2>Related Products</h2>
+    <p>Summer Collection New Morden Design</p>
+    <div class="pro-container">
+      <% if(related.length>0){%>
+        <% for(let i=0;i< related.length ;i++){ %>
 
-<script>
+          <div class="pro" onclick="window.location.href='/sproduct?id=<%= related[i]._id %>'">
+            <a onclick="addToWishlist('<%= related[i]._id %>','<%= locals.login %>')"><i id="wishlist"
+                class="fa-solid fa-heart"></i></a>
+            <% if(related[i].offer && related[i].categoryId.offer &&
+              related[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=related[i].offer.endDate.setHours(23,59,59,999) &&
+              related[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+              <=related[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+              <p id="offerPecen">
+                <%= related[i].offer.discountPercentage>= related[i].categoryId.offer.discountPercentage ?
+                  related[i].offer.discountPercentage+'% Off' : related[i].categoryId.offer.discountPercentage+'% Off'
+                  %>
+              </p>
+              <% }else if(related[i].offer){ %>
+                <p id="offerPecen">
+                  <%= related[i].offer && related[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                    <=related[i].offer.endDate.setHours(23,59,59,999) ? related[i].offer.discountPercentage+'% Off' : ''
+                    %>
+                </p>
+                <% }else if(related[i].categoryId.offer){ %>
+                  <p id="offerPecen">
+                    <%= related[i].categoryId.offer &&
+                      related[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=related[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                      related[i].categoryId.offer.discountPercentage+'% Off' : '' %>
+                  </p>
+                  <% } %>
+                    <img src="images/productImages/<%= related[i].image[0] %>" alt="">
+                    <div class="des">
+                      <span>
+                        <%= related[i].brand %>
+                      </span>
+                      <h5>
+                        <%= related[i].name %>
+                      </h5>
+                      <div class="star">
+                        <% for(let j=0;j< related[i].rating; j++){ %>
+                          <i class="ri-star-fill"></i>
+                          <% } %>
+                      </div>
+                      <div style="display: flex; flex-direction: row;">
+                        <% if(related[i].offer && related[i].offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                          locals.data <=related[i].offer.endDate.setHours(23,59,59,999)||related[i].categoryId.offer &&
+                          related[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=related[i].categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                          <h4 style="color: #99a6be; text-decoration: line-through;">
+                            ₹<%= related[i].price %>
+                          </h4>
+                          <% } %>
+                            &nbsp;&nbsp;
+                            <h4>
+                              <% if(related[i].offer && related[i].categoryId.offer &&
+                                related[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=related[i].offer.endDate.setHours(23,59,59,999) &&
+                                related[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=related[i].categoryId.offer.endDate.setHours(23,59,59,999)){ %>
 
-  // image chage 
-  let MainImg = document.getElementById('MainImg');
-  let smallimg = document.getElementsByClassName('small-img');
+                                <%= related[i].offer.discountPercentage>=
+                                  related[i].categoryId.offer.discountPercentage
+                                  ?
+                                  related[i].price -
+                                  Math.round(related[i].price*(Number(related[i].offer.discountPercentage)/100))
+                                  :
+                                  related[i].price -
+                                  Math.round(related[i].price*(Number(related[i].categoryId.offer.discountPercentage)/100))
+                                  %>
 
-  smallimg[0].onclick = () => {
-    MainImg.src = smallimg[0].src;
-  }
-  smallimg[1].onclick = () => {
-    MainImg.src = smallimg[1].src;
-  }
-  smallimg[2].onclick = () => {
-    MainImg.src = smallimg[2].src;
-  }
-  smallimg[3].onclick = () => {
-    MainImg.src = smallimg[3].src;
-  }
+                                  <% }else if(related[i].offer){ %>
+                                    ₹<%= related[i].offer && related[i].offer.startDate.setHours(0,0,0,0)<=locals.data
+                                      && locals.data <=related[i].offer.endDate.setHours(23,59,59,999) ?
+                                      related[i].price -
+                                      Math.round(related[i].price*(Number(related[i].offer.discountPercentage)/100)) :
+                                      related[i].price %>
+                                      <% }else if(related[i].categoryId.offer){ %>
+                                        ₹<%= related[i].categoryId.offer &&
+                                          related[i].categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                          locals.data <=related[i].categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                          related[i].price -
+                                          Math.round(related[i].price*(Number(related[i].categoryId.offer.discountPercentage)/100))
+                                          : related[i].price %>
+                                          <% }else{ %>
+                                            ₹<%= related[i].price %>
+                                              <% } %>
+                            </h4>
+                      </div>
+                    </div>
+                    <a onclick="addToCart('<%= related[i]._id %>','<%= locals.login %>')"><i
+                        class="ri-shopping-cart-2-line cart"></i></a>
+          </div>
+          <% } %>
+            <% } else { %>
+              <h2>Products Not Found</h2>
+              <% } %>
+    </div>
+  </section>
 
- 
+  <section id="newsletter" class="section-p1 section-m1">
+    <div class="newstext">
+      <h4>Sign Up For Newsletters</h4>
+      <p>Get E-mail updates about our latest shop and <span>special offers.</span></p>
+    </div>
+    <div class="form">
+      <input type="text" placeholder="Your email address">
+      <button class="normal">Sign Up</button>
+    </div>
+  </section>
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('MainImg').addEventListener('mousemove', function (event) {
+  <footer class="section-p1">
+    <div class="col">
+      <img class="logo" src="images/logo.png" alt="">
+      <h4>Contact</h4>
+      <p><strong>Address: </strong> 562 Wellington Road, Street 32, San Francisco</p>
+      <p><Strong>Phone: </Strong> +01 2222 365 /(+91) 01 2345 6789</p>
+      <p><Strong>Hours: </Strong> 10:00 - 18:00, Mon - Sat</p>
+      <div class="follow">
+        <h4>Follow us</h4>
+        <div class="icon">
+          <i class="fab fa-facebook-f"></i>
+          <i class="fab fa-twitter"></i>
+          <i class="fab fa-instagram"></i>
+          <i class="fab fa-pinterest-p"></i>
+          <i class="fab fa-youtube"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h4>About</h4>
+      <a href="#">About us</a>
+      <a href="#">Delivery Information</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Contact Us</a>
+    </div>
+
+    <div class="col">
+      <h4>My Account</h4>
+      <a href="#">Sign In</a>
+      <a href="#">View Cart</a>
+      <a href="#">My Wishlist</a>
+      <a href="#">Track My Order</a>
+      <a href="#">Help</a>
+    </div>
+
+    <div class="col install">
+      <h4>Install App</h4>
+      <p>From App Store or Google Play</p>
+      <div class="row">
+        <img src="images/pay/app.jpg" alt="">
+        <img src="images/pay/play.jpg" alt="">
+      </div>
+      <p>Secured Payment Gateways</p>
+      <img src="images/pay/pay.png" alt="">
+    </div>
+
+    <div class="copyright">
+      <p>© 2024, Tech2 etc - Ecommerce Website</p>
+    </div>
+  </footer>
+
+  <script>
+
+    // image chage 
+    let MainImg = document.getElementById('MainImg');
+    let smallimg = document.getElementsByClassName('small-img');
+
+    smallimg[0].onclick = () => {
+      MainImg.src = smallimg[0].src;
+    }
+    smallimg[1].onclick = () => {
+      MainImg.src = smallimg[1].src;
+    }
+    smallimg[2].onclick = () => {
+      MainImg.src = smallimg[2].src;
+    }
+    smallimg[3].onclick = () => {
+      MainImg.src = smallimg[3].src;
+    }
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('MainImg').addEventListener('mousemove', function (event) {
         zoomImage(event, this);
-    });
+      });
 
-    function zoomImage(event, element) {
+      function zoomImage(event, element) {
         const rect = element.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -204,34 +370,37 @@ document.addEventListener('DOMContentLoaded', function () {
         element.style.transformOrigin = `${percentX}% ${percentY}%`;
         element.style.transition = 'transform 0.3s ease-in-out';
         element.style.transform = 'scale(1.5)';
-    }
+      }
 
-    document.getElementById('MainImg').addEventListener('mouseleave', function () {
+      document.getElementById('MainImg').addEventListener('mouseleave', function () {
         this.style.transition = 'transform 0.3s ease-in-out';
         this.style.transform = 'scale(1)';
-    });
+      });
 
-    document.getElementById('MainImg2').addEventListener('mousemove', function (event) {
+      document.getElementById('MainImg2').addEventListener('mousemove', function (event) {
         zoomImage(event, this);
-    });
+      });
 
-    document.getElementById('MainImg2').addEventListener('mouseleave', function () {
+      document.getElementById('MainImg2').addEventListener('mouseleave', function () {
         this.style.transition = 'transform 0.3s ease-in-out';
         this.style.transform = 'scale(1)';
-    });
+      });
 
-    document.getElementById('MainImg3').addEventListener('mousemove', function (event) {
+      document.getElementById('MainImg3').addEventListener('mousemove', function (event) {
         zoomImage(event, this);
-    });
+      });
 
-    document.getElementById('MainImg3').addEventListener('mouseleave', function () {
+      document.getElementById('MainImg3').addEventListener('mouseleave', function () {
         this.style.transition = 'transform 0.3s ease-in-out';
         this.style.transform = 'scale(1)';
+      });
+
+
+
     });
 
 
 
-});
 
 
 
@@ -240,16 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+  </script>
 
 
-
-</script>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/javaScript/script.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/javaScript/script.js"></script>
 
   <%- include('../layouts/footer.ejs') -%>

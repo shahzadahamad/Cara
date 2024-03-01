@@ -81,7 +81,7 @@
 
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
-          <h3 style="font-size: 30px;" class="main--title">Products</h3>
+          <h3 style="font-size: 30px;" class="main--title"><%= locals.product ? 'Products' : 'Category' %></h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
@@ -113,7 +113,7 @@
                   <td>
                     <%= i+1 %>
                   </td>
-                  <td><img style="width: 100px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
+                  <td><img style="width: 100px; border-radius: 10px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
                   <td>
                     <%= product[i].name %>
                   </td>
