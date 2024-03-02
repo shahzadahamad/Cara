@@ -3,55 +3,112 @@ const cart = require("../../models/cartModel");
 const Address = require("../../models/addressModel");
 const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
+const Category = require("../../models/categoryModel");
 const Coupon = require("../../models/couponModel");
+const Offer = require("../../models/offerModel");
 const moment = require("moment");
 
 // totalCart price
 const totalCartPrice = async (id, req, res) => {
   try {
-    const totalCart = await cart.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(id),
-        },
-      },
-      {
-        $unwind: "$products",
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "products.productId",
-          foreignField: "_id",
-          as: "total",
-        },
-      },
-      {
-        $unwind: "$total",
-      },
-      {
-        $project: {
-          "products.quantity": 1,
-          "total.price": 1,
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          total: {
-            $sum: {
-              $multiply: ["$products.quantity", "$total.price"],
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-        },
-      },
-    ]);
-    return totalCart;
+    // const totalCart = await cart.aggregate([
+    //   {
+    //     $match: {
+    //       userId: new mongoose.Types.ObjectId(id),
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$products",
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "products",
+    //       localField: "products.productId",
+    //       foreignField: "_id",
+    //       as: "total",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$total",
+    //   },
+    //   {
+    //     $project: {
+    //       "products.quantity": 1,
+    //       "total.price": 1,
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       total: {
+    //         $sum: {
+    //           $multiply: ["$products.quantity", "$total.price"],
+    //         },
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //     },
+    //   },
+    // ]);
+
+    const cartPro = await cart.findOne({ userId: id });
+    const currentDate = new Date();
+    
+    // Set the current date to the beginning of the day
+    currentDate.setHours(0, 0, 0, 0);
+    
+    let total = 0;
+    
+    for (const product of cartPro.products) {
+        const productDetails = await Product.findById(product.productId);
+        let productPrice = productDetails.price * product.quantity;
+        let maxDiscount = 0;
+    
+        if (productDetails.offer) {
+            const productOffer = await Offer.findById(productDetails.offer);
+            if (productOffer.discountPercentage > maxDiscount) {
+                const offerStartDate = new Date(productOffer.startDate);
+                const offerEndDate = new Date(productOffer.endDate);
+  
+                offerStartDate.setHours(0, 0, 0, 0);
+                offerEndDate.setHours(23, 59, 59, 999);
+    
+                if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+                    maxDiscount = productOffer.discountPercentage;
+                }
+            }
+        }
+    
+        if (productDetails.categoryId) {
+            const category = await Category.findById(productDetails.categoryId);
+            if (category.offer) {
+                const categoryOffer = await Offer.findById(category.offer);
+                if (categoryOffer.discountPercentage > maxDiscount) {
+                    const offerStartDate = new Date(categoryOffer.startDate);
+                    const offerEndDate = new Date(categoryOffer.endDate);
+    
+                    offerStartDate.setHours(0, 0, 0, 0);
+                    offerEndDate.setHours(23, 59, 59, 999);
+    
+                    if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+                        maxDiscount = categoryOffer.discountPercentage;
+                    }
+                }
+            }
+        }
+    
+        if (maxDiscount > 0) {
+            productPrice -= (productPrice * maxDiscount) / 100;
+        }
+    
+        total += productPrice;
+    }
+    
+
+    return [{ total: Math.round(total) }];
   } catch (error) {
     console.log(error.message);
   }
@@ -63,7 +120,21 @@ const loadCart = async (req, res) => {
     const message = req.flash("message");
     const products = await cart
       .findOne({ userId: req.session.user._id })
-      .populate("products.productId");
+      .populate({
+        path: "products.productId",
+        populate: {
+          path: "offer",
+        },
+      })
+      .populate({
+        path: "products.productId",
+        populate: {
+          path: "categoryId",
+          populate: {
+            path: "offer",
+          },
+        },
+      });
     if (products) {
       const totalCart = await totalCartPrice(req.session.user._id);
       res.render("cart", {
@@ -71,6 +142,7 @@ const loadCart = async (req, res) => {
         product: products.products,
         total: totalCart[0].total,
         message,
+        data: new Date(),
       });
     } else {
       res.render("cart", { login: req.session.user, message });

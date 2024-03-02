@@ -71,19 +71,112 @@
 
 
                   </td>
-                  <td>₹<%= product[i].productId.price %>
+                  <td id="price<%= i %>">
+                    <% if(product[i].productId.offer &&
+                      product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=product[i].productId.offer.endDate.setHours(23,59,59,999)||product[i].productId.categoryId.offer
+                      && product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                      <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                      <p
+                        style="margin: 0px; text-decoration: line-through; color: #99a6be; display: inline; font-size: 14px;">
+                        ₹<%= product[i].productId.price %>
+                      </p>
+                      <% } %>
+                        &nbsp;&nbsp;
+                        <% if(product[i].productId.offer && product[i].productId.categoryId.offer &&
+                          product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=product[i].productId.offer.endDate.setHours(23,59,59,999) &&
+                          product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+
+                        ₹<%=
+                              product[i].productId.offer.discountPercentage>=
+                              product[i].productId.categoryId.offer.discountPercentage
+                              ?
+                              product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100))
+                              :
+                              product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100))
+                              %>
+
+                          <% }else if(product[i].productId.offer){ %>
+                           ₹<%= product[i].productId.offer
+                                && product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                                <=product[i].productId.offer.endDate.setHours(23,59,59,999) ? product[i].productId.price
+                                -
+                                Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100))
+                                : product[i].productId.price %>
+                            
+                            <% }else if(product[i].productId.categoryId.offer){ %>
+                            ₹<%=
+                                  product[i].productId.categoryId.offer &&
+                                  product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                  locals.data <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                  product[i].productId.price -
+                                  Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100))
+                                  : product[i].productId.price %>
+                             
+                              <% }else{ %>
+                               ₹
+                                  <%=product[i].productId.price %>
+                                
+                                <% } %>
                   </td>
                   <td>
                     <% if(product[i].productId.quantity>0){ %>
-                      <input type="number" id="inputTag<%= i %>"
-                        oninput="countOfQuantity('<%= product[i].productId._id %>','<%= product[i].productId.price %>','<%= i %>','<%= product[i].productId.quantity %>')"
+                      <% let price %>
+                      <% price = product[i].productId.offer &&
+                            product[i].productId.categoryId.offer &&
+                            product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                            <=product[i].productId.offer.endDate.setHours(23,59,59,999) &&
+                            product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                            locals.data <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                            product[i].productId.offer.discountPercentage>=
+                            product[i].productId.categoryId.offer.discountPercentage ? (product[i].productId.price -
+                            Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100)))
+                           : (product[i].productId.price -
+                            Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100)))
+                           : product[i].productId.offer &&
+                            product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                              <=product[i].productId.offer.endDate.setHours(23,59,59,999) ? (product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100)))
+                             : product[i].productId.categoryId.offer &&
+                              product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                              locals.data <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                              (product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100)))
+                             : product[i].productId.price %> %>
+                      <input type="number" id="inputTag<%= i %>"           
+                        oninput="countOfQuantity('<%= product[i].productId._id %>','<%= price %>','<%= i %>','<%= product[i].productId.quantity %>')"
                         value="<%= product[i].quantity > product[i].productId.quantity ? product[i].productId.quantity : product[i].quantity ? product[i].quantity : product[i].quantity+1 %>"
                         onkeydown="return false" min="1" max="<%= product[i].productId.quantity %>">
                       <% } %>
                   </td>
                   <% if(product[i].productId.quantity>0){ %>
                     <% if(product[i].quantity){ %>
-                      <td id="subTotal<%=i%>">₹<%= product[i].productId.price * product[i].quantity %>
+                      <td id="subTotal<%=i%>">
+                      ₹<%= product[i].productId.offer &&
+                            product[i].productId.categoryId.offer &&
+                            product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                            <=product[i].productId.offer.endDate.setHours(23,59,59,999) &&
+                            product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                            locals.data <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                            product[i].productId.offer.discountPercentage>=
+                            product[i].productId.categoryId.offer.discountPercentage ? (product[i].productId.price -
+                            Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100)))
+                            * product[i].quantity : (product[i].productId.price -
+                            Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100)))
+                            * product[i].quantity : product[i].productId.offer &&
+                            product[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                              <=product[i].productId.offer.endDate.setHours(23,59,59,999) ? (product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.offer.discountPercentage)/100)))
+                              * product[i].quantity : product[i].productId.categoryId.offer &&
+                              product[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                              locals.data <=product[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                              (product[i].productId.price -
+                              Math.round(product[i].productId.price*(Number(product[i].productId.categoryId.offer.discountPercentage)/100)))
+                              * product[i].quantity : product[i].productId.price * product[i].quantity %>
                       </td>
                       <% }else{ %>
                         <td id="subTotal<%=i%>">₹<%= product[i].productId.price * 1 %>
@@ -262,10 +355,10 @@
                       }
                       total.innerHTML = lastOne ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
                       total.innerHTML = data.totalCart[0].total === 0 ? '₹' + 0 : '₹' + Number(data.totalCart[0].total + 40);
-  
+
                     } else {
                       shipping.innerHTML = 'Free'
-                      total.innerHTML = '₹' + Number(data.totalCart[0].total); 
+                      total.innerHTML = '₹' + Number(data.totalCart[0].total);
                     }
 
                   }
@@ -332,16 +425,17 @@
               }).then((res) => res.json())
                 .then((data) => {
 
+
                   subTotalRow.innerHTML = '₹' + price * input.value;
                   cartSubtotal.innerHTML = '₹' + data.totalCart[0].total;
 
                   if (data.totalCart[0].total < 500) {
                     shipping.innerHTML = '₹' + 40;
-              
-                      total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
-            
+
+                    total.innerHTML = '₹' + Number(data.totalCart[0].total + 40)
+
                   } else {
-                    shipping.innerHTML = 'Free';        
+                    shipping.innerHTML = 'Free';
                     total.innerHTML = '₹' + Number(data.totalCart[0].total);
                   }
 
