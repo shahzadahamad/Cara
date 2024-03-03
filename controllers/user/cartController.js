@@ -11,60 +11,15 @@ const moment = require("moment");
 // totalCart price
 const totalCartPrice = async (id, req, res) => {
   try {
-    // const totalCart = await cart.aggregate([
-    //   {
-    //     $match: {
-    //       userId: new mongoose.Types.ObjectId(id),
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$products",
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "products",
-    //       localField: "products.productId",
-    //       foreignField: "_id",
-    //       as: "total",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$total",
-    //   },
-    //   {
-    //     $project: {
-    //       "products.quantity": 1,
-    //       "total.price": 1,
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: null,
-    //       total: {
-    //         $sum: {
-    //           $multiply: ["$products.quantity", "$total.price"],
-    //         },
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //     },
-    //   },
-    // ]);
 
     const cartPro = await cart.findOne({ userId: id });
     const currentDate = new Date();
     
-    // Set the current date to the beginning of the day
-    currentDate.setHours(0, 0, 0, 0);
-    
     let total = 0;
     
-    for (const product of cartPro.products) {
+    if(cartPro){
+      for (const product of cartPro.products) {
         const productDetails = await Product.findById(product.productId);
-        let productPrice = productDetails.price * product.quantity;
         let maxDiscount = 0;
     
         if (productDetails.offer) {
@@ -99,16 +54,21 @@ const totalCartPrice = async (id, req, res) => {
                 }
             }
         }
+
+        let productPrice = productDetails.price;
     
         if (maxDiscount > 0) {
-            productPrice -= (productPrice * maxDiscount) / 100;
+            productPrice -= Math.round((productPrice * maxDiscount) / 100);
         }
-    
-        total += productPrice;
-    }
-    
 
-    return [{ total: Math.round(total) }];
+       let productPriceFinal = productPrice * product.quantity;
+
+    
+        total += productPriceFinal;
+    }
+    }
+   
+    return [{ total: total }];
   } catch (error) {
     console.log(error.message);
   }
