@@ -41,11 +41,14 @@ const productController = require('../controllers/admin/productController');
 
 adminRouter.get('/products',auth.isLogin,productController.loadProducts);
 adminRouter.get('/add-products',auth.isLogin,productController.loadAddProducts);
-adminRouter.post('/add-products',upload.array('img',4),productController.verifyAddProducts);
+adminRouter.post('/add-products',upload.array('img'),productController.verifyAddProducts);
 adminRouter.get('/edit-products',auth.isLogin,productController.loadEditProduct);
-adminRouter.post('/edit-products',upload.array('img',4),productController.verifyEditProduct);
+adminRouter.post('/edit-products',upload.array('img'),productController.verifyEditProduct);
 adminRouter.patch('/edit-images',upload.single('img'),productController.verifyEditImage);
+adminRouter.post('/add-images',upload.single('img'),productController.addImages);
 adminRouter.delete('/delete-product',productController.verifyDeleteProduct);
+adminRouter.delete('/deleteImage',productController.deleteImages);
+
 
 // <--------------Order Controller-------------->
 const orderController = require('../controllers/admin/orderController');

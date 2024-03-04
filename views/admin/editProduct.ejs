@@ -83,7 +83,7 @@
       </div>
     </div>
 
-    <section style="border-radius: 10px; height: 1150px;" id="forms">
+    <section style="border-radius: 10px; height: 1200px;" id="forms">
       <div style="width: 80%;" id="wrapper">
         <div class="title">
           <span>Edit Product</span>
@@ -155,16 +155,23 @@
                         style="position: relative; margin-bottom: 20px;">
                         <img src="/images/productImages/<%= product.image[i] %>" alt="Image <%= i %>" id="imag<%=i%>"
                           class="imgView" style="width: 130px; height: auto; margin-bottom: 10px;border-radius: 10px;">
+                        <i onclick="deleteImages('<%= i %>','<%= product._id %>')"
+                          style="position: absolute; top: 5px; right: 5px;" class="fa-solid fa-xmark"></i>
                         <div class="button-container" style="position: relative; text-align: center;">
                           <button style="margin-top: 5px;" class="btn btn-outline-success p-1"
                             onclick="changeImage('<%= i %>','<%= product._id %>')">Change</button>
                         </div>
                       </div>
                       <%}%>
+
+                  </div>
+                  <br>
+                  <div id="fileInputContainer" style="display: flex; justify-content: center; align-items: center;">
+                    <button class="btn btn-outline-success " onclick="addImages('<%= product._id %>')">Add Image</button>
                   </div>
 
                   <p style="display: none; color: red; font-weight: 900; margin: 0px;" id="errMsg"></p>
-
+                  <br>
 
 
 
@@ -189,6 +196,53 @@
 
 
   <script>
+
+    function addImages(productId) {
+      event.preventDefault();
+      const fileInputContainer = document.getElementById('fileInputContainer');
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.style.display = 'none';
+
+
+      fileInputContainer.appendChild(fileInput);
+
+
+      fileInput.click();
+
+
+      fileInput.addEventListener('change', function () {
+        const file = fileInput.files[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append('img', file);
+          axios.post(`/admin/add-images?id=${productId}`, formData)
+            .then(response => {
+              if (response.data.status) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Image Added!',
+                  showConfirmButton: false,
+                  timer: 1000,
+                })
+                setTimeout(() => {
+                  window.location.reload('/admin/edit-products')
+                }, 1100);
+              }
+            })
+            .catch(error => {
+              console.log('error')
+              console.error(error.message);
+            });
+        }
+        fileInputContainer.removeChild(fileInput);
+      });
+    }
+
+
+
+
 
 
     function changeImage(i, id) {
@@ -225,6 +279,26 @@
       });
 
       fileInput.click();
+    }
+
+    async function deleteImages(i, id) {
+      const imageContainer = document.getElementById(`imageContainer${i}`);
+      const errMsg = document.getElementById('errMsg');
+      const response = await axios.delete('/admin/deleteImage', { data: { i, id } });
+      if (response.data.status) {
+        if (imageContainer) {
+          imageContainer.remove();
+        }
+        Swal.fire({
+          icon: 'success',
+          title: 'Image Removed!',
+          showConfirmButton: false,
+          timer: 1000,
+        })
+      } else {
+        errMsg.style.display = 'block';
+        errMsg.innerHTML = 'At least one image is require!';
+      }
     }
 
   </script>
