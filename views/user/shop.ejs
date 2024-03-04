@@ -73,7 +73,7 @@
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     }
 
-    #wishlist {
+    .wishlistCheck {
       position: absolute;
       right: 12px;
       color: #088178;
@@ -83,7 +83,7 @@
       transition: 0.3s ease-in-out
     }
 
-    #wishlist:hover {
+    .wishlistCheck:hover {
       color: #fff;
       background-color: #088178;
     }
@@ -134,7 +134,7 @@
           <select class="dropdown" onchange="selectedCategory(this)"
             style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
 
-            <option>
+            <option id="categorySearch">
               <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
             </option>
 
@@ -199,8 +199,24 @@
             <% if(product.length>0){%>
               <% for(let i=0;i< product.length ;i++){ %>
                 <div class="pro" onclick="window.location.href='/sproduct?id=<%= product[i]._id %>'">
-                  <a onclick="addToWishlist('<%= product[i]._id %>','<%= locals.login %>')"><i id="wishlist"
-                      class="fa-solid fa-heart"></i></a>
+                  <% if(locals.existWishlist && existWishlist.length>0){ %>       
+                    <% for(let j=0;j<existWishlist.length;j++){ %>
+                      <% if(product[i]._id.toString()===existWishlist[j].productId.toString()){ %> 
+                        <a onclick="addToWishlist('<%= product[i]._id %>','Shop<%= i %>')">
+                            <i id="wishlistShop<%= i %>" style="color: red;" class="fa-solid fa-heart wishlistCheck"></i>
+                          </a>
+                             <% break %>
+                        <% }else{ %>
+                          <a onclick="addToWishlist('<%= product[i]._id %>','Shop<%= i %>')">
+                            <i id="wishlistShop<%= i %>" style="color: #088178" class="fa-solid fa-heart wishlistCheck"></i>
+                          </a>
+                          <% } %>
+                            <% } %>
+                              <% }else{ %>
+                                <a onclick="addToWishlist('<%= product[i]._id %>','Shop<%= i %>')">
+                            <i id="wishlistShop<%= i %>" style="color: #088178" class="fa-solid fa-heart wishlistCheck"></i>
+                          </a>
+                                <% } %>
                   <% if(product[i].offer && product[i].categoryId.offer &&
                     product[i].offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
                     <=product[i].offer.endDate.setHours(23,59,59,999) &&
@@ -383,6 +399,8 @@
     async function search() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
       const searchResults = document.getElementById('searchResults');
+      const categorySearch = document.getElementById('categorySearch').value;
+     
 
       //clear previous search results
       searchResults.innerHTML = '';
@@ -395,7 +413,7 @@
 
 
       try {
-        const response = await fetch(`/search?data=${searchInput}`);
+        const response = await fetch(`/search?data=${searchInput}&categorys=${categorySearch}`);
         const data = await response.json();
 
         data.products.forEach(element => {

@@ -510,7 +510,8 @@
                         </tr>
                         <tr>
                           <td style="font-weight: 700;" data-label="Product">Total</td>
-                          <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹<%=total<500?total+40:total%>
+                          <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹
+                            <%=total<500?total+40:total%>
                           </td>
                         </tr>
               </tbody>
@@ -672,7 +673,7 @@
               const CODlabel = document.getElementById('CODlabel');
               const t = totalAmount.innerHTML.replace('₹', '')
               discount.style.display = 'table-row';
-              discountAmount.textContent = '-₹'+responce.data.amount;
+              discountAmount.textContent = '-₹' + responce.data.amount;
               totalAmount.innerHTML = '₹' + (Number(t) - responce.data.amount);
               btn.innerHTML = 'Remove'
               if (Number(t) - responce.data.amount > 1000) {
@@ -780,6 +781,9 @@
                     },
                   };
                   const razorpay = new Razorpay(options);
+                  razorpay.on('payment.failed', function (response) {
+                    alert('Payment Failed!')
+                  })
                   razorpay.open();
                 })
             }

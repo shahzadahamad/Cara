@@ -15,7 +15,7 @@ const userController = require('../controllers/user/userController');
 userRouter.get('/',auth.isLogout,userController.loadPage);
 userRouter.get('/home',auth.isBlocked,userController.loadHome);
 userRouter.get('/shop',auth.isBlocked,userController.loadShop);
-userRouter.post('/shop-search',auth.isBlocked,userController.verifyShopSearch);
+userRouter.post('/shop-search',userController.verifyShopSearch);
 userRouter.get('/search',auth.isBlocked,userController.loadSearch);
 userRouter.get('/about',auth.isBlocked,userController.loadAbout);
 userRouter.get('/sproduct',auth.isBlocked,userController.loadSingleProduct);

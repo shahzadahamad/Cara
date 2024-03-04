@@ -256,9 +256,12 @@
 
       <section id="user-detials">
         <div id="div" style="width: 80%; margin-bottom: 30px; margin-top: 70px;" class="user-detials-container">
+          <% if(order[0].orderStatus === 'Delivered'){ %>
           <button
             style="cursor: pointer; padding: 10px; color: white; background-color: #088178; border:1px solid white; border-radius: 10px;"
             onclick="downloadInvoice('<%= order[0]._id %>')">Download Invoice</button>
+            <br><br>
+            <% } %>
           <h4 style="border-bottom: 1px solid black; text-align: center; ">Your Order Status</h4>
           <br><br>
           <div style="display: flex;">
