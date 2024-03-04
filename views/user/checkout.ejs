@@ -158,7 +158,7 @@
     th,
     td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 9px;
       text-align: left;
     }
 
@@ -448,7 +448,46 @@
                             <%= product.products[i].quantity%>
                           </span>
                       </td>
-                      <td data-label="Total">₹<%= product.products[i].productId.price * product.products[i].quantity %>
+                      <td data-label="Total">
+                        <% if(product.products[i].productId.offer && product.products[i].productId.categoryId.offer &&
+                          product.products[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                          <=product.products[i].productId.offer.endDate.setHours(23,59,59,999) &&
+                          product.products[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                          locals.data <=product.products[i].productId.categoryId.offer.endDate.setHours(23,59,59,999)){
+                          %>
+
+                          ₹<%= product.products[i].productId.offer.discountPercentage>=
+                            product.products[i].productId.categoryId.offer.discountPercentage
+                            ?
+                            product.products[i].productId.price -
+                            Math.round(product.products[i].productId.price*(Number(product.products[i].productId.offer.discountPercentage)/100))
+                            :
+                            product.products[i].productId.price -
+                            Math.round(product.products[i].productId.price*(Number(product.products[i].productId.categoryId.offer.discountPercentage)/100))
+                            %>
+
+                            <% }else if(product.products[i].productId.offer){ %>
+                              ₹<%= product.products[i].productId.offer &&
+                                product.products[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                locals.data <=product.products[i].productId.offer.endDate.setHours(23,59,59,999) ?
+                                product.products[i].productId.price -
+                                Math.round(product.products[i].productId.price*(Number(product.products[i].productId.offer.discountPercentage)/100))
+                                : product.products[i].productId.price %>
+
+                                <% }else if(product.products[i].productId.categoryId.offer){ %>
+                                  ₹<%= product.products[i].productId.categoryId.offer &&
+                                    product.products[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data
+                                    && locals.data
+                                    <=product.products[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                    product.products[i].productId.price -
+                                    Math.round(product.products[i].productId.price*(Number(product.products[i].productId.categoryId.offer.discountPercentage)/100))
+                                    : product.products[i].productId.price %>
+
+                                    <% }else{ %>
+                                      ₹
+                                      <%=product.products[i].productId.price %>
+
+                                        <% } %>
                       </td>
                     </tr>
                     <% } %>
@@ -603,9 +642,9 @@
                     title: "Removed!",
                     text: "Your Coupon has been removed.",
                     icon: "success",
-                    timer: 800, 
-                    showConfirmButton: false 
-                  }).then(()=>{
+                    timer: 800,
+                    showConfirmButton: false
+                  }).then(() => {
                     window.location.reload();
                   })
                 }
@@ -631,18 +670,18 @@
               const totalAmount = document.getElementById('totalAmount');
               const COD = document.getElementById('COD');
               const CODlabel = document.getElementById('CODlabel');
-              const t = totalAmount.innerHTML.replace('₹','')
+              const t = totalAmount.innerHTML.replace('₹', '')
               discount.style.display = 'table-row';
-              discountAmount.textContent = '-₹' + responce.data.amount;
-              totalAmount.innerHTML= '₹' + (Number(t) - responce.data.amount);
-              if(Number(t) - responce.data.amount >1000){
-                COD.setAttribute('disabled');
-                CODlabel.innerHTML='Cash On Delivery (Not Available)';
-              }else{
-                COD.removeAttribute('disabled');
-                CODlabel.innerHTML='Cash On Delivery';
-              }
+              discountAmount.textContent = '-₹'+responce.data.amount;
+              totalAmount.innerHTML = '₹' + (Number(t) - responce.data.amount);
               btn.innerHTML = 'Remove'
+              if (Number(t) - responce.data.amount > 1000) {
+                COD.setAttribute('disabled');
+                CODlabel.innerHTML = 'Cash On Delivery (Not Available)';
+              } else {
+                COD.removeAttribute('disabled');
+                CODlabel.innerHTML = 'Cash On Delivery';
+              }
             }
           }
         }

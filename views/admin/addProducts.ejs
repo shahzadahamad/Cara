@@ -199,13 +199,6 @@
     function handleImageUpload(event) {
       const files = event.target.files;
 
-      // if (files.length > 4) {
-      //   previewContainer.style.display='none'
-      //   alert('Only 4 images are allowed.')
-      //   imageInput.value=''
-      //   return;
-      // }
-
       previewContainer.innerHTML = '';
 
       Array.from(files).forEach(file => {

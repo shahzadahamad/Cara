@@ -7,7 +7,9 @@ const Product = require("../../models/productsModel");
 const totalPrice = require("../../controllers/user/cartController");
 const Payment = require("../../models/paymentModel");
 const Coupon = require("../../models/couponModel");
+const Offer = require("../../models/offerModel");
 const Wallet = require("../../models/walletModel");
+const Category = require("../../models/categoryModel");
 const moment = require("moment");
 
 const razorpay = async () => {
@@ -37,14 +39,60 @@ const decrementProductQuatity = async (id) => {
       );
     });
 
-    for (let i = 0; i < cartPro.products.length; i++) {
-      const price = cartPro.products[i].productId.price;
-      const productId = cartPro.products[i]._id;
-      await cart.updateOne(
-        { userId: id, "products._id": productId },
+    const currentDate = new Date();
+    for (const product of cartPro.products) {
+      const productDetails = await Product.findById(product.productId);
+      let maxDiscount = 0;
+
+      if (productDetails.offer) {
+        const productOffer = await Offer.findById(productDetails.offer);
+        if (productOffer.discountPercentage > maxDiscount) {
+          const offerStartDate = new Date(productOffer.startDate);
+          const offerEndDate = new Date(productOffer.endDate);
+
+          offerStartDate.setHours(0, 0, 0, 0);
+          offerEndDate.setHours(23, 59, 59, 999);
+
+          if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+            maxDiscount = productOffer.discountPercentage;
+          }
+        }
+      }
+
+      if (productDetails.categoryId) {
+        const category = await Category.findById(productDetails.categoryId);
+        if (category.offer) {
+          const categoryOffer = await Offer.findById(category.offer);
+          if (categoryOffer.discountPercentage > maxDiscount) {
+            const offerStartDate = new Date(categoryOffer.startDate);
+            const offerEndDate = new Date(categoryOffer.endDate);
+
+            offerStartDate.setHours(0, 0, 0, 0);
+            offerEndDate.setHours(23, 59, 59, 999);
+
+            if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+              maxDiscount = categoryOffer.discountPercentage;
+            }
+          }
+        }
+      }
+
+      let productPrice = productDetails.price;
+
+      if (maxDiscount > 0) {
+        productPrice -= Math.round((productPrice * maxDiscount) / 100);
+      }
+
+      let productPriceFinal = productPrice;
+
+      const price = productPriceFinal;
+ 
+       await cart.updateOne(
+        { userId: id, "products._id": product._id },
         { $set: { "products.$.price": price } }
       );
     }
+    
 
     const cartProducts = await cart
       .findOne({ userId: id }, { products: 1 })
@@ -87,7 +135,21 @@ const loadCheckout = async (req, res) => {
     const address = await Address.findOne({ userId: req.session.user._id });
     const products = await cart
       .findOne({ userId: req.session.user._id })
-      .populate("products.productId");
+      .populate({
+        path: "products.productId",
+        populate: {
+          path: "offer",
+        },
+      })
+      .populate({
+        path: "products.productId",
+        populate: {
+          path: "categoryId",
+          populate: {
+            path: "offer",
+          },
+        },
+      });
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
     const message = req.flash("message");
     res.render("checkout", {
@@ -95,6 +157,7 @@ const loadCheckout = async (req, res) => {
       address: address,
       product: products,
       total: totalCart[0].total,
+      data: new Date(),
       message,
       coupons,
     });

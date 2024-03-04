@@ -11,63 +11,64 @@ const moment = require("moment");
 // totalCart price
 const totalCartPrice = async (id, req, res) => {
   try {
-
     const cartPro = await cart.findOne({ userId: id });
     const currentDate = new Date();
-    
+
     let total = 0;
-    
-    if(cartPro){
+
+    if (cartPro) {
       for (const product of cartPro.products) {
         const productDetails = await Product.findById(product.productId);
         let maxDiscount = 0;
-    
+
         if (productDetails.offer) {
-            const productOffer = await Offer.findById(productDetails.offer);
-            if (productOffer.discountPercentage > maxDiscount) {
-                const offerStartDate = new Date(productOffer.startDate);
-                const offerEndDate = new Date(productOffer.endDate);
-  
-                offerStartDate.setHours(0, 0, 0, 0);
-                offerEndDate.setHours(23, 59, 59, 999);
-    
-                if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
-                    maxDiscount = productOffer.discountPercentage;
-                }
+          const productOffer = await Offer.findById(productDetails.offer);
+          if (productOffer.discountPercentage > maxDiscount) {
+            const offerStartDate = new Date(productOffer.startDate);
+            const offerEndDate = new Date(productOffer.endDate);
+
+            offerStartDate.setHours(0, 0, 0, 0);
+            offerEndDate.setHours(23, 59, 59, 999);
+
+            if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+              maxDiscount = productOffer.discountPercentage;
             }
+          }
         }
-    
+
         if (productDetails.categoryId) {
-            const category = await Category.findById(productDetails.categoryId);
-            if (category.offer) {
-                const categoryOffer = await Offer.findById(category.offer);
-                if (categoryOffer.discountPercentage > maxDiscount) {
-                    const offerStartDate = new Date(categoryOffer.startDate);
-                    const offerEndDate = new Date(categoryOffer.endDate);
-    
-                    offerStartDate.setHours(0, 0, 0, 0);
-                    offerEndDate.setHours(23, 59, 59, 999);
-    
-                    if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
-                        maxDiscount = categoryOffer.discountPercentage;
-                    }
-                }
+          const category = await Category.findById(productDetails.categoryId);
+          if (category.offer) {
+            const categoryOffer = await Offer.findById(category.offer);
+            if (categoryOffer.discountPercentage > maxDiscount) {
+              const offerStartDate = new Date(categoryOffer.startDate);
+              const offerEndDate = new Date(categoryOffer.endDate);
+
+              offerStartDate.setHours(0, 0, 0, 0);
+              offerEndDate.setHours(23, 59, 59, 999);
+
+              if (
+                currentDate >= offerStartDate &&
+                currentDate <= offerEndDate
+              ) {
+                maxDiscount = categoryOffer.discountPercentage;
+              }
             }
+          }
         }
 
         let productPrice = productDetails.price;
-    
+
         if (maxDiscount > 0) {
-            productPrice -= Math.round((productPrice * maxDiscount) / 100);
+          productPrice -= Math.round((productPrice * maxDiscount) / 100);
         }
 
-       let productPriceFinal = productPrice * product.quantity;
+        let productPriceFinal = productPrice * product.quantity;
 
-    
         total += productPriceFinal;
+      }
     }
-    }
-   
+
     return [{ total: total }];
   } catch (error) {
     console.log(error.message);
