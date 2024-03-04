@@ -405,6 +405,21 @@ const customReport = async (fromDate, toDate) => {
             ],
           },
         },
+        totalCouponValue: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $eq: ["$isReturned", false] },
+                  { $eq: ["$isCancelled", false] },
+                  { $ne: ["$couponApplied", null] },
+                ],
+              },
+              "$couponApplied", 
+              0,
+            ],
+          },
+        },
       },
     },
     {
@@ -415,6 +430,7 @@ const customReport = async (fromDate, toDate) => {
         cancelledOrdersCount: 1,
         totalOrders: 1,
         couponAppliedCount: 1,
+        totalCouponValue: 1,
       },
     },
     {
@@ -422,12 +438,14 @@ const customReport = async (fromDate, toDate) => {
     },
   ]);
 
+
   const data = result.reduce(
     (acc, curr) => {
       acc.totalOrders += curr.totalOrders;
       acc.totalRevenue += curr.totalRevenue;
       acc.totalCancelledOrders += curr.cancelledOrdersCount;
       acc.totalCouponApplied += curr.couponAppliedCount;
+      acc.totalCouponValue += curr.totalCouponValue;
       return acc;
     },
     {
@@ -435,6 +453,7 @@ const customReport = async (fromDate, toDate) => {
       totalRevenue: 0,
       totalCancelledOrders: 0,
       totalCouponApplied: 0,
+      totalCouponValue: 0,
     }
   );
 
@@ -705,6 +724,21 @@ const custsomMonthYearWeekDaily = async (data) => {
                 ],
               },
             },
+            totalCouponValue: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ["$isReturned", false] },
+                      { $eq: ["$isCancelled", false] },
+                      { $ne: ["$couponApplied", null] },
+                    ],
+                  },
+                  "$couponApplied", 
+                  0,
+                ],
+              },
+            },
           },
         },
         {
@@ -714,6 +748,7 @@ const custsomMonthYearWeekDaily = async (data) => {
             totalRevenue: 1,
             cancelledOrdersCount: 1,
             couponAppliedCount: 1,
+            totalCouponValue: 1,
             totalOrders: 1,
           },
         },
@@ -727,7 +762,7 @@ const custsomMonthYearWeekDaily = async (data) => {
           acc.totalRevenue += curr.totalRevenue;
           acc.totalCancelledOrders += curr.cancelledOrdersCount;
           acc.totalCouponApplied += curr.couponAppliedCount;
-
+          acc.totalCouponValue += curr.totalCouponValue;
           return acc;
         },
         {
@@ -735,6 +770,7 @@ const custsomMonthYearWeekDaily = async (data) => {
           totalRevenue: 0,
           totalCancelledOrders: 0,
           totalCouponApplied: 0,
+          totalCouponValue: 0,
         }
       );
 

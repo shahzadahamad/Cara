@@ -150,7 +150,56 @@
                     <%= wishlist.products[i].productId.name %>
                   </td>
                   <td>
-                    ₹<%= wishlist.products[i].productId.price %>
+                    <% if(wishlist.products[i].productId.offer &&
+                    wishlist.products[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                    <=wishlist.products[i].productId.offer.endDate.setHours(23,59,59,999)||wishlist.products[i].productId.categoryId.offer
+                    && wishlist.products[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                    <=wishlist.products[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ){ %>
+                    <p
+                      style="margin: 0px; text-decoration: line-through; color: #99a6be; display: inline; font-size: 14px;">
+                      ₹<%= wishlist.products[i].productId.price %>
+                    </p>
+                    <% } %>
+                      &nbsp;&nbsp;
+                      <% if(wishlist.products[i].productId.offer && wishlist.products[i].productId.categoryId.offer &&
+                        wishlist.products[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                        <=wishlist.products[i].productId.offer.endDate.setHours(23,59,59,999) &&
+                        wishlist.products[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                        <=wishlist.products[i].productId.categoryId.offer.endDate.setHours(23,59,59,999)){ %>
+
+                      ₹<%=
+                            wishlist.products[i].productId.offer.discountPercentage>=
+                            wishlist.products[i].productId.categoryId.offer.discountPercentage
+                            ?
+                            wishlist.products[i].productId.price -
+                            Math.round(wishlist.products[i].productId.price*(Number(wishlist.products[i].productId.offer.discountPercentage)/100))
+                            :
+                            wishlist.products[i].productId.price -
+                            Math.round(wishlist.products[i].productId.price*(Number(wishlist.products[i].productId.categoryId.offer.discountPercentage)/100))
+                            %>
+
+                        <% }else if(wishlist.products[i].productId.offer){ %>
+                         ₹<%= wishlist.products[i].productId.offer
+                              && wishlist.products[i].productId.offer.startDate.setHours(0,0,0,0)<=locals.data && locals.data
+                              <=wishlist.products[i].productId.offer.endDate.setHours(23,59,59,999) ? wishlist.products[i].productId.price
+                              -
+                              Math.round(wishlist.products[i].productId.price*(Number(wishlist.products[i].productId.offer.discountPercentage)/100))
+                              : wishlist.products[i].productId.price %>
+                          
+                          <% }else if(wishlist.products[i].productId.categoryId.offer){ %>
+                          ₹<%=
+                                wishlist.products[i].productId.categoryId.offer &&
+                                wishlist.products[i].productId.categoryId.offer.startDate.setHours(0,0,0,0)<=locals.data &&
+                                locals.data <=wishlist.products[i].productId.categoryId.offer.endDate.setHours(23,59,59,999) ?
+                                wishlist.products[i].productId.price -
+                                Math.round(wishlist.products[i].productId.price*(Number(wishlist.products[i].productId.categoryId.offer.discountPercentage)/100))
+                                : wishlist.products[i].productId.price %>
+                           
+                            <% }else{ %>
+                             ₹
+                                <%=wishlist.products[i].productId.price %>
+                              
+                              <% } %>
                   </td>
                   <td>
                     <button class="normal1"

@@ -206,6 +206,22 @@ const verifyCheckout = async (req, res) => {
   try {
     const { selectedPaymentMethod, selectedAddress } = req.body;
 
+    const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
+
+    const shipping =
+      totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
+    const discount = req.session.coupon
+      ? shipping - req.session.coupon.discountAmount
+      : shipping;
+
+    if (discount > 1000 && selectedPaymentMethod === "COD") {
+      req.flash(
+        "message",
+        "Cash On Delivery is not available for orders below ₹1000."
+      );
+      return res.redirect("/checkout");
+    }
+
     if (!selectedAddress) {
       req.flash("message", "please select address");
       return res.redirect("/checkout");
@@ -223,14 +239,6 @@ const verifyCheckout = async (req, res) => {
 
     // decrementing the product quantity
     const cartPro = await decrementProductQuatity(req.session.user._id);
-
-    const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
-
-    const shipping =
-      totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
-    const discount = req.session.coupon
-      ? shipping - req.session.coupon.discountAmount
-      : shipping;
 
     const order = new Order({
       userId: req.session.user._id,

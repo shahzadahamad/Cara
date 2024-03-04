@@ -106,11 +106,11 @@ function addToCart(id, isLogin) {
 }
 
 // add to wishlist
-async function addToWishlist(id) {
-  event.stopPropagation();
+async function addToWishlist(id,i) {
 
-  console.log('fal;sfjlksa')
+  event.stopPropagation();
   try {
+
     const Toast = Swal.mixin({
       toast: true,
       position: "top-end",
@@ -126,6 +126,10 @@ async function addToWishlist(id) {
     const response = await axios.post("/add-to-wishlist", { id });
 
     if (response.data.status) {
+      const wishlist = document.getElementById(`wishlist${i}`);
+
+      wishlist.style.color = 'red';
+
       Toast.fire({
         icon: "success",
         title: "Product Added To Wishlist",

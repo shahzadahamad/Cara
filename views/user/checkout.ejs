@@ -316,9 +316,10 @@
   </section>
 
   <% if( locals.message ){ %>
-    <div style="color: green; text-align: center; margin-top: 30px;" id="hide">
+    <div style="color: red; text-align: center; margin-top: 15px; font-weight: 900;" id="hide">
       <%=message%>
     </div>
+    <br>
     <% } %>
 
       <div id="couponModal" class="modal">
@@ -481,10 +482,10 @@
             <div style=" margin-top: 20px;">
               <% if(locals.total>1000) {%>
                 <input type="radio" name="selectedPaymentMethod" value="COD" id="COD" disabled>
-                <label for="COD">Cash On Delivery</label>
+                <label id="CODlabel" for="COD">Cash On Delivery (Not Available)</label>
                 <% }else{ %>
                   <input type="radio" name="selectedPaymentMethod" value="COD" id="COD">
-                  <label for="COD">Cash On Delivery</label>
+                  <label id="CODlabel" for="COD">Cash On Delivery</label>
                   <% } %>
                     <br><br>
                     <input type="radio" name="selectedPaymentMethod" value="Online" id="Online">
@@ -624,15 +625,23 @@
                 showConfirmButton: false,
                 timer: 800,
               })
-              const discount = document.getElementById('discount')
+              const discount = document.getElementById('discount');
               const discountAmount = document.getElementById('discountAmount');
               const btn = document.getElementById('btn-coupon');
               const totalAmount = document.getElementById('totalAmount');
+              const COD = document.getElementById('COD');
+              const CODlabel = document.getElementById('CODlabel');
               const t = totalAmount.innerHTML.replace('₹','')
               discount.style.display = 'table-row';
               discountAmount.textContent = '-₹' + responce.data.amount;
               totalAmount.innerHTML= '₹' + (Number(t) - responce.data.amount);
-              console.log(totalAmount.innerHTML)
+              if(Number(t) - responce.data.amount >1000){
+                COD.setAttribute('disabled');
+                CODlabel.innerHTML='Cash On Delivery (Not Available)';
+              }else{
+                COD.removeAttribute('disabled');
+                CODlabel.innerHTML='Cash On Delivery';
+              }
               btn.innerHTML = 'Remove'
             }
           }

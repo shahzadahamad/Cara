@@ -2,6 +2,7 @@ const user = require("../../models/userModel");
 const userOTPVerification = require("../../models/userOTPVerificationModel");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
+const Wishlist = require('../../models/wishlistModel');
 const Referral = require('../../models/refferalModel')
 const bcrypt = require("bcrypt");
 const nodeMailer = require("nodemailer");
@@ -23,12 +24,23 @@ const loadHome = async (req, res) => {
   try {
     const productData = await product.find().limit(8).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
     const latestProducts = await product.find().sort({ _id: -1 }).limit(8).populate('offer').populate({path:'categoryId',populate:{path:'offer'}});
-    res.render("home", {
-      login: req.session.user,
-      product: productData,
-      latestProducts: latestProducts,
-      data: new Date(),
-    });
+    if(req.session.user){
+      const existingWishlistPro = await Wishlist.find({userId:req.session.user._id});
+      res.render("home", {
+        login: req.session.user,
+        product: productData,
+        latestProducts: latestProducts,
+        existWishlist: existingWishlistPro[0].products,
+        data: new Date(),
+      });
+    }else{
+      res.render("home", {
+        login: req.session.user,
+        product: productData,
+        latestProducts: latestProducts,
+        data: new Date(),
+      });
+    }
   } catch (error) {
     console.log(error.message);
   }
