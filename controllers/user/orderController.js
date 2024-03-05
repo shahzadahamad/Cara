@@ -29,9 +29,10 @@ const incrementProductQuatity = async (id) => {
 
 const invoice = async (req,res) => {
   try{
-    const {order}=req.body;
+    const {order}=req.query;
     const orderId = await Order.findOne({_id:order}).populate('userId orderItems.productId')
-    res.json({data:orderId});
+    console.log(orderId)
+    res.render('invoice',{order:orderId});
   }catch(error){
     console.log(error.message)
   }

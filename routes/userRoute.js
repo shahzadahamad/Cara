@@ -76,7 +76,7 @@ userRouter.get('/order',auth.isLogin,auth.isBlocked,orderController.loadOrder);
 userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.loadOrderDetials);
 userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
-userRouter.post('/invoice-download',orderController.invoice);
+userRouter.get('/invoice-download',auth.isLogin,auth.isBlocked,orderController.invoice);
 
 // <--------------Checkout Controller-------------->
 const checkoutController = require('../controllers/user/checkoutController');
@@ -88,7 +88,7 @@ userRouter.post('/verify-cart-checkout',checkoutController.verifyCartCheckout)
 userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,checkoutController.loadOrder);  
 userRouter.post('/verify-razorpay',auth.isLogin,auth.isBlocked,checkoutController.verifyRazorpay);
 userRouter.patch('/razorpay-success',auth.isLogin,auth.isBlocked,checkoutController.razorpaySuccess);
-userRouter.post('/coupon',auth.isLogin,auth.isBlocked,checkoutController.verifyCoupon);
+userRouter.post('/coupon',checkoutController.verifyCoupon);
 userRouter.delete('/destory-coupon',checkoutController.deleteSession);
 
 // <--------------Wallet Controller-------------->

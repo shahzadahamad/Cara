@@ -259,7 +259,7 @@
           <% if(order[0].orderStatus === 'Delivered'){ %>
           <button
             style="cursor: pointer; padding: 10px; color: white; background-color: #088178; border:1px solid white; border-radius: 10px;"
-            onclick="downloadInvoice('<%= order[0]._id %>')">Download Invoice</button>
+            onclick="window.location.href='/invoice-download?order=<%= order[0]._id %>'">Invoice</button>
             <br><br>
             <% } %>
           <h4 style="border-bottom: 1px solid black; text-align: center; ">Your Order Status</h4>
@@ -519,68 +519,6 @@
           });
         });
 
-        function base64_encode(imgPath) {
-          let png = f
-        }
-
-        async function downloadInvoice(order) {
-
-          const response = await axios.post('/invoice-download', { order });
-          const data = response.data.data;
-
-          console.log(data)
-
-
-          const products = data.orderItems.map((e, i) => {
-            return ({
-              description: e.productId.name,
-              quantity: e.quantity,
-              price: e.price,
-            })
-          });
-
-          console.log(products)
-
-          const date = data.orderDate.slice(0, 10);
-
-
-          const obj = {
-            apiKey: "M5iCmS6hKzbBiBOneRijlIvzsgFiDwT4rGlce4VGM2gY8BVj43qlseCsKSj8QLuj",
-            images: {
-              logo: "",
-            },
-            sender: {
-              company: "Cara",
-              address: 'Kerala',
-              zip: 676309,
-              city: 'Kochi',
-              country: "India"
-            },
-            client: {
-              company: data.userId.fullname,
-              address: data.deliveryAddress.address,
-              zip: data.deliveryAddress.pincode,
-              city: data.deliveryAddress.city,
-              state: data.deliveryAddress.state,
-              country: "India"
-            },
-            information: {
-              number: data.deliveryAddress.mobile,
-              date: date,
-            },
-            products: products,
-            bottomNotice: "Thank You For Purchasing",
-            settings: {
-              currency: "INR",
-            },
-
-          };
-
-          easyinvoice.createInvoice(obj, function (result) {
-            easyinvoice.download('invoice.pdf');
-          });
-
-        }
 
         function removeAddress(id, i) {
           const div = document.getElementById(`div${i}`);
