@@ -178,7 +178,7 @@ const gettotalRevenue = async (req, res) => {
     const total = await Order.find({});
 
     const dailyRevenue = total.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned) {
+      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         return acc;
@@ -210,7 +210,7 @@ const getDailyData = async (req, res) => {
 
     let count = 0;
     const dailyRevenue = dailyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned) {
+      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -248,7 +248,7 @@ const getWeeklyData = async (req, res) => {
 
     let count = 0;
     const weeklyRevenue = weeklyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned) {
+      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -288,7 +288,7 @@ const getMonthlyData = async (req, res) => {
 
     let count = 0;
     const monthlyRevenue = monthlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned) {
+      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -328,7 +328,7 @@ const getYearlyData = async (req, res) => {
 
     let count = 0;
     const yearlyRevenue = yearlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned) {
+      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -368,6 +368,7 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
+                  { $ne : ["$orderStatus",'Payment Failed']},
                 ],
               },
               "$orderAmount",
@@ -397,6 +398,7 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
+                  { $ne : ["$orderStatus",'Payment Failed']},
                   { $ne: ["$couponApplied", null] },
                 ],
               },
@@ -412,6 +414,8 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
+                  { $ne : ["$orderStatus",'Payment Failed']},
+                  { $ne : ["$orderStatus",'Payment Failed']},
                   { $ne: ["$couponApplied", null] },
                 ],
               },
@@ -482,6 +486,7 @@ const graphDaily = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
+                    { $ne : ["$orderStatus",'Payment Failed']}
                   ],
                 },
                 "$orderAmount",
@@ -541,6 +546,7 @@ const graphMonthly = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
+                    { $ne : ["$orderStatus",'Payment Failed']}
                   ],
                 },
                 "$orderAmount",
@@ -573,9 +579,6 @@ const graphMonthly = async () => {
           cancelledOrReturnedOrders: 1,
         },
       },
-      {
-        $sort: { _id: 1 },
-      },
     ]);
 
     return data;
@@ -598,6 +601,7 @@ const graphYearly = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
+                    { $ne : ["$orderStatus",'Payment Failed']}
                   ],
                 },
                 "$orderAmount",
@@ -629,9 +633,6 @@ const graphYearly = async () => {
           totalRevenue: 1,
           cancelledOrReturnedOrders: 1,
         },
-      },
-      {
-        $sort: { year: 1 },
       },
     ]);
     return data;
@@ -687,6 +688,7 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
+                      { $ne : ["$orderStatus",'Payment Failed']}
                     ],
                   },
                   "$orderAmount",
@@ -716,6 +718,7 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
+                      { $ne : ["$orderStatus",'Payment Failed']},
                       { $ne: ["$couponApplied", null] },
                     ],
                   },
@@ -731,6 +734,7 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
+                      { $ne : ["$orderStatus",'Payment Failed']},
                       { $ne: ["$couponApplied", null] },
                     ],
                   },

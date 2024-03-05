@@ -264,6 +264,56 @@ const razorpaySuccess = async (req, res) => {
   }
 };
 
+// razorpayFalied
+const razorpayFalied = async (req,res) => {
+  try{
+    const { selectedAddress } = req.body;
+    const address = await Address.findOne(
+      { userId: req.session.user._id },
+      { address: { $elemMatch: { _id: selectedAddress } } }
+    );
+
+
+    const cartPro = await cart
+    .findOne({ userId: req.session.user._id }, { products: 1 })
+    .populate("products.productId");
+    const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
+    const shipping =
+      totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
+    const discount = req.session.coupon
+      ? shipping - req.session.coupon.discountAmount
+      : shipping;
+
+      const order = new Order({
+        userId: req.session.user._id,
+        orderAmount: discount,
+        couponId:req.session.coupon ? req.session.coupon._id : null,
+        couponApplied: req.session.coupon
+          ? req.session.coupon.discountAmount
+          : "",
+        deliveryAddress: address.address[0],
+        paymentMethod: "Online",
+        orderItems: cartPro.products,
+        orderStatus: "Payment Failed",
+        orderDate: new Date(),
+      });
+  
+      if (!req.session.coupon) {
+        delete order.couponId;
+        delete order.couponApplied;
+      }
+
+
+    await order.save();
+    await cart.deleteOne({ userId: req.session.user._id });
+    res.send({ status: true });
+
+
+  }catch(error){
+    console.log(error);
+  }
+}
+
 // verifly checkout
 const verifyCheckout = async (req, res) => {
   try {
@@ -387,7 +437,12 @@ const verifyCartCheckout = async (req, res) => {
 // loadOrder page
 const loadOrder = async (req, res) => {
   try {
-    res.render("order", { user: req.session.user });
+    const {falied}=req.query;
+    if(falied){
+      res.render('order',{user:req.session.user,falied:true})
+    }else{
+      res.render("order", { user: req.session.user,falied:false });
+    }
   } catch (error) {
     console.log(error.message);
   }
@@ -404,7 +459,7 @@ const verifyCoupon = async (req, res) => {
       const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
       const total =
         totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
-      if (total <= coupon[0].discountAmount) {
+      if (total <= coupon[0].discountAmount && coupon[0].quantity<=0) {
         return res.json({ status: "Invalied Coupon" });
       }
       req.session.coupon = coupon[0];
@@ -437,4 +492,6 @@ module.exports = {
   razorpay,
   verifyCoupon,
   deleteSession,
+  razorpayFalied,
+  paymentDetials,
 };

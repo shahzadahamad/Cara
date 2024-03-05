@@ -781,8 +781,12 @@
                     },
                   };
                   const razorpay = new Razorpay(options);
-                  razorpay.on('payment.failed', function (response) {
-                    alert('Payment Failed!');
+                  razorpay.on('payment.failed',async function (response) {
+                    const responce = await axios.post('/payment-failed',{selectedAddress});
+                    const data=  responce.data.status
+                    if(data){
+                      window.location.href = '/order-confirm?falied=true/#page-header';
+                    }
                   })
                   razorpay.open();
                 })

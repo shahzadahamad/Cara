@@ -77,6 +77,8 @@ userRouter.get('/order-detials',auth.isLogin,auth.isBlocked,orderController.load
 userRouter.get('/cancel-order',auth.isLogin,auth.isBlocked,orderController.loadCancelPage);
 userRouter.post('/cancel-order',orderController.verifyCancelPage);
 userRouter.get('/invoice-download',auth.isLogin,auth.isBlocked,orderController.invoice);
+userRouter.patch('/repayment',orderController.verifyRepayment);
+userRouter.patch('/repayment-success',orderController.repeymentSuccess);
 
 // <--------------Checkout Controller-------------->
 const checkoutController = require('../controllers/user/checkoutController');
@@ -86,8 +88,9 @@ userRouter.get('/checkout',auth.isLogin,auth.isBlocked,checkoutController.loadCh
 userRouter.post('/checkout',checkoutController.verifyCheckout);
 userRouter.post('/verify-cart-checkout',checkoutController.verifyCartCheckout)
 userRouter.get('/order-confirm',auth.isLogin,auth.isBlocked,checkoutController.loadOrder);  
-userRouter.post('/verify-razorpay',auth.isLogin,auth.isBlocked,checkoutController.verifyRazorpay);
-userRouter.patch('/razorpay-success',auth.isLogin,auth.isBlocked,checkoutController.razorpaySuccess);
+userRouter.post('/verify-razorpay',checkoutController.verifyRazorpay);
+userRouter.patch('/razorpay-success',checkoutController.razorpaySuccess);
+userRouter.post('/payment-failed',checkoutController.razorpayFalied);
 userRouter.post('/coupon',checkoutController.verifyCoupon);
 userRouter.delete('/destory-coupon',checkoutController.deleteSession);
 

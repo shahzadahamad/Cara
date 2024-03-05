@@ -1,5 +1,6 @@
 <%- include('../layouts/header.ejs') -%>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
   <style>
@@ -265,14 +266,20 @@
                     <img style="width: 100px; border-radius: 10px;" onclick="window.location.href='/sproduct?id=<%= order[i].orderItems[j].productId._id %>'" src="/images/productImages/<%= order[i].orderItems[j].productId.image[0] %>" alt="">
                     <% } %>
                 </td>
-                <% if(order[i].orderStatus==='Cancelled' || order[i].orderStatus==='Return Requasted' || order[i].orderStatus==='Returned') {%>
+                <% if(order[i].orderStatus==='Cancelled' || order[i].orderStatus==='Return Requasted' || order[i].orderStatus==='Returned' || order[i].orderStatus==='Payment Failed') {%>
                 <td style="color: red; font-weight: 700;"> <%= order[i].orderStatus %></td>
                 <% } else {%>
                 <td style="color: green; font-weight: 700;"> <%= order[i].orderStatus %></td>
                   <% } %>
+                  <% if(order[i].orderStatus !== 'Payment Failed'){ %>
                 <td>
                   <a style="background-color: green; color: #fff;" class="normal" href="/order-detials?id=<%= order[i]._id  %>">Detials</a>
                 </td>
+                <% }else{ %>
+                  <td>
+                    <a style="background-color: green; color: #fff;" onclick="payAgain('<%= order[i]._id %>')" class="normal">&nbsp;&nbsp;&nbsp;Pay&nbsp;&nbsp;&nbsp;</a>
+                  </td>
+                  <% } %>
               </tr>
               <% } %>
               <% }else{ %>
@@ -350,8 +357,55 @@
         </div>
       </footer>
 
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 
       <script>
+
+
+
+           async function payAgain(orderId){
+            try{
+              const responce = await axios.patch('/repayment',{orderId});
+              const data = responce.data;
+              if(data){
+                const options = {
+                  key: data.key,
+                  amount: data.amount,
+                  currency: 'INR',
+                  name: 'Cara Online Shopping Site',
+                  description: 'Purchase Description add letter',
+                  order_id: data.orderId,
+                  handler: async function (responce) {
+                    try{
+                      const successReponse = await axios.patch('/repayment-success',{transactionId: responce.razorpay_order_id,orderId:orderId});
+                      const data = successReponse.data.status;
+                      if(data){
+                        window.location.href = '/order-confirm/#page-header';
+                      }
+                    }catch(error){
+                      console.log(error.message);
+                    }
+                  },
+                  prefill: {
+                    name: data.cusName,
+                    email: data.cusEmail,
+                    contact: data.cusContact,
+                  },
+                }
+                const razorpay = new Razorpay(options);
+                   razorpay.on('payment.failed',async function (response) {
+                    window.location.href = '/order-confirm?falied=true/#page-header';
+                })
+              razorpay.open();
+              };
+            }catch(error){
+              console.log(error.message);
+            }
+          }
+
+
+
         const logout = document.getElementById('logout');
         logout.addEventListener('click', () => {
           Swal.fire({

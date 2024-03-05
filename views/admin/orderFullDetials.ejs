@@ -172,7 +172,7 @@
               <tr>
                 <th style="text-align: start;">Order Status</th>
 
-                <% if( !order.isCancelled && !order.isReturned ){ %>
+                <% if( !order.isCancelled && !order.isReturned && order.orderStatus!=='Payment Failed' ){ %>
                   <td>
                     <% if(order.orderStatus!=='Return Requasted'){ %>
                     <select onchange="orderStatus('<%= order._id %>')"

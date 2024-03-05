@@ -41,7 +41,7 @@ const loadHome = async (req, res) => {
         login: req.session.user,
         product: productData,
         latestProducts: latestProducts,
-        existWishlist: existingWishlistPro[0].products,
+        existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
         data: new Date(),
       });
     } else {
@@ -94,7 +94,7 @@ const loadShop = async (req, res) => {
           login: req.session.user,
           product: decodedProducts,
           category: categorys,
-          existWishlist: existingWishlistPro[0].products,
+          existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           selectedSearch: value,
           data: new Date(),
         });
@@ -106,7 +106,7 @@ const loadShop = async (req, res) => {
           login: req.session.user,
           product: filltered,
           category: categorys,
-          existWishlist: existingWishlistPro[0].products,
+          existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : falses,
           selectedSearch: nameSearch ? nameSearch : brandSearch,
           data: new Date(),
         });
@@ -121,7 +121,7 @@ const loadShop = async (req, res) => {
           login: req.session.user,
           product: selectedCategory,
           category: categorys,
-          existWishlist: existingWishlistPro[0].products,
+          existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           data: new Date(),
         });
       } else {
@@ -137,7 +137,7 @@ const loadShop = async (req, res) => {
           login: req.session.user,
           product: productData,
           category: categorys,
-          existWishlist: existingWishlistPro[0].products,
+          existWishlist:existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           id: id,
           data: new Date(),
         });
@@ -239,6 +239,7 @@ const loadSearch = async (req, res) => {
       });
       res.send({ products });
     } else {
+      
       const products = await product.find({
         $or: [
           { name: { $regex: data, $options: "i" } },
@@ -283,7 +284,7 @@ const loadSingleProduct = async (req, res) => {
           login: req.session.user,
           sproduct: sproduct,
           related: relatedProduct,
-          existWishlist: existingWishlistPro[0].products,
+          existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           data: new Date(),
         });
       }else{

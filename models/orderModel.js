@@ -8,6 +8,10 @@ const orderSchema = new mongoose.Schema({
   orderAmount:{
     type: Number,
   },
+  couponId:{
+    type:mongoose.Schema.ObjectId,
+    ref:'coupon'
+  },
   couponApplied:{
     type: Number,
     ref:'coupon'
@@ -35,7 +39,7 @@ const orderSchema = new mongoose.Schema({
   }],
   orderStatus:{
     type:String,
-    enum:['Pending','Placed','Shipping','On The Way','Delivered','Cancelled','Returned','Return Requasted'],
+    enum:['Pending','Placed','Shipping','On The Way','Delivered','Cancelled','Returned','Return Requasted','Payment Failed'],
   },
   cancelReason:{
     tyep:String,

@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const loadOrderDetials = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const order = await Order.find({}).populate('userId orderItems.productId deliveryAddress');
+    const order = await Order.find({}).sort({orderDate:-1}).populate('userId orderItems.productId deliveryAddress');
     res.render('orderDetials',{admins:adminData,order:order});
   } catch (error) {
     console.log(error.message);

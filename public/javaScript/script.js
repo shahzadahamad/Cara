@@ -127,7 +127,6 @@ async function addToWishlist(id,i) {
 
     if (response.data.status) {
       const wishlist = document.getElementById(`wishlist${i}`);
-
       wishlist.style.color = 'red';
 
       Toast.fire({
