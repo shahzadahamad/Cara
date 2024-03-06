@@ -318,9 +318,15 @@
   </section>
 
   <section id="pagination" class="section-p1">
-    <a href="#"><i class="fa-solid fa-arrow-left"></i></a>
-    <a href="#">1</a>
-    <a href="#"><i class="fa-solid fa-arrow-right"></i></a>
+    <% if(currentPage !== 1){ %>
+    <a href="/shop?page=<%= currentPage - 1 %>"><i class="fa-solid fa-arrow-left"></i></a>
+    <% } %>
+    <% if(currentPage > 1 || product.length>7 ){ %>
+    <a><%= currentPage %></a>
+    <% } %>
+    <% if(product.length>7){ %>
+    <a href="/shop?page=<%= currentPage + 1 %>"><i class="fa-solid fa-arrow-right"></i></a>
+    <% } %>
   </section>
 
   <section id="newsletter" class="section-p1 section-m1">

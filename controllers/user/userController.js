@@ -83,7 +83,9 @@ const loadShop = async (req, res) => {
   try {
     const categorys = await category.find();
     const { id, nameSearch, brandSearch, results, value } = req.query;
-
+    const page = parseInt(req.query.page) || 1;
+    const limit = 8;
+    const startIndex = (page-1)*limit;
     if (req.session.user) {
       const existingWishlistPro = await Wishlist.find({userId:req.session.user._id});
       if (results) {
@@ -96,6 +98,7 @@ const loadShop = async (req, res) => {
           category: categorys,
           existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           selectedSearch: value,
+          currentPage : page,
           data: new Date(),
         });
       }
@@ -108,13 +111,14 @@ const loadShop = async (req, res) => {
           category: categorys,
           existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : falses,
           selectedSearch: nameSearch ? nameSearch : brandSearch,
+          currentPage : page,
           data: new Date(),
         });
       }
 
       if (id && id !== "allCategory") {
         const selectedCategory = await product
-          .find({ categoryId: id })
+          .find({ categoryId: id }).skip(startIndex).limit(limit)
           .populate("offer")
           .populate({ path: "categoryId", populate: { path: "offer" } });
         return res.render("shop", {
@@ -122,11 +126,12 @@ const loadShop = async (req, res) => {
           product: selectedCategory,
           category: categorys,
           existWishlist: existingWishlistPro[0] ? existingWishlistPro[0].products : false,
+          currentPage : page,
           data: new Date(),
         });
       } else {
         const productData = await product
-          .find()
+          .find().skip(startIndex).limit(limit)
           .populate("offer")
           .populate({
             path: "categoryId",
@@ -139,6 +144,7 @@ const loadShop = async (req, res) => {
           category: categorys,
           existWishlist:existingWishlistPro[0] ? existingWishlistPro[0].products : false,
           id: id,
+          currentPage : page,
           data: new Date(),
         });
       }
@@ -152,6 +158,7 @@ const loadShop = async (req, res) => {
           product: decodedProducts,
           category: categorys,
           selectedSearch: value,
+          currentPage : page,
           data: new Date(),
         });
       }
@@ -163,24 +170,26 @@ const loadShop = async (req, res) => {
           product: filltered,
           category: categorys,
           selectedSearch: nameSearch ? nameSearch : brandSearch,
+          currentPage : page,
           data: new Date(),
         });
       }
 
       if (id && id !== "allCategory") {
         const selectedCategory = await product
-          .find({ categoryId: id })
+          .find({ categoryId: id }).skip(startIndex).limit(limit)
           .populate("offer")
           .populate({ path: "categoryId", populate: { path: "offer" } });
         return res.render("shop", {
           login: req.session.user,
           product: selectedCategory,
           category: categorys,
+          currentPage : page,
           data: new Date(),
         });
       } else {
         const productData = await product
-          .find()
+          .find().skip(startIndex).limit(limit)
           .populate("offer")
           .populate({
             path: "categoryId",
@@ -192,6 +201,7 @@ const loadShop = async (req, res) => {
           product: productData,
           category: categorys,
           id: id,
+          currentPage : page,
           data: new Date(),
         });
       }

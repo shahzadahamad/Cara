@@ -333,7 +333,6 @@ const repeymentSuccess = async (req, res) => {
     const { transactionId, orderId } = req.body;
     const orders = await Order.findOne({ _id: orderId });
     const orderPro = await decrementProductQuatity(orderId);
-    console.log(orderPro.orderProducts)
     await checkout.paymentDetials(
       transactionId,
       orders.userId,
