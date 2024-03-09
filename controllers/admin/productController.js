@@ -2,6 +2,9 @@ const admin = require("../../models/adminModel");
 const multer = require("../../middleware/multer");
 const product = require("../../models/productsModel");
 const category = require("../../models/categoryModel");
+const fs = require('fs');
+const path = require('path');
+const imagePath = path.join(__dirname,'../../public/images/productImages/');
 const mongoose = require("mongoose");
 
 // loadProducts
@@ -191,6 +194,12 @@ const verifyEditImage = async (req, res) => {
   try {
     const file = req.file;
     const { index, id } = req.query;
+    const proImage = await product.findOne({_id:id}); 
+    fs.unlink(imagePath+proImage.image[index],(err)=>{
+      if(err){
+        console.log(err.message);
+      }
+    });
     await product.updateOne(
       { _id: id },
       { $set: { ["image." + index]: file.filename } }
@@ -205,6 +214,14 @@ const verifyEditImage = async (req, res) => {
 const verifyDeleteProduct = async (req, res) => {
   try {
     const id = req.query.id;
+    const proImage = await product.findOne({_id:id});
+    proImage.image.forEach(element => {
+      fs.unlink(imagePath+element,(err)=>{
+        if(err){
+          console.log(err.message);
+        }
+      });
+    });
     const deleteProduct = await product.deleteOne({ _id: id });
     if (deleteProduct) {
       res.send({ deleteProduct });
@@ -224,6 +241,12 @@ const deleteImages = async (req, res) => {
     if (findImage.image.length === 1) {
       return res.json({ status: false });
     }
+
+    fs.unlink(imagePath+findImage.image[i],(err)=>{
+      if(err){
+        console.log(err.message);
+      }
+    });
 
     const imageToRevmove = findImage.image[i];
     await product.updateOne({ _id: id }, { $pull: { image: imageToRevmove } });
