@@ -53,7 +53,8 @@
                 </span>
                 Cara Online Shopping Site
             </div>
-
+             <br>
+            Date : <%= order.orderDate.toString().split(' ').slice(0,4) %>
 
             <div class="invoice-header">
                 <div class="row">
@@ -80,11 +81,15 @@
                     </div>
                 </div>
                 <div class="invoice-date">
-                    <small>Invoice </small>
-                    <div class="date text-inverse m-t-5"><%= order.orderDate %></div> 
+                    <small>Payment Detials</small>
+                    <div class="date text-inverse m-t-5"><%= order.orderDate.toString().split(' ').slice(0,4) %></div> 
                     <div class="invoice-detail">
-                        #<%= order._id %><br>
-                        Online Shopping
+                      OrderId : #<%= payment.orderId %><br>
+                      Payment Amount : <%= order.orderAmount %> <br>
+                      Payment Method : <%= order.paymentMethod %> <br>
+                      <% if(order.paymentMethod==='Online'){ %> 
+                      TransactionId : <%= payment.transactionId %> <br>
+                        <% } %> 
                     </div>
                 </div>
             </div>
@@ -99,26 +104,19 @@
                                 <th>Product</th>
                                 <th class="text-center" width="10%">RATE</th>
                                 <th class="text-center" width="10%">QTY</th>
-                                <% if(order.couponApplied){ %>
-                                <th class="text-center" width="10%">Discount</th>
-                                <% } %>
                                 <th class="text-right" width="20%">LINE TOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
                           <% let subtotal=0 %>
                             <% for(let i=0;i<order.orderItems.length;i++){ %>
-                              <%= subtotal+=order.orderItems[i].price*order.orderItems[i].quantity %>
                             <tr>
                                 <td>
                                     <span class="text-inverse"><%= order.orderItems[i].productId.name %></span><br>
                                 </td>
                                 <td class="text-center">₹ <%= order.orderItems[i].price %></td>
-                                <td class="text-center"><%= order.orderItems[i].quantity %></td>
-                                <% if(order.couponApplied){ %>
-                                <td class="text-center"><%= order.couponApplied %></td>    
-                                <% } %>                       
-                                <td class="text-right"><%= order.orderItems[i].price*order.orderItems[i].quantity %></td>
+                                <td class="text-center"><%= order.orderItems[i].quantity %></td>                      
+                                <td class="text-right">₹ <%= subtotal+= order.orderItems[i].price*order.orderItems[i].quantity %></td>
                             </tr>
                             <% } %>
                         </tbody>

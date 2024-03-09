@@ -3,10 +3,6 @@ const adminRouter = express();
 const auth = require('../middleware/adminAuth');
 const upload = require('../middleware/multer');
 
-// view engine
-adminRouter.set('view engine','ejs');
-adminRouter.set('views','./views/admin');
-
 // <--------------Admin Controller-------------->
 const adminController = require('../controllers/admin/adminController');
 // <--------------Admin Controller-------------->

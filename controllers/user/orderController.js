@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Order = require("../../models/orderModel");
 const Product = require("../../models/productsModel");
+const Payment = require('../../models/paymentModel');
 const Wallet = require("../../models/walletModel");
 const Category = require("../../models/categoryModel");
 const Offer = require("../../models/offerModel");
@@ -118,10 +119,11 @@ const decrementProductQuatity = async (id) => {
 const invoice = async (req, res) => {
   try {
     const { order } = req.query;
+    const payment = await Payment.findOne({orderId: order});
     const orderId = await Order.findOne({ _id: order }).populate(
       "userId orderItems.productId"
     );
-    res.render("invoice", { order: orderId });
+    res.render("invoice", { order: orderId,payment:payment });
   } catch (error) {
     console.log(error.message);
   }
@@ -353,9 +355,12 @@ const repeymentSuccess = async (req, res) => {
     await Order.updateOne(
       { _id: orderId },
       {
-        orderStatus: "Pending",
-        orderItems: orderPro.orderProducts.orderItems,
-        orderAmount: finalAmount,
+        $set:{
+          orderStatus: "Pending",
+          orderItems: orderPro.orderProducts.orderItems,
+          orderAmount: finalAmount,
+          orderDate:new Date(),
+        }
       }
     );
     res.json({ status: true });

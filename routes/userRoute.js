@@ -2,10 +2,6 @@ const express = require('express');
 const userRouter = express();
 const auth = require('../middleware/userAuth');
 
-// viewEngine
-userRouter.set('view engine','ejs');
-userRouter.set('views','./views/user');
-
 // <-------------- User routes-------------->
 
 // <--------------User Controller-------------->

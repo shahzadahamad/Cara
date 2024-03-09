@@ -121,6 +121,7 @@ const loadShop = async (req, res) => {
           .find({ categoryId: id }).skip(startIndex).limit(limit)
           .populate("offer")
           .populate({ path: "categoryId", populate: { path: "offer" } });
+
         return res.render("shop", {
           login: req.session.user,
           product: selectedCategory,

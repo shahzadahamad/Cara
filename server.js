@@ -23,6 +23,9 @@ app.use(
   })
 );
 
+// view engine
+app.set('view engine','ejs');
+
 // morgan
 // app.use(morgan('dev'));
 
@@ -41,11 +44,25 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // userRoutes
 const userRouter = require("./routes/userRoute");
+userRouter.set('views','views/user');
 app.use("/", userRouter);
 
 // adminRoutes
 const adminRouter = require("./routes/adminRoute");
+adminRouter.set('views','views/admin');
 app.use("/admin", adminRouter);
+
+app.set('views','views/error');
+
+//admin error page
+app.use('/admin',(req, res, next) => {
+  res.status(404).render('error',{status:false});
+});
+
+// user error page
+app.use('/',(req, res, next) => {
+  res.status(404).render('error',{status:true});
+});
 
 // serverRunning
 const port = process.env.port || 3000;

@@ -130,12 +130,11 @@
     <div class="tabular--wrapper">
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
 
-        <% if(!locals.selectedSearch){ %>
           <select class="dropdown" onchange="selectedCategory(this)"
             style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
 
             <option id="categorySearch">
-              <%= locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' %>
+              <%= locals.product.length > 0 ?  locals.product[0].categoryId.name ? product[0].categoryId.name : 'All Category' : 'All Category' %>
             </option>
 
 
@@ -151,22 +150,19 @@
                           <option value="<%= category[i]._id %>">
                             <%= category[i].name %>
                           </option>
-                          <% }%>
+                          <% } else {%>
+                            <% if(locals.product.length>0 ? locals.product[0].categoryId.name !==category[i].name : locals.selectedSearch  ){ %>
+                            <option value="<%= category[i]._id %>">
+                              <%= category[i].name %>
+                            </option>
+                            <% } %>
+                            <% } %>
                             <% } %>
                               <% } else { %>
                                 <option>No Category</option>
                                 <% } %>
           </select>
-          <% }else{ %>
-            <select class="dropdown"
-              style="color: #fff; background-color: #088178; border-radius: 10px; border: 0; font-size: 18px; padding: 10px;outline: 0px;">
-              <option>Sort By</option>
-              <option>Aa to Zz</option>
-              <option>Zz to Aa</option>
-              <option>Low to High</option>
-              <option>Hign to Low</option>
-            </select>
-            <% } %>
+
               <form action="/shop-search" method="post">
                 <div class="search--box">
 
@@ -405,7 +401,7 @@
     async function search() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
       const searchResults = document.getElementById('searchResults');
-      const categorySearch = document.getElementById('categorySearch').value;
+      const categorySearch = document.getElementById('categorySearch');
      
 
       //clear previous search results
@@ -419,7 +415,7 @@
 
 
       try {
-        const response = await fetch(`/search?data=${searchInput}&categorys=${categorySearch}`);
+        const response = await fetch(`/search?data=${searchInput}&categorys=${categorySearch ? categorySearch.value : false}`);
         const data = await response.json();
 
         data.products.forEach(element => {

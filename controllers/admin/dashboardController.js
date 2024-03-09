@@ -288,7 +288,7 @@ const getMonthlyData = async (req, res) => {
 
     let count = 0;
     const monthlyRevenue = monthlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
+      if (!order.isCancelled && !order.isReturned && order.orderStatus!=='Payment Failed') {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -478,7 +478,7 @@ const graphDaily = async () => {
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
-          totalOrders: { $sum: 1 },
+          totalOrders: {$sum: { $cond: { if: { $ne: ["$orderStatus", "Payment Failed"] }, then: 1, else: 0 } }},
           totalRevenue: {
             $sum: {
               $cond: [
@@ -579,6 +579,11 @@ const graphMonthly = async () => {
           cancelledOrReturnedOrders: 1,
         },
       },
+      {
+        $sort:{
+          date:1
+        }
+      }
     ]);
 
     return data;
@@ -634,6 +639,11 @@ const graphYearly = async () => {
           cancelledOrReturnedOrders: 1,
         },
       },
+      {
+        $sort:{
+          date:1
+        }
+      }
     ]);
     return data;
   } catch (error) {
@@ -649,7 +659,6 @@ const verifyDashboard = async (req, res) => {
       const data = await graphDaily();
       res.send({ data, type });
     } else if (type === "Monthly") {
-      console.log("in");
       const data = await graphMonthly();
       res.send({ data, type });
     } else if (type === "Yearly") {
@@ -777,9 +786,9 @@ const custsomMonthYearWeekDaily = async (data) => {
           totalCouponValue: 0,
         }
       );
-
-
       return { result, data };
+    }else{
+      return {error:true};
     }
   } catch (error) {
     console.log(error.message);
@@ -804,6 +813,9 @@ const loadCustomSalesReport = async (req, res) => {
 
     if (data) {
       const result = await custsomMonthYearWeekDaily(data);
+      if(result.error){
+        return res.render('error');
+      }
       return res.render("CustomSaleReport", {
         admins: adminData,
         info: { customReport: result.result },
