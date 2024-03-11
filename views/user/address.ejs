@@ -224,7 +224,7 @@
 
 
       <section id="user-detials">
-        <% if(locals.address.address.length>0){ %>
+        <% if(locals.address && locals.address.address.length>0){ %>
           <% for(let i=0 ; i<address.address.length;i++){%>
             <div id="div<%= i %>" style="margin-bottom: 30px;" class="user-detials-container">
               <div id="p">

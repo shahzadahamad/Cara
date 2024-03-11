@@ -159,6 +159,7 @@ const loadCheckout = async (req, res) => {
       total: totalCart[0].total,
       data: new Date(),
       message,
+      couponApplied: req.session.coupon ? req.session.coupon : false,
       coupons,
     });
   } catch (error) {
@@ -448,6 +449,7 @@ const loadOrder = async (req, res) => {
   }
 };
 
+// verifying coupon
 const verifyCoupon = async (req, res) => {
   try {
     const { inputVal } = req.body;
@@ -472,10 +474,12 @@ const verifyCoupon = async (req, res) => {
   }
 };
 
+// delteing coupon Session
 const deleteSession = async (req, res) => {
   try {
     delete req.session.coupon;
-    res.json({ status: true });
+    const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
+    res.json({ status: true, total:totalCart[0].total<500 ? totalCart[0].total+40 : totalCart[0].total  });
   } catch (error) {
     console.log(error);
   }

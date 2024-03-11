@@ -184,7 +184,7 @@
   <section style="padding: 0px 40px;" id="product1" class="section-p1">
     <% if(!locals.selectedSearch){ %>
       <h4 class="h4-category">
-        <%= locals.product[0].categoryId.name ? locals.product[0].categoryId.name : 'All Category' %>
+        <%= locals.product.length>0 && locals.product[0].categoryId.name ? locals.product[0].categoryId.name : 'All Category' %>
       </h4>
       <% }else{ %>
         <h4 class="h4-category">

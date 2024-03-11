@@ -356,8 +356,8 @@
             id="errorMsg"></p>
           <div>
             <form>
-              <input type="text" id="inputVal" placeholder="Enter Your Coupon Code">
-              <button class="normal" id="btn-coupon" onclick="CouponApply()">Apply</button>
+              <input type="text" id="inputVal" <%= locals.couponApplied ? 'disabled' : '' %> value="<%= locals.couponApplied ? couponApplied.couponCode : '' %>" placeholder="Enter Your Coupon Code">
+              <button class="normal" id="btn-coupon" onclick="CouponApply()"><%= locals.couponApplied ? 'Remove' : 'Apply' %></button>
             </form>
             <br>
             <a style="padding: 8px;" class="style" id="openModalBtn">Show Coupon</a>
@@ -485,7 +485,7 @@
 
                                     <% }else{ %>
                                       ₹
-                                      <%=product.products[i].productId.price %>
+                                      <%= product.products[i].productId.price %>
 
                                         <% } %>
                       </td>
@@ -503,15 +503,22 @@
                             <%= total<500? '₹40' : 'Free' %>
                           </td>
                         </tr>
-                        <tr style="display: none;" id="discount">
+                        <% if(locals.couponApplied){ %>
+                        <tr id="discount">
+                          <td data-label="Product">Discount</td>
+                          <td data-label="Total" id="discountAmount">-₹<%= couponApplied.discountAmount %>
+                          </td>
+                        </tr>
+                        <% }else{ %>
+                          <tr style="display: none;" id="discount">
                           <td data-label="Product">Discount</td>
                           <td data-label="Total" id="discountAmount">
                           </td>
                         </tr>
+                          <% } %>
                         <tr>
                           <td style="font-weight: 700;" data-label="Product">Total</td>
-                          <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹
-                            <%=total<500?total+40:total%>
+                          <td style="font-weight: 700;" id="totalAmount" data-label="Total">₹<%= locals.couponApplied ? total<500?total+40 - couponApplied.discountAmount : total-couponApplied.discountAmount : total<500?total+40:total%>
                           </td>
                         </tr>
               </tbody>
@@ -613,14 +620,14 @@
 
       <script>
 
-        window.addEventListener('load', () => {
-          axios.delete('/destory-coupon');
-        })
 
         async function CouponApply() {
           event.preventDefault();
           const errorMsg = document.getElementById('errorMsg');
           const inputVal = document.getElementById('inputVal').value;
+          const totalAmount = document.getElementById('totalAmount');
+          const inputVal1 = document.getElementById('inputVal');
+          const btn = document.getElementById('btn-coupon');
           if (inputVal === '') {
             errorMsg.style.display = 'block'
             errorMsg.innerHTML = 'Enter a Code'
@@ -645,8 +652,15 @@
                     icon: "success",
                     timer: 800,
                     showConfirmButton: false
-                  }).then(() => {
-                    window.location.reload();
+                  }).then( async () => {
+                    const responce1 = await axios.delete('/destory-coupon');
+                    if(responce1.data.status){
+                      console.log(responce1.data.total)
+                      totalAmount.innerHTML = '₹' + responce1.data.total;
+                      inputVal1.removeAttribute('disabled');
+                      inputVal1.value=''
+                      btn.innerHTML='Apply'
+                    }
                   })
                 }
               });
@@ -659,6 +673,7 @@
               errorMsg.style.display = 'block';
               errorMsg.innerText = 'Coupon Applied';
               errorMsg.style.color = 'green';
+              inputVal1.setAttribute('disabled', 'disabled');
               Swal.fire({
                 icon: 'success',
                 title: 'Coupon Applied!',
@@ -667,8 +682,6 @@
               })
               const discount = document.getElementById('discount');
               const discountAmount = document.getElementById('discountAmount');
-              const btn = document.getElementById('btn-coupon');
-              const totalAmount = document.getElementById('totalAmount');
               const COD = document.getElementById('COD');
               const CODlabel = document.getElementById('CODlabel');
               const t = totalAmount.innerHTML.replace('₹', '')
