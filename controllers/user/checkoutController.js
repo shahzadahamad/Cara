@@ -259,6 +259,7 @@ const razorpaySuccess = async (req, res) => {
     await order.save();
 
     await cart.deleteOne({ userId: req.session.user._id });
+    delete req.session.coupon;
     res.send({ status: true });
   } catch (error) {
     console.log(error.message);
@@ -389,6 +390,7 @@ const verifyCheckout = async (req, res) => {
 
       await order.save();
       await cart.deleteOne({ userId: req.session.user._id });
+      delete req.session.coupon;
       res.redirect("/order-confirm/#page-header");
     } else if (selectedPaymentMethod === "Wallet") {
       const balaceWallat = await Wallet.findOne({
@@ -418,6 +420,7 @@ const verifyCheckout = async (req, res) => {
         );
         await order.save();
         await cart.deleteOne({ userId: req.session.user._id });
+        delete req.session.coupon;
         res.redirect("/order-confirm/#page-header");
       }
     }
