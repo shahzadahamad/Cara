@@ -86,13 +86,12 @@ const decrementProductQuatity = async (id) => {
       let productPriceFinal = productPrice;
 
       const price = productPriceFinal;
- 
-       await cart.updateOne(
+
+      await cart.updateOne(
         { userId: id, "products._id": product._id },
         { $set: { "products.$.price": price } }
       );
     }
-    
 
     const cartProducts = await cart
       .findOne({ userId: id }, { products: 1 })
@@ -131,37 +130,42 @@ const paymentDetials = async (
 // checkout
 const loadCheckout = async (req, res) => {
   try {
-    const coupons = await Coupon.find({});
-    const address = await Address.findOne({ userId: req.session.user._id });
-    const products = await cart
-      .findOne({ userId: req.session.user._id })
-      .populate({
-        path: "products.productId",
-        populate: {
-          path: "offer",
-        },
-      })
-      .populate({
-        path: "products.productId",
-        populate: {
-          path: "categoryId",
+    const cartPro = await cart.findOne({ userId: req.session.user._id });
+    if (cartPro) {
+      const coupons = await Coupon.find({});
+      const address = await Address.findOne({ userId: req.session.user._id });
+      const products = await cart
+        .findOne({ userId: req.session.user._id })
+        .populate({
+          path: "products.productId",
           populate: {
             path: "offer",
           },
-        },
+        })
+        .populate({
+          path: "products.productId",
+          populate: {
+            path: "categoryId",
+            populate: {
+              path: "offer",
+            },
+          },
+        });
+      const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
+      const message = req.flash("message");
+      res.render("checkout", {
+        user: req.session.user,
+        address: address,
+        product: products,
+        total: totalCart[0].total,
+        data: new Date(),
+        message,
+        couponApplied: req.session.coupon ? req.session.coupon : false,
+        coupons,
       });
-    const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
-    const message = req.flash("message");
-    res.render("checkout", {
-      user: req.session.user,
-      address: address,
-      product: products,
-      total: totalCart[0].total,
-      data: new Date(),
-      message,
-      couponApplied: req.session.coupon ? req.session.coupon : false,
-      coupons,
-    });
+    } else {
+      res.redirect('/cart');
+    }
   } catch (error) {
     console.log(error.message);
   }
@@ -267,18 +271,17 @@ const razorpaySuccess = async (req, res) => {
 };
 
 // razorpayFalied
-const razorpayFalied = async (req,res) => {
-  try{
+const razorpayFalied = async (req, res) => {
+  try {
     const { selectedAddress } = req.body;
     const address = await Address.findOne(
       { userId: req.session.user._id },
       { address: { $elemMatch: { _id: selectedAddress } } }
     );
 
-
     const cartPro = await cart
-    .findOne({ userId: req.session.user._id }, { products: 1 })
-    .populate("products.productId");
+      .findOne({ userId: req.session.user._id }, { products: 1 })
+      .populate("products.productId");
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
     const shipping =
       totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
@@ -286,35 +289,32 @@ const razorpayFalied = async (req,res) => {
       ? shipping - req.session.coupon.discountAmount
       : shipping;
 
-      const order = new Order({
-        userId: req.session.user._id,
-        orderAmount: discount,
-        couponId:req.session.coupon ? req.session.coupon._id : null,
-        couponApplied: req.session.coupon
-          ? req.session.coupon.discountAmount
-          : "",
-        deliveryAddress: address.address[0],
-        paymentMethod: "Online",
-        orderItems: cartPro.products,
-        orderStatus: "Payment Failed",
-        orderDate: new Date(),
-      });
-  
-      if (!req.session.coupon) {
-        delete order.couponId;
-        delete order.couponApplied;
-      }
+    const order = new Order({
+      userId: req.session.user._id,
+      orderAmount: discount,
+      couponId: req.session.coupon ? req.session.coupon._id : null,
+      couponApplied: req.session.coupon
+        ? req.session.coupon.discountAmount
+        : "",
+      deliveryAddress: address.address[0],
+      paymentMethod: "Online",
+      orderItems: cartPro.products,
+      orderStatus: "Payment Failed",
+      orderDate: new Date(),
+    });
 
+    if (!req.session.coupon) {
+      delete order.couponId;
+      delete order.couponApplied;
+    }
 
     await order.save();
     await cart.deleteOne({ userId: req.session.user._id });
     res.send({ status: true });
-
-
-  }catch(error){
+  } catch (error) {
     console.log(error);
   }
-}
+};
 
 // verifly checkout
 const verifyCheckout = async (req, res) => {
@@ -441,11 +441,11 @@ const verifyCartCheckout = async (req, res) => {
 // loadOrder page
 const loadOrder = async (req, res) => {
   try {
-    const {falied}=req.query;
-    if(falied){
-      res.render('order',{user:req.session.user,falied:true})
-    }else{
-      res.render("order", { user: req.session.user,falied:false });
+    const { falied } = req.query;
+    if (falied) {
+      res.render("order", { user: req.session.user, falied: true });
+    } else {
+      res.render("order", { user: req.session.user, falied: false });
     }
   } catch (error) {
     console.log(error.message);
@@ -464,7 +464,7 @@ const verifyCoupon = async (req, res) => {
       const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
       const total =
         totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
-      if (total <= coupon[0].discountAmount && coupon[0].quantity<=0) {
+      if (total <= coupon[0].discountAmount && coupon[0].quantity <= 0) {
         return res.json({ status: "Invalied Coupon" });
       }
       req.session.coupon = coupon[0];
@@ -482,7 +482,11 @@ const deleteSession = async (req, res) => {
   try {
     delete req.session.coupon;
     const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
-    res.json({ status: true, total:totalCart[0].total<500 ? totalCart[0].total+40 : totalCart[0].total  });
+    res.json({
+      status: true,
+      total:
+        totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total,
+    });
   } catch (error) {
     console.log(error);
   }

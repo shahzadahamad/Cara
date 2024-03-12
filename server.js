@@ -61,7 +61,7 @@ app.use('/admin',(req, res, next) => {
 
 // user error page
 app.use('/',(req, res, next) => {
-  res.status(404).render('error',{status:true});
+  res.status(404).render('error',{login: req.session.user,status:true});
 });
 
 // serverRunning

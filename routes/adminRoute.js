@@ -8,6 +8,8 @@ const adminController = require('../controllers/admin/adminController');
 // <--------------Admin Controller-------------->
 
 adminRouter.get('/',auth.isLogout,adminController.loadLogin);
+adminRouter.get('/profile',auth.isLogin,adminController.loadProfile);
+adminRouter.patch('/editprofile',upload.single('img'),adminController.editprofile);
 adminRouter.post('/login',auth.isLogout,adminController.verifyLogin);
 adminRouter.get('/logout',auth.isLogin,adminController.adminLogout);
 

@@ -7,6 +7,9 @@ const Order = require('../../models/orderModel');
 const Payment = require('../../models/paymentModel');
 const refund = require('../../controllers/user/orderController');
 const bcrypt = require("bcrypt");
+const fs = require('fs')
+const path = require('path')
+const imagePath = path.join(__dirname,'../../public/images/productImages/');
 const mongoose = require('mongoose');
 
 // hashPassword
@@ -35,6 +38,40 @@ const loadLogin = (req, res) => {
     console.log(error.message);
   }
 };
+
+// loading admin profile
+const loadProfile = async (req,res) => {
+  try{
+    const adminData = await admin.findById({ _id: req.session.admin_id });
+    res.render('profile',{admins:adminData})
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// editing admin profile
+const editprofile = async (req,res) => {
+  try{
+    const {username,password,filename}=req.query;
+    const file = req.file;
+    if(file){
+      fs.unlink(imagePath+filename,(err)=>{
+        if(err){
+          console.log(err.message);
+        }
+      })
+    };
+    const data = await admin.findOne({_id: req.session.admin_id});
+    if(password){
+      const spassword = await securePassword(password);
+      await admin.updateOne({_id: req.session.admin_id},{$set:{username:username,password:spassword,profile: file ? file.filename : filename}});
+    }else{
+      await admin.updateOne({_id: req.session.admin_id},{$set:{username:username,profile: file ? file.filename : filename}});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+}
 
 // verifyLogin
 const verifyLogin = async (req, res) => {
@@ -79,4 +116,6 @@ module.exports = {
   loadLogin,
   verifyLogin,
   adminLogout,
+  loadProfile,
+  editprofile,
 };
