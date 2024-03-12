@@ -229,14 +229,13 @@
     <div id="editModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Edit Profile</h2>
+        <h2 style="font-weight: 900;">Edit Profile</h2>
         <div class="profile-img" onclick="triggerFileInput()">
           <img id="profilePreview" src="/images/productImages/<%= admins.profile %>" alt="Admin Profile Picture">
           <div class="text-overlay">Change Image</div>
           <input type="file" accept="image/*" id="profileImageInput" style="display: none;" onchange="previewImage()">
-          <br>
-          <p style="margin: 0px; display: none;" id="errMsg"></p>
         </div>
+        <p style="margin: 0px; display: none; color: red;" id="errMsg"></p>
         <input type="text" placeholder="Username" value="<%= admins.username %>" class="input-field" id="usernameInput">
         <input type="password" placeholder="Set New Password" class="input-field" id="passwordInput">
         <button onclick="saveChanges('<%= admins.profile %>')" class="edit-button-modal">Save Changes</button>
