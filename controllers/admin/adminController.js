@@ -54,6 +54,14 @@ const editprofile = async (req,res) => {
   try{
     const {username,password,filename}=req.query;
     const file = req.file;
+    if(!username){
+      return res.json({msg:'username required'});
+    }
+    if(password){
+      if(password.length<8){
+        return res.json({msg:'password length should be 8 or more'});
+      }
+    }
     if(file){
       fs.unlink(imagePath+filename,(err)=>{
         if(err){
@@ -65,8 +73,10 @@ const editprofile = async (req,res) => {
     if(password){
       const spassword = await securePassword(password);
       await admin.updateOne({_id: req.session.admin_id},{$set:{username:username,password:spassword,profile: file ? file.filename : filename}});
+      res.json({status:true})
     }else{
       await admin.updateOne({_id: req.session.admin_id},{$set:{username:username,profile: file ? file.filename : filename}});
+      res.json({status:true})
     }
   }catch(error){
     console.log(error.message);
