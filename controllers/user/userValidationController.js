@@ -93,7 +93,7 @@ const loadLogin = (req, res) => {
 // verifyLogin
 const verifyLogin = async (req, res) => {
   try {
-    const email = req.body.email;
+    const email = req.body.email.trim();
     const password = req.body.password;
     const userData = await user.findOne({ email: email });
 

@@ -86,7 +86,7 @@ const editprofile = async (req,res) => {
 // verifyLogin
 const verifyLogin = async (req, res) => {
   try {
-    const username = req.body.username;
+    const username = req.body.username.trim();
     const password = req.body.password;
 
     const adminData = await admin.findOne({ username: username });
