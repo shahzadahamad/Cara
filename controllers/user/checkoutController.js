@@ -310,6 +310,7 @@ const razorpayFalied = async (req, res) => {
 
     await order.save();
     await cart.deleteOne({ userId: req.session.user._id });
+    delete req.session.coupon;
     res.send({ status: true });
   } catch (error) {
     console.log(error);
