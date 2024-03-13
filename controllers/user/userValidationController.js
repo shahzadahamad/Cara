@@ -152,17 +152,31 @@ const verifySignUp = async (req, res) => {
       return res.redirect("/signup");
     }
 
-    // const strongPasswordRegex =/^(?=.\d)(?=.[a-z])(?=.[A-Z])(?=.[!@#$%^&()_+}{":;'?/>.<,])(?=.[^\s]).{8,}$/;
-    // if (strongPasswordRegex.test(password)) {
-    // }else{
-    //   req.flash("message", "Week Password");
-    //   return res.redirect("/signup");
-    // }
+    if(email.endsWith('.com')){
+    }else{
+      req.flash('message','Enter a Proper Email');
+      return res.redirect('/signup')
+    }
+
+    if(mobile.length>10 || /\D/.test(mobile)){
+      req.flash('message','Enter a Proper Mobile Number');
+      return res.redirect('/signup');
+    }
+
+    if(password.includes(' ') || cpassword.includes(' ')){
+      req.flash('message','Password cannot cantain white spaces');
+      return res.redirect('/signup');
+    };
+
+    if(password.length < 8){
+      req.flash('message','Password length should be 8 or more');
+      return res.redirect('/signup');
+    }
 
     const addUser = new user({
-      fullname: name,
+      fullname: name.trim(),
       email: email,
-      mobile: mobile,
+      mobile: mobile.trim(),
       password: password,
       createdDate: new Date(),
       isBlocked: false,
