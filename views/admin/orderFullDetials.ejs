@@ -208,14 +208,22 @@
               <tr>
                 <th style="text-align: start;">Order Date</th>
                 <td>
-                  <%= order.orderDate %>
+                  <%= order.orderDate.toString().split(' ').slice(0,4) %>
                 </td>
               </tr>
               <% if(locals.order.cancelDate){ %>
                 <tr>
                   <th style="text-align: start;">Cancel Date</th>
                   <td>
-                    <%= order.cancelDate %>
+                    <%= order.cancelDate.toString().split(' ').slice(0,4) %>
+                  </td>
+                </tr>
+                <% } %>
+              <% if(locals.order.returnedDate){ %>
+                <tr>
+                  <th style="text-align: start;">Returned Date</th>
+                  <td>
+                    <%= order.returnedDate.toString().split(' ').slice(0,4) %>
                   </td>
                 </tr>
                 <% } %>

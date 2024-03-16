@@ -25,6 +25,7 @@ const loadOrderFullDetials= async (req, res) => {
     res.render('orderFullDetials',{admins:adminData,order:order});
   } catch (error) {
     console.log(error.message);
+    res.render('error')
   }
 };
 
@@ -54,7 +55,7 @@ const editOrderStatus = async (req,res) => {
         const update = {
           orderStatus:select,
           isReturned:true,
-          returedDate:new Date,
+          returnedDate:new Date,
         }
         await Order.updateOne({ _id: id }, { $set: update });
         await refund.incrementProductQuatity(id);
@@ -75,7 +76,6 @@ const editOrderStatus = async (req,res) => {
     console.log(error.message);
   }
 };
-
 
 module.exports = {
   loadOrderDetials,

@@ -153,7 +153,7 @@ const verifyCheckoutAddAddress = async (req, res) => {
         { $push: { address: update } }
       );
 
-        req.flash("message", "Address Added");
+        req.flash("message1", "Address Added");
         res.redirect("/checkout");
 
     } else {
@@ -164,7 +164,7 @@ const verifyCheckoutAddAddress = async (req, res) => {
 
       await addAddress.save();
  
-        req.flash("message", "Address Added");
+        req.flash("message1", "Address Added");
         res.redirect("/checkout");
       
     }

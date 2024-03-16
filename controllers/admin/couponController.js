@@ -12,6 +12,10 @@ const validation = (couponCode,discount,expire,discription,quantity) => {
     return "Invalid coupon code format" 
   }
 
+  if(discount>200){
+    return "Minimun discount amount is 200";
+  }
+
   const discountValue = parseFloat(discount);
   if(isNaN(discountValue) || discountValue<=0){
     return "Dicount must be a positive number" 

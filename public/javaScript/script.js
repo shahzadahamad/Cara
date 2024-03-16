@@ -81,13 +81,6 @@ function addToCart(id, isLogin) {
     },
   });
 
-  if (isLogin) {
-    Toast.fire({
-      icon: "success",
-      title: "Product Added To Cart",
-    });
-  }
-
   event.stopPropagation();
   fetch(`/add-to-cart?id=${id}`, {
     method: "POST",
@@ -98,9 +91,31 @@ function addToCart(id, isLogin) {
   })
     .then((res) => res.json())
     .then((data) => {
-      if (!data.status) {
+      if (!isLogin) {
         window.location.href = "/login";
       }
+
+      if(data.exist){
+        Toast.fire({
+          icon: "error",
+          title: "Product exist In Cart",
+        });
+      }
+
+      if(data.outOfStock){
+        Toast.fire({
+          icon: "error",
+          title: "Out Of Stock",
+        });
+      }
+
+      if(data.status){
+        Toast.fire({
+          icon: "success",
+          title: "Product Added To Cart",
+        });
+      }
+
     })
     .catch((error) => console.log(error.message));
 }

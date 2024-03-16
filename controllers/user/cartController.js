@@ -36,6 +36,7 @@ const totalCartPrice = async (id, req, res) => {
           }
         }
 
+
         if (productDetails.categoryId) {
           const category = await Category.findById(productDetails.categoryId);
           if (category.offer) {
@@ -129,29 +130,22 @@ const verifyAddToCart = async (req, res) => {
       });
 
       if (existingProduct) {
-        if (productQ.quantity === 0) {
-          await cart.updateOne(
-            { userId: req.session.user._id, "products.productId": id },
-            { $set: { "products.$.quantity": productQ.quantity } }
-          );
-        } else {
-          await cart.updateOne(
-            { userId: req.session.user._id, "products.productId": id },
-            { $inc: { "products.$.quantity": 1 } }
-          );
-        }
-        res.send({ status: "received" });
+        // const find = existingProduct.products.find(obj => obj.productId.equals(new mongoose.Types.ObjectId(id)));
+        // if(productQ.quantity<=find.quantity){
+        //   return res.json({outOfStock:true});
+        // }
+        // if (productQ.quantity === 0) {
+        //   return res.json({outOfStock:true});
+        // } else {
+        //   await cart.updateOne(
+        //     { userId: req.session.user._id, "products.productId": id },
+        //     { $inc: { "products.$.quantity": 1 } }
+        //   );
+        // }
+        res.send({ exist:true });
       } else {
         if (productQ.quantity === 0) {
-          await cart.updateOne(
-            { userId: req.session.user._id },
-            {
-              $addToSet: {
-                products: { productId: id, quantity: productQ.quantity },
-              },
-            },
-            { upsert: true }
-          );
+          return res.json({outOfStock:true});
         } else {
           await cart.updateOne(
             { userId: req.session.user._id },

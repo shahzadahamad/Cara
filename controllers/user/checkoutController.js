@@ -153,6 +153,7 @@ const loadCheckout = async (req, res) => {
         });
       const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
       const message = req.flash("message");
+      const message1 = req.flash('message1')
       res.render("checkout", {
         user: req.session.user,
         address: address,
@@ -160,6 +161,7 @@ const loadCheckout = async (req, res) => {
         total: totalCart[0].total,
         data: new Date(),
         message,
+        message1,
         couponApplied: req.session.coupon ? req.session.coupon : false,
         coupons,
       });
