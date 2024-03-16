@@ -53,6 +53,7 @@ const addressController = require('../controllers/user/addressController');
 
 userRouter.get('/address',auth.isLogin,auth.isBlocked,addressController.loadAddress);
 userRouter.get('/add-address',auth.isLogin,auth.isBlocked,addressController.loadAddAddress);
+userRouter.patch('/add-address-check',addressController.checkAddress);
 userRouter.post('/add-address',addressController.verifyAddAddress);
 userRouter.get('/checkout-add-address',auth.isLogin,auth.isBlocked,addressController.loadCheckoutAddAddress);
 userRouter.post('/checkout-add-address',addressController.verifyCheckoutAddAddress);

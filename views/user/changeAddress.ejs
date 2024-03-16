@@ -232,10 +232,17 @@
 
         <form action="/change-add-address" method="post">
           <br>
-          <div style="display: flex; justify-content: center; margin-top: 0px;">
-            <a style="  background-color: #088178; color: #fff;"  id="alert"
-              onclick="window.location.href='/change-add-address'" class="normal">Add New Address</a>
-          </div>
+          <% if(locals.address && address.address.length>=3){ %>
+            <div style="display: none; justify-content: center; margin-top: 0px;">
+              <a style="  background-color: #088178; color: #fff;"  id="alert"
+                onclick="window.location.href='/change-add-address'" class="normal">Add New Address</a>
+            </div>
+            <% }else{ %>
+              <div style="display: flex; justify-content: center; margin-top: 0px;">
+                <a style="  background-color: #088178; color: #fff;"  id="alert"
+                  onclick="window.location.href='/change-add-address'" class="normal">Add New Address</a>
+              </div>
+              <% } %>
         </form>
 
     <section id="user-detials">

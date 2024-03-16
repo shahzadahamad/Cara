@@ -1,5 +1,12 @@
 <%- include('../layouts/header.ejs') -%>
 
+
+  <!-- jQuery UI CSS -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <!-- DataTables jQuery UI CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.jqueryui.min.css">
+  <!-- DataTables Scroller jQuery UI CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/scroller/2.1.1/css/scroller.jqueryui.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
@@ -240,7 +247,6 @@
     /* Form styles */
     form {
       margin-top: 20px;
-      border: 1px solid black;
       padding: 20px;
     }
 
@@ -381,28 +387,42 @@
         <div class="modal-content">
           <span class="close" onclick="closeTransactionsModal()">&times;</span>
           <h2>Transactions</h2>
-            <% if(locals.wallet && wallet.transactions && wallet.transactions.length>0){ %>
-              <% for(let i=0;i<wallet.transactions.length;i++){ %>
           <form id="transactionsForm">
-            <div>
-              <label for="credit"><span style="font-weight: 600;">Type</span> : <span style="font-weight: 500;"><%= wallet.transactions[i].type %></span></label>
-            </div>
-            <div>
-              <label for="amount"><span style="font-weight: 600;">Amount</span> : <span style="font-weight: 700; color: <%= wallet.transactions[i].type === 'Credit' ? 'green' : 'red' %>;"><%= wallet.transactions[i].type === 'Credit' ? "+"+wallet.transactions[i].amount : "-"+wallet.transactions[i].amount %></span></label>
-            </div>
-            <div>
-              <label for="reason"><span style="font-weight: 600;">Reason</span> : <span style="font-weight: 500;"><%= wallet.transactions[i].reason %></span></label>   
-            </div>
-            <div>
-              <label for="transactionDate"><span style="font-weight: 600;">Transaction Date</span> : <span style="font-weight: 500;"><%= wallet.transactions[i].transactionDate.toString().split(' ').slice(0,4) %></span></label>
-            </div>
+            <table id="userTable" style="text-align: center;">
+              <thead>
+                <tr>
+                  <th>type</th>
+                  <th>Amount</th>
+                  <th>Reason</th>
+                  <th>TransactionDate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if(locals.wallet && wallet.transactions && wallet.transactions.length>0){ %>
+                  <% for(let i=0;i<wallet.transactions.length;i++){ %>
+                <tr>
+                  <td>
+                    <%= wallet.transactions[i].type %>
+                  </td>
+                  <td>
+                    <%= wallet.transactions[i].amount %>
+                  </td>
+                  <td>
+                    <%= wallet.transactions[i].reason %>
+                  </td>
+                  <td>
+                    <%= wallet.transactions[i].transactionDate.toString().split(' ').slice(0,4) %>
+                   </td>
+                 </tr>
+                 <% } %>
+                 <% } else { %>
+                   <tr>
+                     <td colspan="4">No Transaction Found</td>
+                   </tr>
+                   <% } %>
+              </tbody>
+           </table>
           </form>
-            <% } %>
-            <% }else{ %>
-              <div>
-                <label for="">No Transaction Found</label>
-              </div>
-              <% } %>
         </div>
       </div>
 
@@ -470,10 +490,23 @@
         </div>
       </footer>
 
+              <!-- jQuery -->
+                        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
+                        <!-- DataTables Core JavaScript -->
+                        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+                        <!-- DataTables jQuery UI Integration -->
+                        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.jqueryui.min.js"></script>
+
+                        <!-- DataTables Scroller Extension -->
+                        <script src="https://cdn.datatables.net/scroller/2.1.1/js/dataTables.scroller.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       <script>
 
+        $(document).ready(function () {
+          $("#userTable").DataTable({});
+        });
         // modal for transaction
         var modal = document.getElementById("transactionsModal");
         var btn = document.getElementById("transactionsBtn");

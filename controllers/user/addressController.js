@@ -26,6 +26,19 @@ const loadAddAddress = async (req, res) => {
   }
 };
 
+const checkAddress = async (req,res) => {
+  try{
+    const address = await Address.findOne({userId:req.session.user._id});
+    if(address && address.address.length>=3){
+      res.json({status:true});
+    }else{
+      res.json({status:false});
+    }
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
 // Verify add address
 const verifyAddAddress = async (req, res) => {
   try {
@@ -247,6 +260,7 @@ const verifyChangeAddAddress = async (req, res) => {
 
 module.exports = {
   loadAddress,
+  checkAddress,
   loadAddAddress,
   verifyAddAddress,
   verifyDeleteAddress,

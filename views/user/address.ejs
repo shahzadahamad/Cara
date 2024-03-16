@@ -212,14 +212,16 @@
   </section>
 
   <% if( locals.message ){ %>
-    <div style="color: green; text-align: center; margin-top: 30px;" id="hide">
+    <div style="color: green; text-align: center; margin-top: 30px; font-weight: 900;" id="hide">
       <%=message%>
     </div>
     <% } %>
 
       <div style="display: flex; justify-content: end; margin-right: 40px;">
-        <a style="background-color: #088178;  color: #fff;" class="normal" href="/add-address">Add Address</a>
+        <a style="background-color: #088178;  color: #fff;" class="normal" onclick="addAddress()">Add Address</a>
       </div>
+
+      <p id="errMsg" style="margin: 0px; display: none; text-align: center; color: red; font-weight: 600;"></p>
 
 
       <section id="user-detials">
@@ -252,16 +254,16 @@
                   <%= address.address[i].state %>
                 </p>
                 <div>
-                  <button onclick="window.location.href='/edit-address?id=<%=address.address[i]._id%>'" style="background-color: #088178; color: #fff;"
-                    class="normal edit-btn">Edit</button>
+                  <button onclick="window.location.href='/edit-address?id=<%=address.address[i]._id%>'"
+                    style="background-color: #088178; color: #fff;" class="normal edit-btn">Edit</button>
                   <a style="background-color: red;  color: #fff;" class="normal"
-                    onclick="if(confirm('Did you want to delete Address <%= i+1 %>')) { removeAddress('<%=address.address[i]._id%>','<%=i %>')}">Remove</a>
+                    onclick="removeAddress('<%=address.address[i]._id%>','<%=i %>')">Remove</a>
                 </div>
               </div>
             </div>
             <% } %>
               <% }else { %>
-                <div  style="text-align:  center;">
+                <div style="text-align:  center;">
                   <h3>Shipping Address</h3>
                   <p>You have not set up address yet.</p>
                   <% } %>
@@ -333,8 +335,34 @@
         </div>
       </footer>
 
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
       <script>
+
+        const errMsg = document.getElementById('errMsg');
+
+        async function addAddress() {
+          try {
+            const response = await axios.patch('/add-address-check');
+            if (response.data.status) {
+              errMsg.innerHTML = 'Maximum 3 address allowed!';
+              errMsg.style.display = 'block';
+              setTimeout(() => {
+                errMsg.style.display = 'none'
+              }, 3000);
+            } else {
+              window.location.href = '/add-address'
+            }
+          } catch (error) {
+            console.log(error.message);
+          }
+        }
+
+
+
+
+
+
         const logout = document.getElementById('logout');
         logout.addEventListener('click', () => {
           Swal.fire({
@@ -353,17 +381,28 @@
 
         function removeAddress(id, i) {
           const div = document.getElementById(`div${i}`);
-          fetch('/remove-address', {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: id }),
-          }).then((res) => res.json())
-            .then((data) => {
-              div.remove();
-            })
-            .catch((error) => console.log(error.message));
+          Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Remove"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              fetch('/remove-address', {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: id }),
+              }).then((res) => res.json())
+                .then((data) => {
+                  div.remove();
+                })
+                .catch((error) => console.log(error.message));
+            }
+          });
         }
       </script>
 
