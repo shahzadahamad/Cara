@@ -77,16 +77,12 @@ const verifySuccessAddMoney = async (req, res) => {
 const getTransactionData = async (req,res) => {
   try{
     const {currentPage}=req.body;
-    console.log(currentPage)
     const pageLimit = 8;
     const wallet = await Wallet.findOne({ userId: req.session.user._id });
     const totalPages = Math.ceil(wallet.transactions.length/pageLimit);
     const start = currentPage * pageLimit;
     const end = (currentPage + 1)* pageLimit;
-    console.log(start)
-    console.log(end)
     const limitedTransactions = wallet.transactions.sort((a, b) => b.transactionDate - a.transactionDate).slice(start,end);
-    console.log(limitedTransactions);
     res.json({wallet:limitedTransactions,totalPages});
   }catch(error){
     console.log(error.message);

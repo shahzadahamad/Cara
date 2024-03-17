@@ -11,8 +11,8 @@ const mongoose = require("mongoose");
 const loadProducts = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const products = await product.find().populate("categoryId");
-    res.render("products", { admins: adminData, product: products });
+    const products = await product.find();
+    res.render("products", { admins: adminData, product: products});
   } catch (error) {
     console.log(error.message);
   }
@@ -257,12 +257,35 @@ const deleteImages = async (req, res) => {
   }
 };
 
+// add image
 const addImages = async (req,res) => {
   try{
     const {id}=req.query;
     const file = req.file;
     await product.updateOne({_id:id},{$push:{image:file.filename}});
     res.json({status:true});
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+// to get the search in products list
+const getSearchData = async (req,res) => {
+  try{
+    const {searchValue,page}=req.query;
+    let pageInt = parseInt(page);
+    if(pageInt<=0){
+      pageInt=1;
+    }
+    const limit = 2;
+    const startIndex = (pageInt-1)*limit;
+    const regexPattern = new RegExp(searchValue,'i');
+    const products = await product.find({$or:[{name:regexPattern},{brand:regexPattern},{"categoryId.name":regexPattern}]}).populate('categoryId').skip(startIndex).limit(limit).sort({name: -1, brand: -1, "categoryId.name": -1});
+    const allProducts = await product.find().populate('categoryId').skip(startIndex).limit(limit).sort({name:-1});
+    const totalProductsCount = await product.find({name:regexPattern}).countDocuments();
+    const AlltotalProductsCount = await product.countDocuments();
+    const hasNextPage = searchValue ?  totalProductsCount > limit * pageInt : AlltotalProductsCount > limit * pageInt;
+    res.json({products:searchValue?products:allProducts, nextPage:hasNextPage ,page:pageInt});
   }catch(error){
     console.log(error.message);
   }
@@ -278,4 +301,5 @@ module.exports = {
   verifyEditImage,
   deleteImages,
   addImages,
+  getSearchData,
 };

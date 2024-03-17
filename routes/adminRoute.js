@@ -46,6 +46,7 @@ adminRouter.patch('/edit-images',upload.single('img'),productController.verifyEd
 adminRouter.post('/add-images',upload.single('img'),productController.addImages);
 adminRouter.delete('/delete-product',productController.verifyDeleteProduct);
 adminRouter.delete('/deleteImage',productController.deleteImages);
+adminRouter.get('/get-products-search',auth.isLogin,productController.getSearchData);
 
 
 // <--------------Order Controller-------------->

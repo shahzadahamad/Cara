@@ -238,9 +238,6 @@
                         <% } %>
                           <img style="width: 224px; height: 299px;"
                             src="images/productImages/<%= product[i].image[0] %>" alt="">
-                          <% if(locals.selectedSearch && product[i].quantity===0){ %>
-                            <p style="color: red; font-weight: 700;">Out Of Stock</p>
-                            <% } %>
                               <div class="des">
                                 <span>
                                   <%= product[i].brand %>
