@@ -462,16 +462,16 @@ const verifyCoupon = async (req, res) => {
     if (req.session.coupon) {
       return res.json({ remove: true });
     }
-    const coupon = await Coupon.find({ couponCode: inputVal });
+    const coupon = await Coupon.findOne({ couponCode: inputVal });
     if (coupon) {
       const totalCart = await totalPrice.totalCartPrice(req.session.user._id);
       const total =
         totalCart[0].total < 500 ? totalCart[0].total + 40 : totalCart[0].total;
-      if (total <= coupon[0].discountAmount && coupon[0].quantity <= 0) {
+      if (total <= coupon.discountAmount || coupon.quantity <= 0) {
         return res.json({ status: "Invalied Coupon" });
       }
-      req.session.coupon = coupon[0];
-      res.json({ amount: coupon[0].discountAmount });
+      req.session.coupon = coupon;
+      res.json({ amount: coupon.discountAmount });
     } else {
       res.json({ status: "Invalied Coupon" });
     }

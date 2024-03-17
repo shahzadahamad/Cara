@@ -676,6 +676,7 @@
             if (responce.data.status) {
               errorMsg.style.display = 'block';
               errorMsg.innerHTML = responce.data.status;
+              errorMsg.style.color='red';
               discount.style.display = 'none';
             } else if (responce.data.amount) {
               errorMsg.style.display = 'block';

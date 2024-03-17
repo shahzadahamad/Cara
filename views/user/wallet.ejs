@@ -1,12 +1,6 @@
 <%- include('../layouts/header.ejs') -%>
 
 
-  <!-- jQuery UI CSS -->
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-  <!-- DataTables jQuery UI CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.jqueryui.min.css">
-  <!-- DataTables Scroller jQuery UI CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/scroller/2.1.1/css/scroller.jqueryui.min.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
@@ -173,7 +167,7 @@
 
     .add-money-btn {
       display: block;
-      width: calc(100% - 22px);
+      width: calc(106% - 22px);
       padding: 10px;
       background-color: #4CAF50;
       color: #fff;
@@ -225,7 +219,7 @@
       border: 1px solid #888;
       width: 80%;
       /* Set width to 80% of the viewport width */
-      max-width: 600px;
+      max-width: 800px;
       /* Set maximum width */
     }
 
@@ -247,6 +241,7 @@
     /* Form styles */
     form {
       margin-top: 20px;
+      /* border: 1px solid black; */
       padding: 20px;
     }
 
@@ -289,6 +284,49 @@
       border: 1px solid black;
       border-radius: 5px;
     }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .transactions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .transactions-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+     }
+
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-weight: 800;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+
 
     @media only screen and (max-width: 768px) {
       .container {
@@ -379,51 +417,12 @@
         <p style="color: red;margin: 0px;font-size: 15px; margin-bottom: 5px; font-weight: 900;" class="checking"></p>
         <input type="number" id="add-amount" placeholder="Enter Amount">
         <button class="add-money-btn" onclick="addMoney()">Add Money</button>
-        <button id="btn-transaction" onclick="openTransactionsModal()">Transactions</button>
+        <button id="btn-transaction"  onclick="openTransactionsModal()">Transactions</button>
       </div>
 
       <!-- Modal -->
       <div id="transactionsModal" class="modal">
-        <div class="modal-content">
-          <span class="close" onclick="closeTransactionsModal()">&times;</span>
-          <h2>Transactions</h2>
-          <form id="transactionsForm">
-            <table id="userTable" style="text-align: center;">
-              <thead>
-                <tr>
-                  <th>type</th>
-                  <th>Amount</th>
-                  <th>Reason</th>
-                  <th>TransactionDate</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if(locals.wallet && wallet.transactions && wallet.transactions.length>0){ %>
-                  <% for(let i=0;i<wallet.transactions.length;i++){ %>
-                <tr>
-                  <td>
-                    <%= wallet.transactions[i].type %>
-                  </td>
-                  <td>
-                    <%= wallet.transactions[i].amount %>
-                  </td>
-                  <td>
-                    <%= wallet.transactions[i].reason %>
-                  </td>
-                  <td>
-                    <%= wallet.transactions[i].transactionDate.toString().split(' ').slice(0,4) %>
-                   </td>
-                 </tr>
-                 <% } %>
-                 <% } else { %>
-                   <tr>
-                     <td colspan="4">No Transaction Found</td>
-                   </tr>
-                   <% } %>
-              </tbody>
-           </table>
-          </form>
-        </div>
+
       </div>
 
       <section id="newsletter" class="section-p1 section-m1">
@@ -490,30 +489,91 @@
         </div>
       </footer>
 
-              <!-- jQuery -->
-                        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-                        <!-- DataTables Core JavaScript -->
-                        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-
-                        <!-- DataTables jQuery UI Integration -->
-                        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.jqueryui.min.js"></script>
-
-                        <!-- DataTables Scroller Extension -->
-                        <script src="https://cdn.datatables.net/scroller/2.1.1/js/dataTables.scroller.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       <script>
 
-        $(document).ready(function () {
-          $("#userTable").DataTable({});
-        });
         // modal for transaction
         var modal = document.getElementById("transactionsModal");
         var btn = document.getElementById("transactionsBtn");
         var span = document.getElementsByClassName("close")[0];
-        function openTransactionsModal() {
-          modal.style.display = "block";
+
+
+
+
+      async function openTransactionsModal(page) {
+   
+        let currentPage = 0;
+        if(page){
+          currentPage=page;
         }
+        const response = await axios.put('/get-transation-data',{currentPage});
+        const wallet = response.data.wallet;
+        const totalPages = response.data.totalPages;
+          modal.style.display = "block";
+          modal.innerHTML=`
+    <div class="modal-content">
+      <span class="close" onclick="closeTransactionsModal()">&times;</span>
+      <h2>Transactions</h2>
+      ${wallet && wallet.length > 0 ?
+        `<form id="transactionsForm">
+          <div class="table-responsive">
+            <table class="transactions-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Reason</th>
+                  <th>Transaction Date</th>
+                </tr>
+              </thead>
+              <tbody id="transactionsBody">
+                ${wallet.map(transaction => `
+                  <tr>
+                    <td>${transaction.type}</td>
+                    <td style="color: ${transaction.type === 'Credit' ? 'green' : 'red'};">${transaction.type === 'Credit' ? '+' + transaction.amount : '-' + transaction.amount}</td>
+                    <td>${transaction.reason}</td>
+                    <td>${transaction.transactionDate.slice(0, 10)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <div class="pagination-buttons">
+          <button id="prevButton" onclick="prevPage('${currentPage}')"><<</button>
+          <button id="nextButton" onclick="nextPage('${currentPage}')">>></button>
+        </div>` :
+        `<div>
+          <label for="">No Transaction Found</label>
+        </div>`
+      }
+    </div>`;
+
+
+           const prevButton = document.getElementById('prevButton');
+           const nextButton = document.getElementById('nextButton');
+           prevButton.disabled = currentPage === 0; 
+           prevButton.style.opacity = currentPage === 0 ? '0.6' : '1'
+           nextButton.disabled = currentPage === totalPages - 1;
+           nextButton.style.opacity = currentPage === totalPages - 1 ? '0.6' : '1'
+
+        }
+
+        function prevPage(page){
+          page--
+          const pageDecrement = page
+          openTransactionsModal(pageDecrement)
+        }
+
+        function nextPage(page){
+          page++
+          const pageIncrement =  page
+          openTransactionsModal(pageIncrement)
+        }
+
+
+
+
         function closeTransactionsModal() {
           modal.style.display = "none";
         }
@@ -527,18 +587,6 @@
           closeTransactionsModal();
         });
         // modal for transaction
-
-
-
-
-
-
-
-
-
-
-
-
 
         async function addMoney() {
           try {
@@ -556,8 +604,13 @@
               inputEmtpy.textContent = 'Minimum 100 required'
               inputEmtpy.style.display = 'block'
               return
-            } else {
+            } else if(amount > 10000) {
+              inputEmtpy.textContent = 'Maximum 10000 only'
+              inputEmtpy.style.display = 'block'
+              return
+            }else{
               inputEmtpy.style.display = 'none'
+
             }
 
             const responce = await axios.post('add-to-wallet', { amount });
@@ -602,8 +655,6 @@
             console.log(error.message)
           }
         }
-
-
 
 
 

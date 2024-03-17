@@ -98,6 +98,7 @@ const walletController = require('../controllers/user/walletController');
 userRouter.get('/wallet',auth.isLogin,auth.isBlocked,walletController.loadWallet);
 userRouter.post('/add-to-wallet',walletController.verifyAddMoney);
 userRouter.patch('/waller-add-success',walletController.verifySuccessAddMoney);
+userRouter.put('/get-transation-data',walletController.getTransactionData);
 
 // <--------------wishlist Controller-------------->
 const wishlistController = require('../controllers/user/wishlistController');
