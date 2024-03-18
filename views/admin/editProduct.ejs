@@ -104,21 +104,21 @@
                 <%=message1%>
               </div>
               <% } %>
-                <form action="/admin/edit-products?id=<%= product._id %>" method="post" enctype="multipart/form-data">
+                <form id="editForm" method="post" enctype="multipart/form-data">
                   <label for="">Name</label>
                   <div class="row">
                     <i class="fa-solid fa-signature"></i>
-                    <input type="text" name="name" placeholder="Name" value="<%= product.name %>" required>
+                    <input type="text" name="name" placeholder="Name" value="<%= product.name %>">
                   </div>
                   <label for="">Brand</label>
                   <div class="row">
                     <i class="fa-solid fa-b"></i>
-                    <input type="text" name="brand" placeholder="Brand" value="<%= product.brand %>" required>
+                    <input type="text" name="brand" placeholder="Brand" value="<%= product.brand %>">
                   </div>
                   <label for="">Cateogry</label>
                   <div class="row">
                     <i class="fa-solid fa-list"></i>
-                    <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category" required>
+                    <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category">
                       <option>
                         <%= product.categoryId.name %>
                       </option>
@@ -136,12 +136,12 @@
                   <label for="">Price</label>
                   <div class="row">
                     <i class="fa-solid fa-dollar-sign"></i>
-                    <input type="number" name="price" placeholder="Price" value="<%= product.price %>" required>
+                    <input type="number" name="price" placeholder="Price" value="<%= product.price %>">
                   </div>
                   <label for="">Rating</label>
                   <div class="row">
                     <i class="fa-solid fa-star"></i>
-                    <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating" required>
+                    <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating">
                       <option>
                         <%= product.rating %>
                       </option>
@@ -156,7 +156,7 @@
                   <div class="row">
                     <i class="fa-solid fa-c"></i>
                     <input type="number" name="quantity" placeholder="Quantity" value="<%= product.quantity %>"
-                      required>
+                    >
                   </div>
 
 
@@ -195,6 +195,7 @@
                     <textarea name="description" id="" aria-valuenow="<%= product.description %>" cols="30"
                       rows="5"><%= product.description %></textarea>
                   </div>
+                  <p id="errMsg1" style="font-weight: 900; display: none; color: red;"></p>
                   <div class="row button">
                     <input type="submit" value="Edit">
                   </div>
@@ -209,6 +210,44 @@
 
 
   <script>
+
+    const editForm = document.getElementById('editForm');
+
+    editForm.addEventListener('submit',async (e)=>{
+      e.preventDefault();
+      const formData = new FormData(editForm);
+      const errMsg = document.getElementById('errMsg1');
+      try {
+        const response = await axios.post('/admin/edit-products?id=<%= product._id %>', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        const msg = response.data.msg;
+        const status = response.data.status;
+        if (status) {
+          errMsg.style.display = 'none'
+          Swal.fire({
+            icon: 'success',
+            title: 'Product Updated!',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then((result) => {
+            window.location.href = '/admin/products';
+          })
+        };
+
+        if (msg) {
+          errMsg.innerHTML = msg;
+          errMsg.style.display = 'block'
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+
+    })
+
 
     function addImages(productId) {
       event.preventDefault();

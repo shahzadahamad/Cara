@@ -7,6 +7,67 @@ const path = require('path');
 const imagePath = path.join(__dirname,'../../public/images/productImages/');
 const mongoose = require("mongoose");
 
+// validation for product adding and editing
+const validationFunction = (name, brand,rating, price, quantity, description,categoryy,files,addProductChecking) => {
+  if (
+    !name ||
+    !brand ||
+    !price ||
+    !quantity ||
+    !description
+  ) {
+   return 'All Fields Are Require!'
+  }
+
+  if(!categoryy || categoryy==='Category'){
+    return 'Select Category!'
+  }
+
+  if(!rating || rating==='Rating'){
+    return 'Select Rating!'
+  }
+
+  const quantityValue = parseFloat(quantity);
+  const priceValue = parseFloat(price);
+  if (isNaN(quantityValue) || quantity < 0){
+    return 'Quantity must be a positive Integer!'
+  }
+
+  if(isNaN(priceValue)||price<0){
+    return 'Price must be a positive Integer!'
+  }
+
+  if(addProductChecking){
+    if (!files || files.length === 0) {
+      return 'Images are required!'
+    };
+  
+    if(files.length>4){
+      return 'Please select a maximum of 4 images!'
+    };
+  
+    if(files.length<=0){
+      return 'Please select a minimum of 1 image!'
+    }
+  }
+
+  return {status:true};
+}
+
+// removing image form the files
+function deleteImageFromFile(files){
+  console.log(files);
+  files.forEach(element => {
+    fs.unlink(imagePath+element.filename,(err)=>{
+      if(err){
+        console.log(err.message);
+      }else{
+        console.log('successfully')
+      }
+    });
+  });
+}
+
 // loadProducts
 const loadProducts = async (req, res) => {
   try {
@@ -14,7 +75,7 @@ const loadProducts = async (req, res) => {
     const page = 1;
     const limit = 10;
     const startIndex = (page-1)*limit;
-    const products = await product.find().skip(startIndex).limit(limit).sort({name:-1});
+    const products = await product.find().populate('categoryId').skip(startIndex).limit(limit).sort({name:-1});
     const AlltotalProductsCount = await product.countDocuments();
     const hasNextPage = AlltotalProductsCount > limit * page;
     res.render("products", { admins: adminData, product: products,hasNextPage,AlltotalProductsCount});
@@ -44,67 +105,44 @@ const loadAddProducts = async (req, res) => {
 // verifyAddProducts
 const verifyAddProducts = async (req, res) => {
   try {
-    const { name, brand, rating, price, quantity, description } = req.body;
-    const categorys = await category.findOne({ name: req.body.category });
-
-    if (
-      !name ||
-      !brand ||
-      !rating ||
-      !price ||
-      !quantity ||
-      !description ||
-      !req.body.category
-    ) {
-      req.flash("message1", "All Fields Are Require!");
-      return res.redirect("/admin/add-products");
-    }
-
-    const quantityValue = parseFloat(quantity);
-    const priceValue = parseFloat(price);
-    if (
-      isNaN(quantityValue) ||
-      quantity < 0 ||
-      isNaN(priceValue) ||
-      price < 0
-    ) {
-      req.flash("message1", "Quantity must be a positive number!");
-      return res.redirect("/admin/add-products");
-    }
-
-    if (!req.files || req.files.length === 0) {
-      req.flash("message1", "Images are required!");
-      return res.redirect(`/admin/add-products`);
-    }
-
-    const images = [];
-    const files = req.files;
-
-    files.forEach((files) => {
-      images.push(files.filename);
-    });
-
-    const addProduct = new product({
-      name: name,
-      brand: brand,
-      categoryId: categorys._id,
-      rating: rating,
-      price: price,
-      quantity: quantity,
-      image: images,
-      description: description,
-    });
-
-    const existingProduct = await product.findOne({ name: addProduct.name });
+    const { name, brand,rating, price, quantity, description } = req.body;
+    const existingProduct = await product.findOne({ name: name });
 
     if (existingProduct) {
-      req.flash("message1", "Product Already Exist!");
-      return res.redirect("/admin/add-products");
+      deleteImageFromFile(req.files);
+      return res.json({msg:'Product Already Exist! Use Another Name'});
     }
-    await product.insertMany(addProduct);
 
-    req.flash("message", "Product Added");
-    res.redirect("/admin/add-products");
+    const validation =  validationFunction(name, brand,rating, price, quantity, description,req.body.category,req.files,true);
+
+    if(validation.status){
+      const categorys = await category.findOne({ name: req.body.category });
+
+      const images = [];
+      const files = req.files;
+  
+      files.forEach((files) => {
+        images.push(files.filename);
+      });
+  
+      const addProduct = new product({
+        name: name,
+        brand: brand,
+        categoryId: categorys._id,
+        rating: rating,
+        price: price,
+        quantity: quantity,
+        image: images,
+        description: description,
+      });
+  
+      await addProduct.save()
+      res.json({status:true});
+    }else{
+      deleteImageFromFile(req.files);
+      res.json({msg:validation});
+    }
+
   } catch (error) {
     console.log(error.message);
   }
@@ -145,50 +183,34 @@ const verifyEditProduct = async (req, res) => {
     });
 
     if (existingProduct) {
-      req.flash("message1", "Product Already Exist");
-      return res.redirect(`/admin/edit-products?id=${id}`);
+      return res.json({msg:'Product Already Exist! Use Another Name'})
     }
 
-    if (
-      !name ||
-      !brand ||
-      !rating ||
-      !price ||
-      !quantity ||
-      !description ||
-      !req.body.category
-    ) {
-      req.flash("message1", "All Fields Are Require!");
-      return res.redirect(`/admin/edit-products?id=${id}`);
+    const validation =  validationFunction(name, brand,rating, price, quantity, description,req.body.category,req.files);
+
+    if(validation.status){
+      const categorys = await category.findOne({ name: req.body.category });
+
+      const update = {
+        name: name,
+        brand: brand,
+        categoryId: categorys._id,
+        rating: rating,
+        price: price,
+        quantity: quantity,
+        description: description,
+      };
+  
+     const productUpdate = await product.updateOne({ _id: id }, { $set: update });
+     if(productUpdate.modifiedCount<=0){
+      return res.json({msg:'No Changes Made!'})
+     }
+      res.json({status:true})
+    }else{
+      res.json({msg:validation})
     }
 
-    const quantityValue = parseFloat(quantity);
-    const priceValue = parseFloat(price);
-    if (
-      isNaN(quantityValue) ||
-      quantity < 0 ||
-      isNaN(priceValue) ||
-      price < 0
-    ) {
-      req.flash("message1", "Quantity must be a positive number!");
-      return res.redirect(`/admin/edit-products?id=${id}`);
-    }
 
-    const categorys = await category.findOne({ name: req.body.category });
-
-    const update = {
-      name: name,
-      brand: brand,
-      categoryId: categorys._id,
-      rating: rating,
-      price: price,
-      quantity: quantity,
-      description: description,
-    };
-
-    await product.findByIdAndUpdate({ _id: id }, { $set: update });
-    req.flash("message", "Product Added");
-    res.redirect(`/admin/edit-products?id=${id}`);
   } catch (error) {
     console.log(error.message);
   }

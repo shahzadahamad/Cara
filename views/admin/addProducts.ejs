@@ -3,7 +3,6 @@
   <link rel="stylesheet" href="/styleSheet/admin.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
 
   <style>
     input[type="number"]::-webkit-inner-spin-button,
@@ -25,7 +24,6 @@
       width: 100px;
       height: auto;
       object-fit: cover;
-      margin-left: 30px;
       margin-bottom: 10px;
       border-radius: 10px;
     }
@@ -129,7 +127,7 @@
                 <%=message1%>
               </div>
               <% } %>
-                <form action="/admin/add-products" method="post" enctype="multipart/form-data">
+                <form method="post" id="formDataAddProduct" enctype="multipart/form-data">
                   <label for="">Name</label>
                   <div class="row">
                     <i class="fa-solid fa-signature"></i>
@@ -178,8 +176,9 @@
                     <i class="fa-solid fa-c"></i>
                     <input type="number" name="quantity" placeholder="Quantity">
                   </div>
-                  <label style="margin-bottom: 10px;" for="">Images</label>
-                  <div id="previewContainer"></div>
+                  <label style="margin-bottom: 10px;" for="">Images (Maximum 4 images allowed)</label>
+                  <p id="errMsg1" style="font-weight: 900; display: none; color: red;"></p>
+                  <div id="previewContainer" style="display: none; border: 1px solid #dee2e6; padding: 10px;"></div>
                   <div class="row">
                     <i class="fa-solid fa-image"></i>
                     <input style="font-size: 20px; color: #787978;" id="imageInput" type="file" class="form-control"
@@ -189,6 +188,7 @@
                     <label for="">Description</label>
                     <textarea name="description" id="" cols="30" rows="5"></textarea>
                   </div>
+                  <p id="errMsg" style="font-weight: 900; display: none; color: red;"></p>
                   <div class="row button">
                     <input id="val" type="submit" value="Add">
                   </div>
@@ -200,36 +200,108 @@
   </div>
 
 
-
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 
   <script>
 
+    const form = document.getElementById('formDataAddProduct');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const previewContainer = document.getElementById('previewContainer');
+      const errMsg = document.getElementById('errMsg');
+      try {
+        const response = await axios.post('/admin/add-products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        const msg = response.data.msg;
+        const status = response.data.status;
+        if (status) {
+          errMsg.style.display = 'none'
+          Swal.fire({
+            icon: 'success',
+            title: 'Product Added!',
+            showConfirmButton: false,
+            timer: 1000,
+          }).then((result) => {
+            window.location.href = '/admin/products';
+          })
+        };
+
+        if (msg) {
+          errMsg.innerHTML = msg;
+          errMsg.style.display = 'block'
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+    })
+
+
+
+
+
     const previewContainer = document.getElementById('previewContainer');
     const imageInput = document.getElementById('imageInput');
-    const errMsg = document.getElementById('errMsg');
+    const errMsg1 = document.getElementById('errMsg1');
 
     function handleImageUpload(event) {
       const files = event.target.files;
 
+      if (files.length > 4) {
+        errMsg1.innerHTML = 'Only 4 Images Allowed!';
+        errMsg1.style.display = 'block';
+        files = '';
+      } else {
+        errMsg1.style.display = 'none';
+      }
+
       previewContainer.innerHTML = '';
 
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = () => {
+
           const previewImage = document.createElement('img');
           previewImage.classList.add('preview-image');
           previewImage.src = reader.result;
+          previewImage.style.width = '130px';
+          previewImage.style.height = 'auto';
+
+
+          const deleteIcon = document.createElement('i');
+          deleteIcon.classList.add('fa-solid', 'fa-xmark');
+          deleteIcon.style.position = 'absolute';
+          deleteIcon.style.top = '5px';
+          deleteIcon.style.right = '5px';
+
+
+          const imageContainer = document.createElement('div');
+          imageContainer.style.position = 'relative';
+          imageContainer.style.marginBottom = '15px';
+          imageContainer.appendChild(previewImage);
+          imageContainer.appendChild(deleteIcon);
+
+
           previewContainer.style.display = 'flex';
-          previewContainer.style.justifyContent = 'space-between';
+          previewContainer.style.justifyContent = 'space-around';
+          previewContainer.style.alignItems = 'center'
           previewContainer.style.flexWrap = 'wrap';
-          previewContainer.appendChild(previewImage);
+          previewContainer.style.marginBottom = '15px'
+          previewContainer.appendChild(imageContainer);
         };
+
         reader.readAsDataURL(file);
+
       });
+
     }
     imageInput.addEventListener('change', handleImageUpload);
-
 
   </script>
 
@@ -237,6 +309,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="/javaScript/script.js"></script>
 

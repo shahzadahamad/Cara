@@ -377,7 +377,7 @@
               <P style="margin: 0px; color: red; font-size: 12px;"><%= offer[i].endDate.toString().split(' ').slice(0,4) %></P>
             </td>
             <td>
-              <button onclick="editOffer(' <%=offer[i]._id %>')" class="btn btn-outline-primary"
+              <button onclick="editOffer('<%=offer[i]._id %>')" class="btn btn-outline-primary"
                         data-target="#editOfferModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
                           class="btn btn-outline-danger"
                           onclick="deleteOffer('<%= offer[i]._id %>','<%= i %>')">Delete</button>
