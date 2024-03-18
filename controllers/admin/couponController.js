@@ -32,19 +32,25 @@ const validation = (couponCode,discount,expire,discription,quantity) => {
   }
 
   return false
-}
+};
 
+// loading coupon page
 const loadCouponDetials = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const coupon = await Coupon.find();
-
-    res.render("coupen", { admins: adminData,coupon:coupon });
+    const page = 1;
+    const limit = 10;
+    const startIndex = (page-1)*limit;
+    const coupon = await Coupon.find().skip(startIndex).limit(limit).sort({createDate:-1});
+    const totalCouponCount = await Coupon.countDocuments();
+    const hasNextPage = totalCouponCount > limit * page;
+    res.render("coupen", { admins: adminData,coupon:coupon,hasNextPage,totalCouponCount });
   } catch (error) {
     console.log(error.message);
   }
 };
 
+// verfify adding coupon
 const verifyAddCoupon = async (req, res) => {
   try {
     const { couponCode, discount, expire, discription,quantity } = req.body;
@@ -71,6 +77,7 @@ const verifyAddCoupon = async (req, res) => {
   }
 };
 
+// verify editng coupon getting datas
 const verifyEditCoupon = async (req,res) => {
   try{
     const {id}=req.body;
@@ -79,8 +86,9 @@ const verifyEditCoupon = async (req,res) => {
   }catch(error){
     console.log(error.message);
   }
-}
+};
 
+// verify editing coupon
 const verifyEditCouponConfirm = async (req,res) => {
   try{
     const {id}=req.body;
@@ -110,8 +118,9 @@ const verifyEditCouponConfirm = async (req,res) => {
   }catch(error){
     console.log(error.message);
   }
-}
+};
 
+// deleting coupons
 const deleteCoupon = async (req,res) => {
   try{
     const {id}=req.query;
@@ -122,10 +131,33 @@ const deleteCoupon = async (req,res) => {
   }
 };
 
+// to get the search in coupon list
+const getSearchData = async (req,res) => {
+  try{
+    const {searchValue,page}=req.query;
+    let pageInt = parseInt(page);
+    if(pageInt<=0){
+      pageInt=1;
+    }
+    const limit = 10;
+    const startIndex = (pageInt-1)*limit;
+    const regexPattern = new RegExp(searchValue,'i');
+    const coupons = await Coupon.find({$or:[{couponCode:regexPattern},{description:regexPattern}]}).skip(startIndex).limit(limit).sort({createDate:-1});
+    const allCoupon = await Coupon.find().skip(startIndex).limit(limit).sort({createDate:-1});
+    const totalCouponCount = await Coupon.find({$or:[{couponCode:regexPattern},{description:regexPattern}]}).countDocuments();
+    const AlltotalCouponCount = await Coupon.countDocuments();
+    const hasNextPage = searchValue ?  totalCouponCount > limit * pageInt : AlltotalCouponCount > limit * pageInt;
+    res.json({coupon:searchValue?coupons:allCoupon, nextPage:hasNextPage ,page:pageInt});
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
 module.exports = {
   loadCouponDetials,
   verifyAddCoupon,
   verifyEditCoupon,
   verifyEditCouponConfirm,
   deleteCoupon,
+  getSearchData,
 };

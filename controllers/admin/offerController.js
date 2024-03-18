@@ -3,6 +3,7 @@ const Product = require("../../models/productsModel");
 const Offer = require("../../models/offerModel");
 const Admin = require("../../models/adminModel");
 
+// adding offer validation
 const validation = (
   offerTitle,
   offerType,
@@ -38,6 +39,7 @@ const validation = (
   return false;
 };
 
+// editing offer validation
 const validationEdit = (
   editOfferTitle,
   editDiscountPercentage,
@@ -74,16 +76,31 @@ const validationEdit = (
   return false;
 };
 
+// load offer page
 const loadOffers = async (req, res) => {
   try {
     const admin = await Admin.findOne({ _id: req.session.admin_id });
-    const offer = await Offer.find();
-    res.render("offer", { admins: admin, offer: offer });
+    const page = 1;
+    const limit = 10;
+    const startIndex = (page - 1) * limit;
+    const offer = await Offer.find()
+      .skip(startIndex)
+      .limit(limit)
+      .sort({ createAt: -1 });
+    const totalOfferCount = await Offer.countDocuments();
+    const hasNextPage = totalOfferCount > limit * page;
+    res.render("offer", {
+      admins: admin,
+      offer: offer,
+      hasNextPage,
+      totalOfferCount,
+    });
   } catch (error) {
     console.log(error.message);
   }
 };
 
+// verifyOffer
 const verifyOffer = async (req, res) => {
   try {
     const {
@@ -124,6 +141,7 @@ const verifyOffer = async (req, res) => {
   }
 };
 
+// delete Offer
 const deleteOffer = async (req, res) => {
   try {
     const { id } = req.query;
@@ -136,6 +154,7 @@ const deleteOffer = async (req, res) => {
   }
 };
 
+// editOffer
 const editOffer = async (req, res) => {
   try {
     const { id } = req.body;
@@ -146,6 +165,7 @@ const editOffer = async (req, res) => {
   }
 };
 
+// verify edit Offer
 const verifyEditOffer = async (req, res) => {
   try {
     const { id } = req.body;
@@ -196,6 +216,7 @@ const verifyEditOffer = async (req, res) => {
   }
 };
 
+// laod choose Offer page
 const loadChooseOffer = async (req, res) => {
   try {
     const { id } = req.query;
@@ -203,37 +224,109 @@ const loadChooseOffer = async (req, res) => {
     const offer = await Offer.findOne({ _id: id });
     if (offer.offerType === "product") {
       const products = await Product.find();
-      res.render("offerProducts", { admins: adminData, product: products,id:id });
-    }else if(offer.offerType==='category'){
+      res.render("offerProducts", {
+        admins: adminData,
+        product: products,
+        id: id,
+      });
+    } else if (offer.offerType === "category") {
       const category = await Category.find();
-      res.render("offerProducts", { admins: adminData, category: category,id:id });
+      res.render("offerProducts", {
+        admins: adminData,
+        category: category,
+        id: id,
+      });
     }
   } catch (error) {
     console.log(error.message);
   }
 };
 
-const verifyAddingOffer = async (req,res) => {
-  try{
-    const {_id,type,id,checkbox}=req.body;
-    if(type==='category'){
-      if(checkbox){
-        await Category.updateOne({_id:_id},{$set:{offer:id}})
-      }else{
-        await Category.updateOne({_id:_id},{$unset:{offer:id}})
+// verify adding offer
+const verifyAddingOffer = async (req, res) => {
+  try {
+    const { _id, type, id, checkbox } = req.body;
+    if (type === "category") {
+      if (checkbox) {
+        await Category.updateOne({ _id: _id }, { $set: { offer: id } });
+      } else {
+        await Category.updateOne({ _id: _id }, { $unset: { offer: id } });
       }
-    }else if(type==='product'){
-      if(checkbox){
-        await Product.updateOne({_id:_id},{$set:{offer:id}})
-      }else{
-        await Product.updateOne({_id:_id},{$unset:{offer:id}})
+    } else if (type === "product") {
+      if (checkbox) {
+        await Product.updateOne({ _id: _id }, { $set: { offer: id } });
+      } else {
+        await Product.updateOne({ _id: _id }, { $unset: { offer: id } });
       }
     }
-    res.json({status:'success'});
-  }catch(error){
+    res.json({ status: "success" });
+  } catch (error) {
     console.log(error.message);
   }
-}
+};
+
+// to get the search in coupon list
+const getSearchData = async (req, res) => {
+  try {
+    const { searchValue, page } = req.query;
+    let pageInt = parseInt(page);
+    if (pageInt <= 0) {
+      pageInt = 1;
+    }
+    const limit = 10;
+    const startIndex = (pageInt - 1) * limit;
+    const regexPattern = new RegExp(searchValue, "i");
+    const offer = await Offer.find({
+      $or: [
+        { offerTitle: regexPattern },
+        { offerType: regexPattern },
+        { description: regexPattern },
+      ],
+    })
+      .skip(startIndex)
+      .limit(limit)
+      .sort({ createAt: -1 });
+    const allOffer = await Offer.find()
+      .skip(startIndex)
+      .limit(limit)
+      .sort({ createAt: -1 });
+    const totalOfferCount = await Offer.find({
+      $or: [
+        { offerTitle: regexPattern },
+        { offerType: regexPattern },
+        { description: regexPattern },
+      ],
+    }).countDocuments();
+    const AlltotalOfferCount = await Offer.countDocuments();
+    const hasNextPage = searchValue
+      ? totalOfferCount > limit * pageInt
+      : AlltotalOfferCount > limit * pageInt;
+    res.json({
+      offer: searchValue ? offer : allOffer,
+      nextPage: hasNextPage,
+      page: pageInt,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// product and category offer adding search
+const getSearchChooseData = async (req, res) => {
+  try {
+    const { type, searchInput } = req.query;
+    const regexPattern = new RegExp(searchInput, "i");
+    if (type === "product") {
+      const product = await Product.find({ name: regexPattern });
+      res.json({ product });
+    } else if (type === "category") {
+      const category = await Category.find({ name: regexPattern });
+      res.json({ category });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 module.exports = {
   loadOffers,
@@ -243,4 +336,6 @@ module.exports = {
   verifyEditOffer,
   loadChooseOffer,
   verifyAddingOffer,
+  getSearchData,
+  getSearchChooseData,
 };

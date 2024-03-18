@@ -9,8 +9,13 @@ const mongoose = require('mongoose');
 const loadOrderDetials = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const order = await Order.find({}).sort({orderDate:-1}).populate('userId orderItems.productId deliveryAddress');
-    res.render('orderDetials',{admins:adminData,order:order});
+    const page = 1;
+    const limit = 10;
+    const startIndex = (page-1)*limit;
+    const order = await Order.find().populate('userId').skip(startIndex).limit(limit).sort({orderDate:-1});
+    const totalOrderCount = await Order.countDocuments();
+    const hasNextPage = totalOrderCount > limit * page;
+    res.render('orderDetials',{admins:adminData,order:order,hasNextPage,totalOrderCount});
   } catch (error) {
     console.log(error.message);
   }
@@ -77,8 +82,32 @@ const editOrderStatus = async (req,res) => {
   }
 };
 
+// to get the search in order list
+const getSearchData = async (req,res) => {
+  try{
+    const {searchValue,page}=req.query;
+    let pageInt = parseInt(page);
+    if(pageInt<=0){
+      pageInt=1;
+    }
+    const limit = 10;
+    const startIndex = (pageInt-1)*limit;
+    const regexPattern = new RegExp(searchValue,'i');
+    const orders = await Order.find({$or:[{'userId.fullname':regexPattern},{paymentMethod:regexPattern},{orderStatus:regexPattern}]}).populate('userId').skip(startIndex).limit(limit).sort({orderDate:-1});
+    const allOrders = await Order.find().populate('userId').skip(startIndex).limit(limit).sort({orderDate:-1});
+    const totalOrdersCount = await Order.find({$or:[{'userId.fullname':regexPattern},{paymentMethod:regexPattern},{orderStatus:regexPattern}]}).countDocuments();
+    const AlltotalOrdersCount = await Order.countDocuments();
+    const hasNextPage = searchValue ?  totalOrdersCount > limit * pageInt : AlltotalOrdersCount > limit * pageInt;
+    res.json({order:searchValue?orders:allOrders, nextPage:hasNextPage ,page:pageInt});
+
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadOrderDetials,
   loadOrderFullDetials,
   editOrderStatus,
+  getSearchData,
 }

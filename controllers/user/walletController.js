@@ -1,10 +1,10 @@
 const Wallet = require("../../models/walletModel");
 const Razorpay = require("../../controllers/user/checkoutController");
 
+// loading wallet
 const loadWallet = async (req, res) => {
   try {
     const wallet = await Wallet.findOne({ userId: req.session.user._id });
-    console.log(wallet)
     if (wallet) {
       res.render("wallet", { user: req.session.user, wallet: wallet });
     } else {
@@ -15,6 +15,7 @@ const loadWallet = async (req, res) => {
   }
 };
 
+// Adding Money to Wallet
 const verifyAddMoney = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -47,6 +48,7 @@ const verifyAddMoney = async (req, res) => {
   }
 };
 
+// Adding money success
 const verifySuccessAddMoney = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -74,6 +76,7 @@ const verifySuccessAddMoney = async (req, res) => {
   }
 };
 
+// Get transaction detials for showing transactions
 const getTransactionData = async (req,res) => {
   try{
     const {currentPage}=req.body;
@@ -87,7 +90,7 @@ const getTransactionData = async (req,res) => {
   }catch(error){
     console.log(error.message);
   }
-}
+};
 
 module.exports = {
   loadWallet,

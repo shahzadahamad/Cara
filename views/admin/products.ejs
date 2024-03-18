@@ -108,6 +108,7 @@
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
           <h3 style="font-size: 30px;" class="main--title">Products</h3>
+          <h3 class="main--title">Total <%= AlltotalProductsCount %> <%= AlltotalProductsCount <= 1 ? 'Product' : 'Products' %></h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
@@ -130,7 +131,39 @@
             </tr>
           </thead>
           <tbody id="productTableBody">
-            
+            <% if(locals.product && product.length>0){ %>
+              <% locals.product.forEach((product,index)=>{ %>
+                <tr id="row<%= index %>">
+                  <td>
+                    <%= product.name %>
+                  </td>
+                  <td>
+                    <%= product.brand %>
+                  </td>
+                  <td>
+                    <%= product.categoryId.name %>
+                  </td>
+                  <td>
+                    <%= product.rating %>
+                  </td>
+                  <td>₹<%= product.price %>
+                  </td>
+                  <td>$<%= product.quantity %>
+                  </td>
+                  <td><img style="width: 100px;border-radius: 10px;" src="/images/productImages/<%= product.image[0] %>"
+                      alt=""></td>
+                  <td><a class="btn btn-outline-primary"
+                      href="/admin/edit-products?id=<%= product._id %>">Edit</a>&nbsp;&nbsp;<button
+                      class="btn btn-outline-danger"
+                      onclick="deleteProduct('<%= product._id %>','<%= index %>')">Delete</button>
+                  </td>
+                </tr>
+                <% }) %>
+                  <% }else{ %>
+                    <tr>
+                      <td colspan="8">Products Not Found</td>
+                    </tr>
+                    <% } %>
           </tbody>
           <tfoot>
             <tr>
@@ -141,10 +174,15 @@
         </table>
         <div class="pagination-buttons">
 
-                <button id="prevButton" onclick="handleButtons(false)"><<</button>
+          <button id="prevButton" style="opacity: 0.5;" disabled onclick="handleButtons(false)">
+            <<</button>
+              <% if(locals.hasNextPage){ %>
                 <button id="nextButton" onclick="handleButtons(true)">>></button>
+                <% }else{ %>
+                  <button id="nextButton" style="opacity: 0.5;" disabled onclick="handleButtons(true)">>></button>
+                  <% } %>
 
-        </div>`
+        </div>
       </div>
     </div>
 
@@ -154,27 +192,27 @@
 
   <script>
 
-    window.addEventListener('load',()=>{
-      handleSearch(1);
-    })
+window.onload=()=>{
+  document.getElementById('search').value=''
+}
 
     let pageForSearch = 1
     let searchInput = ''
 
-    async function handleButtons(button){
-      if(searchInput===''){
-        if(button){
+    async function handleButtons(button) {
+      if (searchInput === '') {
+        if (button) {
           pageForSearch++;
           handleSearch(pageForSearch)
-        }else{
+        } else {
           pageForSearch--;
           handleSearch(pageForSearch)
         }
-      }else{
-        if(button){
+      } else {
+        if (button) {
           pageForSearch++;
           handleSearch(pageForSearch)
-        }else{
+        } else {
           pageForSearch--;
           handleSearch(pageForSearch)
         }
@@ -183,13 +221,13 @@
 
     async function handleSearch(page) {
       const searchInput1 = document.getElementById('search').value.trim();
-      searchInput=searchInput1;
+      searchInput = searchInput1;
       try {
         const response = await axios.get(`/admin/get-products-search?searchValue=${searchInput1}&page=${page}`);
         const products = response.data.products;
         const nextPage = response.data.nextPage;
         const pageInt = response.data.page;
-        pageForSearch=pageInt
+        pageForSearch = pageInt
         const tableBody = document.getElementById('productTableBody');
         const totalValue = document.getElementById('totalValue');
         const prevButton = document.getElementById('prevButton');
@@ -239,7 +277,7 @@
               <td><a class="btn btn-outline-primary"
                       href="/admin/edit-products?id=${product._id}">Edit</a>&nbsp;&nbsp;<button
                       class="btn btn-outline-danger"
-                      onclick="if(confirm('Did you want to delete product ${product.name}')){deleteProduct('${product._id}','${index}')}">Delete</button>
+                      onclick="deleteProduct('${product._id}','${index}')">Delete</button>
                   </td>
           </tr>`;
         tableBody.innerHTML += newRow;
@@ -248,20 +286,33 @@
 
     function deleteProduct(id, i) {
       const row = document.getElementById(`row${i}`)
-      fetch(`/admin/delete-product?id=${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: id })
-      }).then((res) => res.json())
-        .then((data) => {
-          row.remove();
-        })
-        .catch((error) => console.log(error.message));
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          fetch(`/admin/delete-product?id=${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: id })
+          }).then((res) => res.json())
+            .then((data) => {
+              row.remove();
+            })
+            .catch((error) => console.log(error.message));
+        }
+      });
     };
 
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

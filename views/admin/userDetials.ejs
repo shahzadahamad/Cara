@@ -4,9 +4,29 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
+  <style>
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-weight: 800;
+      background-color: #1abc9c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination-buttons button:hover {
+      background-color: #088178;
+    }
+  </style>
 
   <div class="sidebar">
-   <br>
+    <br>
     <ul class="menu">
       <li>
         <a href="/admin/dashboard">
@@ -66,12 +86,14 @@
   </div>
 
   <div class="main--content">
-    
+
     <div class="header--wrapper">
       <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
       <div class="user--info">
         <img src="/images/productImages/<%= admins.profile %>" alt="">
-        <h4><%= admins.username %></h4>
+        <h4>
+          <%= admins.username %>
+        </h4>
       </div>
     </div>
 
@@ -79,10 +101,13 @@
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
           <h3 style="font-size: 30px;" class="main--title">Customers</h3>
+          <h3 class="main--title">Total <%= totalUserCount %>
+              <%= totalUserCount <=1 ? 'Customer' : 'Customers' %>
+          </h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" placeholder="Search" />
+          <input type="text" id="search" placeholder="Search" oninput="handleSearch(1)" />
         </div>
       </div>
 
@@ -97,7 +122,7 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="userTableBody">
             <% if(users.length>0){%>
               <% for(let i=0; i< users.length;i++){ %>
                 <tr>
@@ -114,51 +139,154 @@
                     <%= users[i].createdDate.toString().split(' ').slice(0,4) %>
                   </td>
                   <td>
-                    <button id="block<%= i %>" onclick="blockUser('<%= users[i]._id %>','<%= i %>')" class=" btn <%= users[i].isBlocked ?  'btn-outline-danger' :  'btn-outline-success' %>">
-                      <%= users[i].isBlocked ? 'UnBlock' : 'Block' %>
-                    </button>
+                    <button id="block<%= i %>" onclick="blockUser('<%=users[i]._id %>','<%= i %>')" class=" btn <%=
+                          users[i].isBlocked ? 'btn-outline-danger' : 'btn-outline-success' %>">
+                          <%= users[i].isBlocked ? 'UnBlock' : 'Block' %>
+                            </button>
                   </td>
                 </tr>
                 <% } %>
                   <% } else { %>
                     <tr>
-                      <td colspan="7">User Not Found</td>
+                      <td colspan="7">Users Not Found</td>
                     </tr>
                     <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="7">Total Customers: <%= users.length %>
+              <td id="totalValue" colspan="7">Total Customers: <%= users.length %>
               </td>
             </tr>
           </tfoot>
         </table>
+        <div class="pagination-buttons">
+
+          <button id="prevButton" style="opacity: 0.5;" disabled onclick="handleButtons(false)">
+            <<</button>
+              <% if(locals.hasNextPage){ %>
+                <button id="nextButton" onclick="handleButtons(true)">>></button>
+                <% }else{ %>
+                  <button id="nextButton" style="opacity: 0.5;" disabled onclick="handleButtons(true)">>></button>
+                  <% } %>
+
+        </div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 
   <script>
-    function blockUser(id,i){
+
+window.onload=()=>{
+  document.getElementById('search').value=''
+}
+
+
+    let pageForSearch = 1
+    let searchInput = ''
+
+    async function handleButtons(button) {
+      if (searchInput === '') {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      } else {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      }
+    }
+
+
+    async function handleSearch(page) {
+      const searchInput1 = document.getElementById('search').value.trim();
+      searchInput = searchInput1;
+      try {
+        const response = await axios.get(`/admin/get-user-search?searchValue=${searchInput1}&page=${page}`);
+        const users = response.data.users;
+        const nextPage = response.data.nextPage;
+        const pageInt = response.data.page;
+        pageForSearch = pageInt
+        const tableBody = document.getElementById('userTableBody');
+        const totalValue = document.getElementById('totalValue');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        if (pageInt === 1) {
+          prevButton.style.opacity = '0.5';
+          prevButton.disabled = true
+        } else {
+          prevButton.style.opacity = '1';
+          prevButton.disabled = false
+        }
+        if (nextPage) {
+          nextButton.style.opacity = '1';
+          nextButton.disabled = false
+        } else {
+          nextButton.style.opacity = '0.5';
+          nextButton.disabled = true
+        }
+
+        tableBody.innerHTML = '';
+        totalValue.innerHTML = `Total Customers: ${users.length}`
+        if (users.length > 0) {
+          changeTheValuesOfTable(users);
+        } else {
+          tableBody.innerHTML = '<tr><td colspan="7">Users Not Found</td></tr>';
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    function changeTheValuesOfTable(users) {
+      const tableBody = document.getElementById('userTableBody');
+      users.forEach((users, index) => {
+        const newRow = `<tr>
+                  <td> ${users.fullname}  </td>
+                  <td> ${users.email} </td>
+                  <td> ${users.mobile} </td>
+                  <td> ${new Date(users.createdDate).toString().split(' ').slice(0, 4)}   </td>
+                  <td>
+                    <button id="block${index}" onclick="blockUser('${users._id}','${index}')" class="btn ${users.isBlocked ? 'btn-outline-danger' : 'btn-outline-success'}">${users.isBlocked ? 'UnBlock' : 'Block'}</button>
+                </tr>`;
+        tableBody.innerHTML += newRow;
+      });
+    }
+
+
+
+    function blockUser(id, i) {
 
       const block = document.getElementById(`block${i}`);
 
-      fetch(`/admin/block-user?id=${id}`,{
+      fetch(`/admin/block-user?id=${id}`, {
         method: "PATCH",
         headers: {
-          "Content-Type":"application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({id:id})
+        body: JSON.stringify({ id: id })
       }).then((res) => res.json())
         .then((data) => {
-          if(data.isBlocked){
+          if (data.isBlocked) {
             block.classList.remove('btn-outline-danger');
             block.classList.add('btn-outline-success');
-            block.innerHTML='Block'
-          }else{
+            block.innerHTML = 'Block'
+          } else {
             block.classList.remove('btn-outline-success');
             block.classList.add('btn-outline-danger');
-            block.innerHTML='UnBlock'
+            block.innerHTML = 'UnBlock'
           }
         })
         .catch((error) => console.log(error.message));

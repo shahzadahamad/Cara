@@ -32,6 +32,7 @@ adminRouter.post('/add-category',categoryController.verifyAddCategory);
 adminRouter.get('/edit-categorys',auth.isLogin,categoryController.loadEditCategory);
 adminRouter.post('/edit-categorys',categoryController.verifyEditCategory);
 adminRouter.delete('/delete-category',categoryController.deleteCategory);
+adminRouter.get('/get-category-search',auth.isLogin,categoryController.getSearchData);
 
 // <--------------Product Controller-------------->
 const productController = require('../controllers/admin/productController');
@@ -56,6 +57,7 @@ const orderController = require('../controllers/admin/orderController');
 adminRouter.get('/order-detials',auth.isLogin,orderController.loadOrderDetials);
 adminRouter.get('/order-full-detials',auth.isLogin,orderController.loadOrderFullDetials);
 adminRouter.patch('/order-status',orderController.editOrderStatus);
+adminRouter.get('/get-order-search',auth.isLogin,orderController.getSearchData);
 
 // <--------------Order Controller-------------->
 const userController = require('../controllers/admin/userController');
@@ -63,6 +65,7 @@ const userController = require('../controllers/admin/userController');
 
 adminRouter.get('/user-detials',auth.isLogin,userController.loadUserDetials);
 adminRouter.patch('/block-user',userController.verifyBlockUser);
+adminRouter.get('/get-user-search',auth.isLogin,userController.getSearchData);
 
 // <--------------Coupon Controller-------------->
 const couponController = require('../controllers/admin/couponController');
@@ -73,6 +76,8 @@ adminRouter.post('/add-coupon',couponController.verifyAddCoupon);
 adminRouter.patch('/edit-coupon',couponController.verifyEditCoupon);
 adminRouter.patch('/edit-coupon-confirm',couponController.verifyEditCouponConfirm);
 adminRouter.delete('/coupon-delete',couponController.deleteCoupon);
+adminRouter.get('/get-coupon-search',auth.isLogin,couponController.getSearchData);
+
 
 // <--------------Offer Controller-------------->
 const offerController = require('../controllers/admin/offerController');
@@ -85,6 +90,8 @@ adminRouter.patch('/edit-offer',offerController.editOffer);
 adminRouter.patch('/edit-offer-confirm',offerController.verifyEditOffer);
 adminRouter.get('/choose-offer',auth.isLogin,offerController.loadChooseOffer);
 adminRouter.patch('/adding-offers',auth.isLogin,offerController.verifyAddingOffer);
+adminRouter.get('/get-offer-search',auth.isLogin,offerController.getSearchData);
+adminRouter.get('/get-choose-offer-search',auth.isLogin,offerController.getSearchChooseData)
 
 
 module.exports = adminRouter;

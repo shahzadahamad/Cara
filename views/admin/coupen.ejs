@@ -20,6 +20,25 @@
       text-decoration: none;
       color: #fff;
     }
+
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-weight: 800;
+      background-color: #1abc9c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination-buttons button:hover {
+      background-color: #088178;
+    }
   </style>
 
   <div class="sidebar">
@@ -113,7 +132,8 @@
               </div>
 
               <div class="modal-body">
-                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;" id="errorMsg"></p>
+                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;" id="errorMsg">
+                </p>
                 <div class="form-group">
                   <label for="couponCode">Coupon Code</label>
                   <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Coupon Code">
@@ -162,7 +182,8 @@
               </div>
 
               <div class="modal-body">
-                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;" id="editErrorMsg"></p>
+                <p style="display: none; color: red; margin: 0px; text-align: center; font-weight: 900;"
+                  id="editErrorMsg"></p>
                 <div class="form-group">
                   <label for="couponCode">Coupon Code</label>
                   <input type="text" class="form-control" id="editCouponCode" name="couponCode"
@@ -210,10 +231,13 @@
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
           <h3 style="font-size: 30px;" class="main--title">Coupons</h3>
+          <h3 class="main--title">Total <%= totalCouponCount %>
+              <%= totalCouponCount <=1 ? 'Coupon' : 'Coupons' %>
+          </h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" id="search" placeholder="Search" />
+          <input type="text" id="search" placeholder="Search" oninput="handleSearch(1)" />
         </div>
       </div>
 
@@ -230,7 +254,7 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="couponTableBody">
             <% if( locals.coupon.length>0){ %>
               <% for(let i=0;i<locals.coupon.length;i++){ %>
                 <tr id="row<%= i %>">
@@ -259,7 +283,7 @@
                 <P style="margin: 0px; color: red; font-size: 12px;"><%= coupon[i].expireDate.toString().split(' ').slice(0,4) %></P>
               </td>
               <td>
-              <button onclick="editCoupon('<%=coupon[i]._id %>')" class="btn btn-outline-primary"
+              <button onclick="editCoupon(' <%=coupon[i]._id %>')" class="btn btn-outline-primary"
                         data-target="#editCouponModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
                           class="btn btn-outline-danger"
                           onclick="deleteCoupon('<%= coupon[i]._id %>','<%= i %>')">Delete</button>
@@ -268,17 +292,28 @@
                 <% } %>
                   <% }else{ %>
                     <tr>
-                      <td style="font-size: 20px; padding: 15px;" colspan="7">Coupons Not Found</td>
+                      <td style="font-size: 20px; padding: 15px;" colspan="7">Coupon Not Found</td>
                     </tr>
                     <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td id="totalCategory" colspan="8">Total Coupons: <%= locals.coupon.length %>
+              <td id="totalValue" colspan="8">Total Coupons: <%= locals.coupon.length %>
               </td>
             </tr>
           </tfoot>
         </table>
+        <div class="pagination-buttons">
+
+          <button id="prevButton" style="opacity: 0.5;" disabled onclick="handleButtons(false)">
+            <<</button>
+              <% if(locals.hasNextPage){ %>
+                <button id="nextButton" onclick="handleButtons(true)">>></button>
+                <% }else{ %>
+                  <button id="nextButton" style="opacity: 0.5;" disabled onclick="handleButtons(true)">>></button>
+                  <% } %>
+
+        </div>
       </div>
     </div>
 
@@ -287,6 +322,120 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script>
+
+    window.onload = () => {
+      document.getElementById('search').value = ''
+    }
+
+    let pageForSearch = 1
+    let searchInput = ''
+
+    async function handleButtons(button) {
+      if (searchInput === '') {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      } else {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      }
+    }
+
+    async function handleSearch(page) {
+      const searchInput1 = document.getElementById('search').value.trim();
+      searchInput = searchInput1;
+      try {
+        const response = await axios.get(`/admin/get-coupon-search?searchValue=${searchInput1}&page=${page}`);
+        const coupon = response.data.coupon;
+        const nextPage = response.data.nextPage;
+        const pageInt = response.data.page;
+        pageForSearch = pageInt
+        const tableBody = document.getElementById('couponTableBody');
+        const totalValue = document.getElementById('totalValue');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        if (pageInt === 1) {
+          prevButton.style.opacity = '0.5';
+          prevButton.disabled = true
+        } else {
+          prevButton.style.opacity = '1';
+          prevButton.disabled = false
+        }
+        if (nextPage) {
+          nextButton.style.opacity = '1';
+          nextButton.disabled = false
+        } else {
+          nextButton.style.opacity = '0.5';
+          nextButton.disabled = true
+        }
+
+        tableBody.innerHTML = '';
+        totalValue.innerHTML = `Total Products: ${coupon.length}`
+        if (coupon.length > 0) {
+          changeTheValuesOfTable(coupon);
+        } else {
+          tableBody.innerHTML = '<tr><td colspan="8">Coupon Not Found</td></tr>';
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    function changeTheValuesOfTable(coupons) {
+      const tableBody = document.getElementById('couponTableBody');
+      coupons.forEach((coupon, index) => {
+        const newRow = `<tr id="row${index}">
+      <td>
+        ${index + 1}
+      </td>
+      <td>
+        ${coupon.couponCode}
+      </td>
+      <td>
+        ${coupon.discountAmount}
+      </td>
+      <td>
+        ${coupon.quantity}
+      </td>
+      <td>
+        ${coupon.description}
+      </td>
+      <td>
+        createDate:
+        <br>
+        <p style="margin: 0px; color: green; font-size: 12px;">
+          ${new Date(coupon.createDate).toString().split(' ').slice(0, 4).join(' ')}
+        </p>
+        expireDate:
+        <br>
+        <p style="margin: 0px; color: red; font-size: 12px;">
+          ${new Date(coupon.expireDate).toString().split(' ').slice(0, 4).join(' ')}
+        </p>
+      </td>
+      <td>
+        <button onclick="editCoupon('${coupon._id}')" class="btn btn-outline-primary"
+                data-target="#editCouponModal" data-toggle="modal">Edit</button>
+        &nbsp;&nbsp;
+        <button class="btn btn-outline-danger"
+                onclick="deleteCoupon('${coupon._id}','${index}')">Delete</button>
+      </td>
+    </tr>`;
+        tableBody.innerHTML += newRow;
+      });
+    }
+
+
 
 
     function deleteCoupon(id, i) {

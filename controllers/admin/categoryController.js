@@ -7,8 +7,13 @@ const category = require("../../models/categoryModel");
 const loadCategory = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const categorys = await category.find();
-    res.render("category", { admins: adminData, category: categorys });
+    const page = 1;
+    const limit = 10;
+    const startIndex = (page-1)*limit;
+    const categorys = await category.find().skip(startIndex).limit(limit).sort({name:-1});
+    const totalCategoryCount = await category.countDocuments();
+    const hasNextPage = totalCategoryCount > limit * page;
+    res.render("category", { admins: adminData, category: categorys,hasNextPage,totalCategoryCount });
   } catch (error) {
     console.log(error.message);
   }
@@ -118,6 +123,29 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+// to get the search in category list
+const getSearchData = async (req,res) => {
+  try{
+    const {searchValue,page}=req.query;
+    let pageInt = parseInt(page);
+    if(pageInt<=0){
+      pageInt=1;
+    }
+    const limit = 10;
+    const startIndex = (pageInt-1)*limit;
+    const regexPattern = new RegExp(searchValue,'i');
+    const categorys = await category.find({name:regexPattern}).skip(startIndex).limit(limit).sort({name: -1});
+    const allCategory = await category.find().skip(startIndex).limit(limit).sort({name:-1});
+    const totalCategoryCount = await category.find({name:regexPattern}).countDocuments();
+    const AlltotalCategoryCount = await category.countDocuments();
+    const hasNextPage = searchValue ?  totalCategoryCount > limit * pageInt : AlltotalCategoryCount > limit * pageInt;
+    res.json({category:searchValue?categorys:allCategory, nextPage:hasNextPage ,page:pageInt});
+
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadCategory,
   loadAddCategory,
@@ -125,4 +153,5 @@ module.exports = {
   loadEditCategory,
   verifyEditCategory,
   deleteCategory,
+  getSearchData,
 }

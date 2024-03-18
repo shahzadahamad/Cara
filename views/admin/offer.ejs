@@ -30,6 +30,25 @@
       -webkit-appearance: menulist-button;
       appearance: menulist-button;
     }
+
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-weight: 800;
+      background-color: #1abc9c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination-buttons button:hover {
+      background-color: #088178;
+    }
   </style>
 
   <div class="sidebar">
@@ -140,20 +159,20 @@
                     <!-- Inputs -->
                     <div class="form-group">
                       <label for="input1">Offer Title</label>
-                      <input type="text" class="form-control" name="offerTitle" id="input1" placeholder="Enter Offer Title">
+                      <input type="text" class="form-control" name="offerTitle" id="input1"
+                        placeholder="Enter Offer Title">
                     </div>
                     <div class="form-group">
                       <label>Offer Type</label><br>
                       <!-- Category radio button -->
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio"
-                          name="offerType" id="categoryRadio" value="category">
+                        <input class="form-check-input" type="radio" name="offerType" id="categoryRadio"
+                          value="category">
                         <label class="form-check-label" for="categoryRadio">Category</label>
                       </div>
                       <!-- Product radio button -->
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio"
-                          name="offerType" id="productRadio" value="product">
+                        <input class="form-check-input" type="radio" name="offerType" id="productRadio" value="product">
                         <label class="form-check-label" for="productRadio">Product</label>
                       </div>
                     </div>
@@ -165,7 +184,7 @@
                       </select>
                     </div>
 
-                  
+
                     <div class="form-group" id="productSelectGroup" style="display: none;">
                       <label for="productSelect">Select Product</label>
                       <select name="product" class="form-control" id="productSelect">
@@ -175,7 +194,8 @@
 
                     <div class="form-group">
                       <label for="input3">Discount Percentage</label>
-                      <input type="number" class="form-control" name="discountPercentage" id="input3" placeholder="Enter Discount Percentage">
+                      <input type="number" class="form-control" name="discountPercentage" id="input3"
+                        placeholder="Enter Discount Percentage">
                     </div>
 
                   </div>
@@ -190,14 +210,16 @@
                     </div>
                     <div class="form-group">
                       <label for="textarea">Description</label>
-                      <textarea class="form-control" name="description" id="textarea" rows="3" placeholder="Description"></textarea>
+                      <textarea class="form-control" name="description" id="textarea" rows="3"
+                        placeholder="Description"></textarea>
                     </div>
 
                   </div>
                 </div>
               </div>
               <div class="modal-footer">
-                <p id="errorMsg" style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;"></p>
+                <p id="errorMsg" style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;">
+                </p>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="addOffer()">Save changes</button>
               </div>
@@ -212,7 +234,7 @@
 
 
 
- <!-- edit modal  -->
+      <!-- edit modal  -->
       <form id="editOfferData">
         <div class="modal fade" id="editOfferModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
           aria-hidden="true">
@@ -230,13 +252,15 @@
                     <!-- Inputs -->
                     <div class="form-group">
                       <label for="editOfferTitle">Offer Title</label>
-                      <input type="text" class="form-control" name="editOfferTitle" id="editOfferTitle" placeholder="Enter Offer Title">
+                      <input type="text" class="form-control" name="editOfferTitle" id="editOfferTitle"
+                        placeholder="Enter Offer Title">
                     </div>
 
 
                     <div class="form-group">
                       <label for="editDicountPercentage">Discount Percentage</label>
-                      <input type="number" class="form-control" name="editDiscountPercentage" id="editDicountPercentage" placeholder="Enter Discount Percentage">
+                      <input type="number" class="form-control" name="editDiscountPercentage" id="editDicountPercentage"
+                        placeholder="Enter Discount Percentage">
                     </div>
 
                     <div class="form-group">
@@ -252,14 +276,16 @@
                     </div>
                     <div class="form-group">
                       <label for="editDescription">Description</label>
-                      <textarea class="form-control" name="editDescription" id="editDescription" rows="3" placeholder="Description"></textarea>
+                      <textarea class="form-control" name="editDescription" id="editDescription" rows="3"
+                        placeholder="Description"></textarea>
                     </div>
 
                   </div>
                 </div>
               </div>
               <div class="modal-footer">
-                <p id="editErrorMsg" style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;"></p>
+                <p id="editErrorMsg"
+                  style="font-weight: 900; color: red; display: none; position: absolute; left: 12px;"></p>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="edit-Offer">Save changes</button>
               </div>
@@ -292,10 +318,13 @@
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
           <h3 style="font-size: 30px;" class="main--title">Offers</h3>
+          <h3 class="main--title">Total <%= totalOfferCount %>
+              <%= totalOfferCount <=1 ? 'Offer' : 'Offers' %>
+          </h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" id="search" placeholder="Search" />
+          <input type="text" id="search" placeholder="Search" oninput="handleSearch(1)" />
         </div>
       </div>
 
@@ -313,60 +342,75 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="offerTableBody">
             <% if( locals.offer.length>0){ %>
               <% for(let i=0;i<locals.offer.length;i++){ %>
                 <tr id="row<%= i %>">
-                <td>
-                  <%= i+1 %>
-                </td>
-                <td>
-                  <%= offer[i].offerTitle %>
-                </td>
-                <td>
-                  <%= offer[i].discountPercentage %>%
-                </td>
-                <td>
-                  <%= offer[i].offerType %>
-                </td>
-                <td>
-                  <i style="font-size: 25px;" onclick="window.location.href='/admin/choose-offer?id=<%= offer[i]._id %>'" class="fa-solid fa-circle-plus"></i>
-                </td>
-                <td>
-                  <%= offer[i].description %>
-                </td>
-                <td>
-                  
-                  StartDate:
-                  <br>
-                  <P style="margin: 0px; color: green; font-size: 12px;">
-                    <%= offer[i].startDate.toString().split(' ').slice(0,4) %></P>
+                  <td>
+                    <%= i+1 %>
+                  </td>
+                  <td>
+                    <%= offer[i].offerTitle %>
+                  </td>
+                  <td>
+                    <%= offer[i].discountPercentage %>%
+                  </td>
+                  <td>
+                    <%= offer[i].offerType %>
+                  </td>
+                  <td>
+                    <i style="font-size: 25px;"
+                      onclick="window.location.href='/admin/choose-offer?id=<%= offer[i]._id %>'"
+                      class="fa-solid fa-circle-plus"></i>
+                  </td>
+                  <td>
+                    <%= offer[i].description %>
+                  </td>
+                  <td>
+
+                    StartDate:
+                    <br>
+                    <P style="margin: 0px; color: green; font-size: 12px;">
+                      <%= offer[i].startDate.toString().split(' ').slice(0,4) %></P>
               EndDate:
               <br>
               <P style="margin: 0px; color: red; font-size: 12px;"><%= offer[i].endDate.toString().split(' ').slice(0,4) %></P>
             </td>
             <td>
-              <button onclick="editOffer('<%=offer[i]._id %>')" class="btn btn-outline-primary"
-                data-target="#editOfferModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
-                  class="btn btn-outline-danger"
-                  onclick="deleteOffer('<%= offer[i]._id %>','<%= i %>')">Delete</button>
-                  
-            </td>
-          </tr>
+              <button onclick="editOffer(' <%=offer[i]._id %>')" class="btn btn-outline-primary"
+                        data-target="#editOfferModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
+                          class="btn btn-outline-danger"
+                          onclick="deleteOffer('<%= offer[i]._id %>','<%= i %>')">Delete</button>
+
+                  </td>
+                </tr>
                 <% } %>
-                <% }else{ %>
-                  <tr>
-                    <td style="font-size: 20px; padding: 15px;" colspan="8">Offers Not Found</td>
-                  </tr>
-                  <% } %>
+                  <% }else{ %>
+                    <tr>
+                      <td style="font-size: 20px; padding: 15px;" colspan="8">Offer Not Found</td>
+                    </tr>
+                    <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td id="totalCategory" colspan="8">Total offers: <span id="total"><%= locals.offer.length %></span>
+              <td id="totalValue" colspan="8">Total offers: <span id="total">
+                  <%= locals.offer.length %>
+                </span>
               </td>
             </tr>
           </tfoot>
         </table>
+        <div class="pagination-buttons">
+
+          <button id="prevButton" style="opacity: 0.5;" disabled onclick="handleButtons(false)">
+            <<</button>
+              <% if(locals.hasNextPage){ %>
+                <button id="nextButton" onclick="handleButtons(true)">>></button>
+                <% }else{ %>
+                  <button id="nextButton" style="opacity: 0.5;" disabled onclick="handleButtons(true)">>></button>
+                  <% } %>
+
+        </div>
       </div>
 
     </div>
@@ -382,6 +426,123 @@
 
   <script>
 
+
+    window.onload = () => {
+      document.getElementById('search').value = ''
+    }
+
+    let pageForSearch = 1
+    let searchInput = ''
+
+    async function handleButtons(button) {
+      if (searchInput === '') {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      } else {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      }
+    }
+
+    async function handleSearch(page) {
+      const searchInput1 = document.getElementById('search').value.trim();
+      searchInput = searchInput1;
+      try {
+        const response = await axios.get(`/admin/get-offer-search?searchValue=${searchInput1}&page=${page}`);
+        const offer = response.data.offer;
+        const nextPage = response.data.nextPage;
+        const pageInt = response.data.page;
+        pageForSearch = pageInt
+        const tableBody = document.getElementById('offerTableBody');
+        const totalValue = document.getElementById('totalValue');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        if (pageInt === 1) {
+          prevButton.style.opacity = '0.5';
+          prevButton.disabled = true
+        } else {
+          prevButton.style.opacity = '1';
+          prevButton.disabled = false
+        }
+        if (nextPage) {
+          nextButton.style.opacity = '1';
+          nextButton.disabled = false
+        } else {
+          nextButton.style.opacity = '0.5';
+          nextButton.disabled = true
+        }
+
+        tableBody.innerHTML = '';
+        totalValue.innerHTML = `Total Products: ${offer.length}`
+        if (offer.length > 0) {
+          changeTheValuesOfTable(offer);
+        } else {
+          tableBody.innerHTML = '<tr><td colspan="8">Offer Not Found</td></tr>';
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    function changeTheValuesOfTable(offers) {
+      const tableBody = document.getElementById('offerTableBody');
+      offers.forEach((offer, index) => {
+        const newRow = `<tr id="row${index}">
+      <td>
+        ${index + 1}
+      </td>
+      <td>
+        ${offer.offerTitle}
+      </td>
+      <td>
+        ${offer.discountPercentage}%
+      </td>
+      <td>
+        ${offer.offerType}
+      </td>
+      <td>
+        <i style="font-size: 25px; cursor: pointer;"
+          onclick="window.location.href='/admin/choose-offer?id=${offer._id}'"
+          class="fa-solid fa-circle-plus"></i>
+      </td>
+      <td>
+        ${offer.description}
+      </td>
+      <td>
+        StartDate:
+        <br>
+        <p style="margin: 0px; color: green; font-size: 12px;">
+          ${new Date(offer.startDate).toString().split(' ').slice(0, 4).join(' ')}
+        </p>
+        EndDate:
+        <br>
+        <p style="margin: 0px; color: red; font-size: 12px;">
+          ${new Date(offer.endDate).toString().split(' ').slice(0, 4).join(' ')}
+        </p>
+      </td>
+      <td>
+        <button onclick="editOffer('${offer._id}')" class="btn btn-outline-primary"
+                data-target="#editOfferModal" data-toggle="modal">Edit</button>
+        &nbsp;&nbsp;
+        <button class="btn btn-outline-danger"
+                onclick="deleteOffer('${offer._id}','${index}')">Delete</button>
+      </td>
+    </tr>`;
+        tableBody.innerHTML += newRow;
+      });
+    }
 
 
 

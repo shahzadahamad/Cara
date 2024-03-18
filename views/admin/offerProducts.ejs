@@ -81,11 +81,14 @@
 
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
-          <h3 style="font-size: 30px;" class="main--title"><%= locals.product ? 'Products' : 'Category' %></h3>
+          <h3 style="font-size: 30px;" class="main--title">
+            <%= locals.product ? 'Products' : 'Category' %>
+          </h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" id="search" placeholder="Search" />
+          <input type="text" id="search" placeholder="Search"
+            oninput="searchResult('<%= locals.category ? `category` : `product` %>','<%= locals.id %>')" />
         </div>
       </div>
 
@@ -93,34 +96,36 @@
         <table>
           <thead>
             <% if(locals.product){ %>
-            <tr>
-              <th>No</th>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Actions</th>      
-            </tr>
-            <% }else if(locals.category){ %>
-              <th>No</th>
-              <th>Name</th>
-              <th>Actions</th>      
-              <% } %>
+              <tr>
+                <th>No</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+              <% }else if(locals.category){ %>
+                <th>No</th>
+                <th>Name</th>
+                <th>Actions</th>
+                <% } %>
           </thead>
-          <tbody>
+          <tbody id="TableBody">
             <% if(locals.product && product.length>0){%>
               <% for(let i=0; i< product.length;i++){ %>
                 <tr id="row<%=i%>">
                   <td>
                     <%= i+1 %>
                   </td>
-                  <td><img style="width: 100px; border-radius: 10px;" src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
+                  <td><img style="width: 100px; border-radius: 10px;"
+                      src="/images/productImages/<%= product[i].image[0] %>" alt=""></td>
                   <td>
                     <%= product[i].name %>
                   </td>
                   <th>$<%= product[i].price %>
                   </th>
                   <td>
-                    <input type="checkbox" id="checkbox<%= i %>" <%= product[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= product[i]._id %>','product','<%= locals.id %>','<%= i %>')">
+                    <input type="checkbox" id="checkbox<%= i %>" <%=product[i].offer==locals.id ? 'checked' : '' %>
+                    onchange="offerAdded('<%= product[i]._id %>','product','<%= locals.id %>','<%= i %>')">
                   </td>
                 </tr>
                 <% } %>
@@ -134,15 +139,18 @@
                           <%= category[i].name %>
                         </td>
                         <td>
-                          <input type="checkbox" id="checkbox<%= i %>" <%= category[i].offer==locals.id ? 'checked' : '' %> onchange="offerAdded('<%= category[i]._id %>','category','<%= locals.id %>','<%= i %>')">
+                          <input type="checkbox" id="checkbox<%= i %>" <%=category[i].offer==locals.id ? 'checked' : ''
+                            %> onchange="offerAdded('<%= category[i]._id %>','category','<%= locals.id %>','<%= i %>')">
                         </td>
                       </tr>
                       <% } %>
-                    <% }else{ %>
-                      <tr>
-                        <td colspan="7"><% locals.product ? 'Products Not Found' : 'Category Not Found' %>  Products Not Found</td>
-                      </tr>
-                      <% } %>
+                        <% }else{ %>
+                          <tr>
+                            <td colspan="<%= locals.product ? '5' : '3' %>">
+                              <% locals.product ? 'Products Not Found' : 'Category Not Found' %> Products Not Found
+                            </td>
+                          </tr>
+                          <% } %>
           </tbody>
         </table>
       </div>
@@ -156,9 +164,77 @@
 
   <script>
 
-   async function offerAdded(_id,type,id,i){
+    async function searchResult(type, id) {
+      const searchInput = document.getElementById('search').value.trim();
+      const tableBody = document.getElementById('TableBody');
+      if (type === 'category') {
+        const response = await axios.get(`/admin/get-choose-offer-search?type=category&searchInput=${searchInput}`);
+        const cateogry = response.data.category;
+        tableBody.innerHTML = '';
+
+        if (cateogry.length <= 0) {
+          return tableBody.innerHTML = `<tr>
+                            <td colspan="3">
+                               Category Not Found
+                            </td>
+                          </tr>`
+        }
+
+
+        cateogry.forEach((category, index) => {
+          const newRow = `<tr id="row${index}">
+    <td>
+      ${index + 1}
+    </td>
+    <td>
+      ${category.name}
+    </td>
+    <td>
+      <input type="checkbox" id="checkbox${index}" ${category.offer == id ? 'checked' : ''}
+        onchange="offerAdded('${category._id}','category','${id}','${index}')">
+    </td>
+  </tr>`;
+          tableBody.innerHTML += newRow;
+        })
+
+
+      } else {
+        const response = await axios.get(`/admin/get-choose-offer-search?type=product&searchInput=${searchInput}`);
+        const product = response.data.product;
+        tableBody.innerHTML = '';
+        if (product.length <= 0) {
+          return tableBody.innerHTML = `<tr>
+                            <td colspan="5">
+                               Product Not Found
+                            </td>
+                          </tr>`
+        }
+
+        product.forEach((product, index) => {
+          const newRow = `<tr id="row${index}">
+    <td>
+      ${index + 1}
+    </td>
+    <td><img style="width: 100px; border-radius: 10px;"
+        src="/images/productImages/${product.image[0]}" alt=""></td>
+    <td>
+      ${product.name}
+    </td>
+    <th>$${product.price}
+    </th>
+    <td>
+      <input type="checkbox" id="checkbox${index}" ${product.offer == id ? 'checked' : ''}
+      onchange="offerAdded('${product._id}','product','${id}','${index}')">
+    </td>
+  </tr>`;
+          tableBody.innerHTML += newRow;
+        })
+      }
+    }
+
+    async function offerAdded(_id, type, id, i) {
       const checkbox = document.getElementById(`checkbox${i}`).checked;
-      const response = await axios.patch('/admin/adding-offers',{_id,type,id,checkbox});
+      const response = await axios.patch('/admin/adding-offers', { _id, type, id, checkbox });
     }
 
   </script>

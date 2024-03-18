@@ -4,6 +4,26 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
+  <style>
+    .pagination-buttons {
+      margin-top: 20px;
+    }
+
+    .pagination-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-weight: 800;
+      background-color: #1abc9c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination-buttons button:hover {
+      background-color: #088178;
+    }
+  </style>
 
   <div class="sidebar">
     <br>
@@ -66,27 +86,31 @@
   </div>
 
   <div class="main--content">
-    
+
     <div class="header--wrapper">
       <img src="/images/logo.png" style="width: 140px; height: 40px;" alt="">
       <div class="user--info">
         <img src="/images/productImages/<%= admins.profile %>" alt="">
-        <h4><%= admins.username %></h4>
+        <h4>
+          <%= admins.username %>
+        </h4>
       </div>
     </div>
 
     <div class="tabular--wrapper">
 
       <div class="d-flex flex-wrap: wrap; pb-3 justify-content-end">
-        <a class="btn btn-outline-dark" href="/admin/add-category"><i class="fa-solid fa-circle-plus"></i> Add Category</a>
+        <a class="btn btn-outline-dark" href="/admin/add-category"><i class="fa-solid fa-circle-plus"></i> Add
+          Category</a>
       </div>
       <div style="flex-wrap: wrap; justify-content: space-between; margin-bottom: 20px;" class="user--info">
         <div>
           <h3 style="font-size: 30px;" class="main--title">Category</h3>
+          <h3 class="main--title">Total <%= totalCategoryCount %> <%= totalCategoryCount <= 1 ? 'Category' : 'Categories' %> </h3>
         </div>
         <div class="search--box">
           <i class="fa-solid fa-search"></i>
-          <input type="text" id="search" placeholder="Search" />
+          <input type="text" id="search" placeholder="Search" oninput="handleSearch(1)"/>
         </div>
       </div>
 
@@ -98,52 +122,170 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <% if(category.length>0){%>
+          <tbody id="productTableBody">
+            <% if(locals.category.length>0){%>
               <% for(let i=0; i< category.length;i++){ %>
-            <tr id="row<%=i%>">
-              <td><%= category[i].name %></td>
-              <td><a class="btn btn-outline-primary" href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button class="btn btn-outline-danger" onclick=" if(confirm('Did you want to delete product <%= category[i].name %>')){deleteCategory('<%= category[i]._id %>','<%=i%>')}">Delete</button>
-            </tr> 
-            <% } %>
-            <% } else { %>
-              <tr>
-                <td colspan="7">Category Not Found</td>
-              </tr>
-              <% } %>
+                <tr id="row<%=i%>">
+                  <td>
+                    <%= category[i].name %>
+                  </td>
+                  <td><a class="btn btn-outline-primary"
+                      href="/admin/edit-categorys?id=<%= category[i]._id %>">Edit</a>&nbsp;&nbsp;<button
+                      class="btn btn-outline-danger"
+                      onclick="deleteCategory('<%= category[i]._id %>','<%=i%>')">Delete</button>
+                </tr>
+                <% } %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="7">Category Not Found</td>
+                    </tr>
+                    <% } %>
           </tbody>
           <tfoot>
             <tr>
-              <td id="totalCategory" colspan="8">Total Products: <%= category.length %></td>
+              <td id="totalValue" colspan="8">Total Categorys: <%= category.length %>
+              </td>
             </tr>
           </tfoot>
         </table>
+        <div class="pagination-buttons">
+
+          <button id="prevButton" style="opacity: 0.5;" disabled onclick="handleButtons(false)">
+            <<</button>
+              <% if(locals.hasNextPage){ %>
+                <button id="nextButton" onclick="handleButtons(true)">>></button>
+                <% }else{ %>
+                  <button id="nextButton" style="opacity: 0.5;" disabled onclick="handleButtons(true)">>></button>
+                  <% } %>
+
+        </div>
       </div>
     </div>
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script>
-    
-    function deleteCategory(id,i){
-      let totalCategory = document.getElementById('totalCategory');
+
+window.onload=()=>{
+  document.getElementById('search').value=''
+}
+
+    let pageForSearch = 1
+    let searchInput = ''
+
+    async function handleButtons(button) {
+      if (searchInput === '') {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      } else {
+        if (button) {
+          pageForSearch++;
+          handleSearch(pageForSearch)
+        } else {
+          pageForSearch--;
+          handleSearch(pageForSearch)
+        }
+      }
+    }
+
+    async function handleSearch(page) {
+      const searchInput1 = document.getElementById('search').value.trim();
+      searchInput = searchInput1;
+      try {
+        const response = await axios.get(`/admin/get-category-search?searchValue=${searchInput1}&page=${page}`);
+        const category = response.data.category;
+        const nextPage = response.data.nextPage;
+        const pageInt = response.data.page;
+        pageForSearch = pageInt
+        const tableBody = document.getElementById('productTableBody');
+        const totalValue = document.getElementById('totalValue');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+
+        if (pageInt === 1) {
+          prevButton.style.opacity = '0.5';
+          prevButton.disabled = true
+        } else {
+          prevButton.style.opacity = '1';
+          prevButton.disabled = false
+        }
+        if (nextPage) {
+          nextButton.style.opacity = '1';
+          nextButton.disabled = false
+        } else {
+          nextButton.style.opacity = '0.5';
+          nextButton.disabled = true
+        }
+
+        tableBody.innerHTML = '';
+        totalValue.innerHTML = `Total Categorys: ${category.length}`
+        if (category.length > 0) {
+          changeTheValuesOfTable(category);
+        } else {
+          tableBody.innerHTML = '<tr><td colspan="8">Products Not Found</td></tr>';
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    function changeTheValuesOfTable(category) {
+      const tableBody = document.getElementById('productTableBody');
+      category.forEach((category, index) => {
+        const newRow = `
+          <tr id="row${index}">
+            <td>${category.name}</td>
+              <td><a class="btn btn-outline-primary"
+                      href="/admin/edit-categorys?id=${category._id}">Edit</a>&nbsp;&nbsp;<button
+                      class="btn btn-outline-danger"
+                      onclick="deleteProduct('${category._id}','${index}')">Delete</button>
+                  </td>
+          </tr>`;
+        tableBody.innerHTML += newRow;
+      });
+    }
+
+
+
+
+    function deleteCategory(id, i) {
       const row = document.getElementById(`row${i}`);
-      fetch(`/admin/delete-category?id=${id}`,{
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id:id })
-      }).then((res) => res.json())
-        .then((data) => {
-          row.remove();
-        })
-        .catch((error) => console.log(error.message));
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          fetch(`/admin/delete-category?id=${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: id })
+          }).then((res) => res.json())
+            .then((data) => {
+              row.remove();
+            })
+            .catch((error) => console.log(error.message));
+        }
+      })
     };
 
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"

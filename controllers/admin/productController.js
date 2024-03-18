@@ -11,8 +11,13 @@ const mongoose = require("mongoose");
 const loadProducts = async (req, res) => {
   try {
     const adminData = await admin.findById({ _id: req.session.admin_id });
-    const products = await product.find();
-    res.render("products", { admins: adminData, product: products});
+    const page = 1;
+    const limit = 10;
+    const startIndex = (page-1)*limit;
+    const products = await product.find().skip(startIndex).limit(limit).sort({name:-1});
+    const AlltotalProductsCount = await product.countDocuments();
+    const hasNextPage = AlltotalProductsCount > limit * page;
+    res.render("products", { admins: adminData, product: products,hasNextPage,AlltotalProductsCount});
   } catch (error) {
     console.log(error.message);
   }
@@ -277,12 +282,12 @@ const getSearchData = async (req,res) => {
     if(pageInt<=0){
       pageInt=1;
     }
-    const limit = 2;
+    const limit = 10;
     const startIndex = (pageInt-1)*limit;
     const regexPattern = new RegExp(searchValue,'i');
     const products = await product.find({$or:[{name:regexPattern},{brand:regexPattern},{"categoryId.name":regexPattern}]}).populate('categoryId').skip(startIndex).limit(limit).sort({name: -1, brand: -1, "categoryId.name": -1});
     const allProducts = await product.find().populate('categoryId').skip(startIndex).limit(limit).sort({name:-1});
-    const totalProductsCount = await product.find({name:regexPattern}).countDocuments();
+    const totalProductsCount = await product.find({$or:[{name:regexPattern},{brand:regexPattern},{"categoryId.name":regexPattern}]}).countDocuments();
     const AlltotalProductsCount = await product.countDocuments();
     const hasNextPage = searchValue ?  totalProductsCount > limit * pageInt : AlltotalProductsCount > limit * pageInt;
     res.json({products:searchValue?products:allProducts, nextPage:hasNextPage ,page:pageInt});
