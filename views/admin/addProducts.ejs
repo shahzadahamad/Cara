@@ -11,6 +11,10 @@
       -webkit-appearance: none;
     }
 
+    form label {
+      margin-left: -10px;
+    }
+
     .preview-container {
       display: none;
       flex-wrap: wrap;
@@ -126,14 +130,17 @@
               </div>
               <% } %>
                 <form action="/admin/add-products" method="post" enctype="multipart/form-data">
+                  <label for="">Name</label>
                   <div class="row">
                     <i class="fa-solid fa-signature"></i>
                     <input type="text" name="name" placeholder="Name">
                   </div>
+                  <label for="">Brand</label>
                   <div class="row">
                     <i class="fa-solid fa-b"></i>
                     <input type="text" name="brand" placeholder="Brand">
                   </div>
+                  <label for="">Category</label>
                   <div class="row">
                     <i class="fa-solid fa-list"></i>
                     <select style="color: #787978; padding-left: 60px;" class="border rounded" name="category">
@@ -149,10 +156,12 @@
                               <% } %>
                     </select>
                   </div>
+                  <label for="">Price</label>
                   <div class="row">
                     <i class="fa-solid fa-dollar-sign"></i>
                     <input type="number" name="price" placeholder="Price">
                   </div>
+                  <label for="">Rating</label>
                   <div class="row">
                     <i class="fa-solid fa-star"></i>
                     <select style="color: #787978; padding-left: 60px;" class="border rounded " name="rating">
@@ -164,10 +173,12 @@
                         <% } %>
                     </select>
                   </div>
+                  <label for="">Quantity</label>
                   <div class="row">
                     <i class="fa-solid fa-c"></i>
                     <input type="number" name="quantity" placeholder="Quantity">
                   </div>
+                  <label style="margin-bottom: 10px;" for="">Images</label>
                   <div id="previewContainer"></div>
                   <div class="row">
                     <i class="fa-solid fa-image"></i>

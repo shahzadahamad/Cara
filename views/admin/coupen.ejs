@@ -283,7 +283,7 @@
                 <P style="margin: 0px; color: red; font-size: 12px;"><%= coupon[i].expireDate.toString().split(' ').slice(0,4) %></P>
               </td>
               <td>
-              <button onclick="editCoupon(' <%=coupon[i]._id %>')" class="btn btn-outline-primary"
+              <button onclick="editCoupon('<%=coupon[i]._id %>')" class="btn btn-outline-primary"
                         data-target="#editCouponModal" data-toggle="modal" >Edit</button>&nbsp;&nbsp;<button
                           class="btn btn-outline-danger"
                           onclick="deleteCoupon('<%= coupon[i]._id %>','<%= i %>')">Delete</button>
