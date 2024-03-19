@@ -104,7 +104,6 @@ const verifyAddProducts = async (req, res) => {
   try {
     const { name, brand,rating, price, quantity, description } = req.body;
     const existingProduct = await product.findOne({ name: name });
-    console.log("reqfiles : ",req.files.length);
     if (existingProduct) {
       deleteImageFromFile(req.files);
       return res.json({msg:'Product Already Exist! Use Another Name'});

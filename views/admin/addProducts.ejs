@@ -181,8 +181,9 @@
                   <div id="previewContainer" style="display: none; border: 1px solid #dee2e6; padding: 10px;"></div>
                   <div class="row" id="removeInput">
                     <i class="fa-solid fa-image"></i>
-                    <input style="font-size: 20px; color: #787978;" id="imageInput" type="file" class="form-control"
-                      name="img" multiple accept="image/*">
+                    <label for="imageInput"  style="border-bottom: .5px solid gray;width: 98%; padding: .62rem 0; margin-left: 1rem; border-right: .5px solid gray; border-top: .5px solid gray;" class="btn form-control">choose file</label>
+                    <input style="font-size: 20px; color: #787978; opacity: 0;" id="imageInput"  type="file" class="form-control"
+                      name="img" maxlength="4" multiple accept="image/*">
                   </div>
                   <div class="row-des">
                     <label for="">Description</label>
@@ -216,7 +217,7 @@
       const formData = new FormData(form);
       formData.delete("img");
       images.forEach(item => {
-        if(item===''){
+        if (item === '') {
           return
         }
         formData.append("img", item);
@@ -261,27 +262,30 @@
 
     function handleImageUpload(event) {
 
-      const files = event.target.files;
+      let files = event.target.files;
 
       let max = 4 - images.length
-      // console.log(files.length)
-      // console.log(images.length);
-      // console.log(files.length+images.length>max)
-      console.log(images)
       let nonEmptyImages = images.filter(image => image !== '');
-      if(files.length+nonEmptyImages.length>4){
+      if (files.length + nonEmptyImages.length > 4) {
+        files=''
         errMsg1.innerHTML = 'Please select a maximum of 4 images!';
-            errMsg1.style.display = 'block';
-            Swal.fire({
-              icon: "warning",
-              text: `You can only add ${max} more image. The selected images are not added.`,
-            })
+        errMsg1.style.display = 'block';
+        if (nonEmptyImages.length <= 0 && files.length > 4) {
+          Swal.fire({
+            icon: "warning",
+            text: `Please select a maximum of 4 images!`,
+          })
+          return;
+        }
+        Swal.fire({
+          icon: "warning",
+          text: `You can only add ${max} more image. The selected images are not added.`,
+        })
         return;
-      }else{
-        errMsg1.style.display='none'
+      } else {
+        errMsg1.style.display = 'none'
       }
 
-      // previewContainer.innerHTML = '';
 
       Array.from(files).forEach((file, index) => {
         const reader = new FileReader();
@@ -339,16 +343,13 @@
     imageInput.addEventListener('change', handleImageUpload);
 
     function deleteImages(index) {
-      console.log('ininininininininininin')
       const previewImage = document.getElementById(`previewImage${index}`);
       const deleteIcon = document.getElementById(`deleteIcon${index}`);
       previewImage.remove();
       deleteIcon.remove();
-      console.log( 'index '+index)
-      images[index]=''
-      console.log('lenth' + images.length)
-      console.log(images)
-      if (images.length < 4) {
+      images[index] = ''
+      let nonEmptyImages = images.filter(image => image !== '');
+      if (nonEmptyImages.length<4) {
         errMsg1.style.display = 'none';
         removeInput.style.display = 'block'
       }
