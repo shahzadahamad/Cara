@@ -56,13 +56,10 @@ const validationFunction = (name, brand,rating, price, quantity, description,cat
 
 // removing image form the files
 function deleteImageFromFile(files){
-  console.log(files);
   files.forEach(element => {
     fs.unlink(imagePath+element.filename,(err)=>{
       if(err){
         console.log(err.message);
-      }else{
-        console.log('successfully')
       }
     });
   });
@@ -75,7 +72,7 @@ const loadProducts = async (req, res) => {
     const page = 1;
     const limit = 10;
     const startIndex = (page-1)*limit;
-    const products = await product.find().populate('categoryId').skip(startIndex).limit(limit).sort({name:-1});
+    const products = await product.find().populate('categoryId').sort({_id:-1}).skip(startIndex).limit(limit);
     const AlltotalProductsCount = await product.countDocuments();
     const hasNextPage = AlltotalProductsCount > limit * page;
     res.render("products", { admins: adminData, product: products,hasNextPage,AlltotalProductsCount});
@@ -107,7 +104,7 @@ const verifyAddProducts = async (req, res) => {
   try {
     const { name, brand,rating, price, quantity, description } = req.body;
     const existingProduct = await product.findOne({ name: name });
-
+    console.log("reqfiles : ",req.files.length);
     if (existingProduct) {
       deleteImageFromFile(req.files);
       return res.json({msg:'Product Already Exist! Use Another Name'});
@@ -202,9 +199,9 @@ const verifyEditProduct = async (req, res) => {
       };
   
      const productUpdate = await product.updateOne({ _id: id }, { $set: update });
-     if(productUpdate.modifiedCount<=0){
-      return res.json({msg:'No Changes Made!'})
-     }
+    //  if(productUpdate.modifiedCount<=0){
+    //   return res.json({msg:'No Changes Made!'})
+    //  }
       res.json({status:true})
     }else{
       res.json({msg:validation})
@@ -276,9 +273,8 @@ const deleteImages = async (req, res) => {
     });
 
     const imageToRevmove = findImage.image[i];
-    await product.updateOne({ _id: id }, { $pull: { image: imageToRevmove } });
-
-    res.json({ status: true });
+    const data = await product.findByIdAndUpdate({ _id: id }, { $pull: { image: imageToRevmove } },{new:true});
+    res.json({ status: true,length:data.image.length });
   } catch (error) {
     console.log(error.message);
   }
@@ -289,8 +285,12 @@ const addImages = async (req,res) => {
   try{
     const {id}=req.query;
     const file = req.file;
-    await product.updateOne({_id:id},{$push:{image:file.filename}});
-    res.json({status:true});
+    const productImage = await product.findOne({_id:id});
+    if(productImage.image.length>=4){
+      return res.json({msg:'Maximum of 4 Images are allowed!'});
+    }
+    const data =  await product.findByIdAndUpdate({_id:id},{$push:{image:file.filename}},{new:true});
+    res.json({status:true,length:data.image.length-1,filename:file.filename});
   }catch(error){
     console.log(error.message);
   }
@@ -308,7 +308,7 @@ const getSearchData = async (req,res) => {
     const startIndex = (pageInt-1)*limit;
     const regexPattern = new RegExp(searchValue,'i');
     const products = await product.find({$or:[{name:regexPattern},{brand:regexPattern},{"categoryId.name":regexPattern}]}).populate('categoryId').skip(startIndex).limit(limit).sort({name: -1, brand: -1, "categoryId.name": -1});
-    const allProducts = await product.find().populate('categoryId').skip(startIndex).limit(limit).sort({name:-1});
+    const allProducts = await product.find().populate('categoryId').sort({_id:-1}).skip(startIndex).limit(limit);
     const totalProductsCount = await product.find({$or:[{name:regexPattern},{brand:regexPattern},{"categoryId.name":regexPattern}]}).countDocuments();
     const AlltotalProductsCount = await product.countDocuments();
     const hasNextPage = searchValue ?  totalProductsCount > limit * pageInt : AlltotalProductsCount > limit * pageInt;

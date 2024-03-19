@@ -179,7 +179,7 @@
                   <label style="margin-bottom: 10px;" for="">Images (Maximum 4 images allowed)</label>
                   <p id="errMsg1" style="font-weight: 900; display: none; color: red;"></p>
                   <div id="previewContainer" style="display: none; border: 1px solid #dee2e6; padding: 10px;"></div>
-                  <div class="row">
+                  <div class="row" id="removeInput">
                     <i class="fa-solid fa-image"></i>
                     <input style="font-size: 20px; color: #787978;" id="imageInput" type="file" class="form-control"
                       name="img" multiple accept="image/*">
@@ -198,20 +198,30 @@
     </section>
 
   </div>
-
+  <script defer src="https://cdn.crop.guide/loader/l.js?c=WRNZBR"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 
   <script>
 
+    let images = [];
     const form = document.getElementById('formDataAddProduct');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(form);
       const previewContainer = document.getElementById('previewContainer');
       const errMsg = document.getElementById('errMsg');
+
+      const formData = new FormData(form);
+      formData.delete("img");
+      images.forEach(item => {
+        if(item===''){
+          return
+        }
+        formData.append("img", item);
+      })
+
       try {
         const response = await axios.post('/admin/add-products', formData, {
           headers: {
@@ -244,31 +254,52 @@
 
 
 
-
-
     const previewContainer = document.getElementById('previewContainer');
-    const imageInput = document.getElementById('imageInput');
-    const errMsg1 = document.getElementById('errMsg1');
+    let imageInput = document.getElementById('imageInput');
+    const removeInput = document.getElementById('removeInput');
+    let errMsg1 = document.getElementById('errMsg1');
 
     function handleImageUpload(event) {
+
       const files = event.target.files;
 
-      if (files.length > 4) {
-        errMsg1.innerHTML = 'Only 4 Images Allowed!';
-        errMsg1.style.display = 'block';
-        files = '';
-      } else {
-        errMsg1.style.display = 'none';
+      let max = 4 - images.length
+      // console.log(files.length)
+      // console.log(images.length);
+      // console.log(files.length+images.length>max)
+      console.log(images)
+      let nonEmptyImages = images.filter(image => image !== '');
+      if(files.length+nonEmptyImages.length>4){
+        errMsg1.innerHTML = 'Please select a maximum of 4 images!';
+            errMsg1.style.display = 'block';
+            Swal.fire({
+              icon: "warning",
+              text: `You can only add ${max} more image. The selected images are not added.`,
+            })
+        return;
+      }else{
+        errMsg1.style.display='none'
       }
 
-      previewContainer.innerHTML = '';
+      // previewContainer.innerHTML = '';
 
       Array.from(files).forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = () => {
 
+          images.push(file);
+
+          nonEmptyImages = images.filter(image => image !== '');
+          if (nonEmptyImages.length >= 4) {
+            removeInput.style.display = 'none'
+          } else {
+            errMsg1.style.display = 'none';
+            removeInput.style.display = 'block'
+          }
+
           const previewImage = document.createElement('img');
           previewImage.classList.add('preview-image');
+          previewImage.id = `previewImage${index}`
           previewImage.src = reader.result;
           previewImage.style.width = '130px';
           previewImage.style.height = 'auto';
@@ -279,12 +310,16 @@
           deleteIcon.style.position = 'absolute';
           deleteIcon.style.top = '5px';
           deleteIcon.style.right = '5px';
+          deleteIcon.id = `deleteIcon${index}`
+          deleteIcon.setAttribute('onclick', `deleteImages(${index})`)
 
 
           const imageContainer = document.createElement('div');
           imageContainer.style.position = 'relative';
           imageContainer.style.marginBottom = '15px';
           imageContainer.appendChild(previewImage);
+
+
           imageContainer.appendChild(deleteIcon);
 
 
@@ -302,6 +337,22 @@
 
     }
     imageInput.addEventListener('change', handleImageUpload);
+
+    function deleteImages(index) {
+      console.log('ininininininininininin')
+      const previewImage = document.getElementById(`previewImage${index}`);
+      const deleteIcon = document.getElementById(`deleteIcon${index}`);
+      previewImage.remove();
+      deleteIcon.remove();
+      console.log( 'index '+index)
+      images[index]=''
+      console.log('lenth' + images.length)
+      console.log(images)
+      if (images.length < 4) {
+        errMsg1.style.display = 'none';
+        removeInput.style.display = 'block'
+      }
+    }
 
   </script>
 
