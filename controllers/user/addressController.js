@@ -186,10 +186,11 @@ const verifyCheckoutAddAddress = async (req, res) => {
   }
 };
 
-// change Address 
+// change Address for user
 const loadChangeAddress = async (req,res) => {
   try{
     const id = req.query.id;
+    
     const address = await Address.findOne({userId:req.session.user._id});
     res.render('changeAddress',{user:req.session.user._id,address:address,id:id});
   }catch(error){

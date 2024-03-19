@@ -12,6 +12,7 @@ const Wallet = require("../../models/walletModel");
 const Category = require("../../models/categoryModel");
 const moment = require("moment");
 
+// razorpay insatnce
 const razorpay = async () => {
   const { key_id, key_secret } = process.env;
 
