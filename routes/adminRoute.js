@@ -21,7 +21,7 @@ adminRouter.get('/dashboard',auth.isLogin,dashboardController.loadDashboard);
 adminRouter.patch('/dashboard',dashboardController.verifyDashboard);
 adminRouter.get('/custom-sale-report',auth.isLogin,dashboardController.loadCustomSalesReport);
 adminRouter.post('/custom-sale-report',dashboardController.verifyCustomSalesReport);
-adminRouter.get('/downloadSale',dashboardController.downloadSale)
+// adminRouter.get('/downloadSale',dashboardController.downloadSale)
 
 // <--------------Category Controller-------------->
 const categoryController = require('../controllers/admin/categoryController');
