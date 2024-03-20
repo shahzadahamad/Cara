@@ -147,7 +147,7 @@
                     <div class="sub-price">
                         <small>DELIVERY :</small>
                         <span class="text-inverse">
-                            <%= order.orderAmount<500 ? '₹' +40 : 'Free' %>
+                            <%= order.orderAmount < 500 && subtotal < 500 ? '₹' +40 : 'Free' %>
                         </span>
                     </div>
                     <% if(order.couponApplied){ %>
@@ -169,7 +169,6 @@
     <div class="invoice-note">
         * Make all cheques payable to Cara Online Shopping Site<br>
         * Payment is due within 30 days<br>
-        * If you have any questions concerning this invoice, contact Us
     </div>
 
 

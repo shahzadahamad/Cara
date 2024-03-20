@@ -13,7 +13,11 @@ const validation = (couponCode,discount,expire,discription,quantity) => {
   }
 
   if(discount>200){
-    return "Minimun discount amount is 200";
+    return "Maximun discount amount is 200";
+  }
+
+  if(discount<5){
+    return "Minimun discount amount is 5";
   }
 
   const discountValue = parseFloat(discount);

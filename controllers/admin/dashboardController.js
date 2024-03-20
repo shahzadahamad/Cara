@@ -3,6 +3,7 @@ const admin = require("../../models/adminModel");
 const Order = require("../../models/orderModel");
 const User = require("../../models/userModel");
 const Product = require("../../models/productsModel");
+const he = require('he');
 const mongoose = require("mongoose");
 
 const top10ProductsCategoryAndBrand = async (req, res) => {
@@ -178,7 +179,11 @@ const gettotalRevenue = async (req, res) => {
     const total = await Order.find({});
 
     const dailyRevenue = total.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
+      if (
+        !order.isCancelled &&
+        !order.isReturned &&
+        order.orderStatus !== "Payment Failed"
+      ) {
         return acc + order.orderAmount;
       } else {
         return acc;
@@ -210,7 +215,11 @@ const getDailyData = async (req, res) => {
 
     let count = 0;
     const dailyRevenue = dailyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
+      if (
+        !order.isCancelled &&
+        !order.isReturned &&
+        order.orderStatus !== "Payment Failed"
+      ) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -248,7 +257,11 @@ const getWeeklyData = async (req, res) => {
 
     let count = 0;
     const weeklyRevenue = weeklyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
+      if (
+        !order.isCancelled &&
+        !order.isReturned &&
+        order.orderStatus !== "Payment Failed"
+      ) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -288,7 +301,11 @@ const getMonthlyData = async (req, res) => {
 
     let count = 0;
     const monthlyRevenue = monthlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned && order.orderStatus!=='Payment Failed') {
+      if (
+        !order.isCancelled &&
+        !order.isReturned &&
+        order.orderStatus !== "Payment Failed"
+      ) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -328,7 +345,11 @@ const getYearlyData = async (req, res) => {
 
     let count = 0;
     const yearlyRevenue = yearlyOrder.reduce((acc, order) => {
-      if (!order.isCancelled && !order.isReturned &&order.orderStatus!=='Payment Failed') {
+      if (
+        !order.isCancelled &&
+        !order.isReturned &&
+        order.orderStatus !== "Payment Failed"
+      ) {
         return acc + order.orderAmount;
       } else {
         count++;
@@ -368,7 +389,7 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
-                  { $ne : ["$orderStatus",'Payment Failed']},
+                  { $ne: ["$orderStatus", "Payment Failed"] },
                 ],
               },
               "$orderAmount",
@@ -398,7 +419,7 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
-                  { $ne : ["$orderStatus",'Payment Failed']},
+                  { $ne: ["$orderStatus", "Payment Failed"] },
                   { $ne: ["$couponApplied", null] },
                 ],
               },
@@ -414,12 +435,12 @@ const customReport = async (fromDate, toDate) => {
                 $and: [
                   { $eq: ["$isReturned", false] },
                   { $eq: ["$isCancelled", false] },
-                  { $ne : ["$orderStatus",'Payment Failed']},
-                  { $ne : ["$orderStatus",'Payment Failed']},
+                  { $ne: ["$orderStatus", "Payment Failed"] },
+                  { $ne: ["$orderStatus", "Payment Failed"] },
                   { $ne: ["$couponApplied", null] },
                 ],
               },
-              "$couponApplied", 
+              "$couponApplied",
               0,
             ],
           },
@@ -441,7 +462,6 @@ const customReport = async (fromDate, toDate) => {
       $sort: { date: 1 },
     },
   ]);
-
 
   const data = result.reduce(
     (acc, curr) => {
@@ -478,7 +498,15 @@ const graphDaily = async () => {
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
-          totalOrders: {$sum: { $cond: { if: { $ne: ["$orderStatus", "Payment Failed"] }, then: 1, else: 0 } }},
+          totalOrders: {
+            $sum: {
+              $cond: {
+                if: { $ne: ["$orderStatus", "Payment Failed"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
           totalRevenue: {
             $sum: {
               $cond: [
@@ -486,7 +514,7 @@ const graphDaily = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
-                    { $ne : ["$orderStatus",'Payment Failed']}
+                    { $ne: ["$orderStatus", "Payment Failed"] },
                   ],
                 },
                 "$orderAmount",
@@ -546,7 +574,7 @@ const graphMonthly = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
-                    { $ne : ["$orderStatus",'Payment Failed']}
+                    { $ne: ["$orderStatus", "Payment Failed"] },
                   ],
                 },
                 "$orderAmount",
@@ -580,10 +608,10 @@ const graphMonthly = async () => {
         },
       },
       {
-        $sort:{
-          date:1
-        }
-      }
+        $sort: {
+          date: 1,
+        },
+      },
     ]);
 
     return data;
@@ -606,7 +634,7 @@ const graphYearly = async () => {
                   $and: [
                     { $ne: ["$isCancelled", true] },
                     { $ne: ["$isReturned", true] },
-                    { $ne : ["$orderStatus",'Payment Failed']}
+                    { $ne: ["$orderStatus", "Payment Failed"] },
                   ],
                 },
                 "$orderAmount",
@@ -640,10 +668,10 @@ const graphYearly = async () => {
         },
       },
       {
-        $sort:{
-          date:1
-        }
-      }
+        $sort: {
+          date: 1,
+        },
+      },
     ]);
     return data;
   } catch (error) {
@@ -697,7 +725,7 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
-                      { $ne : ["$orderStatus",'Payment Failed']}
+                      { $ne: ["$orderStatus", "Payment Failed"] },
                     ],
                   },
                   "$orderAmount",
@@ -727,7 +755,7 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
-                      { $ne : ["$orderStatus",'Payment Failed']},
+                      { $ne: ["$orderStatus", "Payment Failed"] },
                       { $ne: ["$couponApplied", null] },
                     ],
                   },
@@ -743,11 +771,11 @@ const custsomMonthYearWeekDaily = async (data) => {
                     $and: [
                       { $eq: ["$isReturned", false] },
                       { $eq: ["$isCancelled", false] },
-                      { $ne : ["$orderStatus",'Payment Failed']},
+                      { $ne: ["$orderStatus", "Payment Failed"] },
                       { $ne: ["$couponApplied", null] },
                     ],
                   },
-                  "$couponApplied", 
+                  "$couponApplied",
                   0,
                 ],
               },
@@ -787,8 +815,8 @@ const custsomMonthYearWeekDaily = async (data) => {
         }
       );
       return { result, data };
-    }else{
-      return {error:true};
+    } else {
+      return { error: true };
     }
   } catch (error) {
     console.log(error.message);
@@ -813,13 +841,14 @@ const loadCustomSalesReport = async (req, res) => {
 
     if (data) {
       const result = await custsomMonthYearWeekDaily(data);
-      if(result.error){
-        return res.render('error');
+      if (result.error) {
+        return res.render("error");
       }
       return res.render("CustomSaleReport", {
         admins: adminData,
         info: { customReport: result.result },
         total: result.data,
+        data: data,
         status: true,
       });
     }
@@ -857,9 +886,42 @@ const verifyCustomSalesReport = async (req, res) => {
   }
 };
 
+// download
+const downloadSale = async (req, res) => {
+  try {
+    const { data, from, to, data1,total } = req.query;
+    const decodedData = he.decode(data);
+    const parsedData = JSON.parse(decodedData);
+    const decodedTotal = he.decode(total);
+    const parsedTotal = JSON.parse(decodedTotal);
+    if(from,to){
+     return  res.render("saleReport", {
+        info: parsedData,
+        total: parsedTotal,
+        from,
+        to,
+        status: false,
+      });
+    }
+
+    if(data1){
+      return res.render("saleReport", {
+        info: parsedData,
+        total: parsedTotal,
+        data: data1,
+        status: true,
+      });
+    }
+
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   loadDashboard,
   verifyDashboard,
   loadCustomSalesReport,
   verifyCustomSalesReport,
+  downloadSale,
 };

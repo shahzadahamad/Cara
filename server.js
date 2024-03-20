@@ -27,7 +27,7 @@ app.use(
 app.set('view engine','ejs');
 
 // morgan
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 // flash 
 app.use(flash());

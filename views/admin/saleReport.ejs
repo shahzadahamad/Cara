@@ -1,0 +1,245 @@
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<!-- <link rel="stylesheet" href="/styleSheet/admin.css"> -->
+
+<style>
+    .invoice-company {
+        background-color: #f8f9fa;
+        padding: 10px;
+        font-size: 24px;
+    }
+
+    .invoice-header {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .table-invoice tbody tr:nth-child(odd) {
+        background-color: #f8f9fa;
+    }
+    .table-invoice{
+      width: 100%;
+    }
+
+    .table-invoice th,
+    .table-invoice td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+    }
+
+    .invoice-price {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .invoice-note {
+        margin-top: 20px;
+    }
+
+    .invoice-footer {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* td {
+      border: 1px solid rgb(231, 231, 231);
+      padding: 10px;
+      font-size: 20px;
+    } */
+
+
+    /* table thead {
+      color: black;
+      border: 1px solid rgb(231, 231, 231);
+      border-bottom: 2px solid gray;
+      background-color: white;
+    }
+
+    table thead tr {
+      text-align: center;
+    } */
+
+    /* table tbody tr td {
+      border: 1px solid black;
+      padding: 8px;
+    } */
+
+    /* table tfoot tr td {
+      padding: 8px;
+    } */
+
+    .summary-container {
+      border: 1px solid black;
+      /* border-radius: 5px; */
+      padding: 10px;
+    }
+
+    .main-title {
+      font-weight: 900;
+    }
+
+    .summary-item {
+      margin-bottom: 10px;
+    }
+
+    .summary-item h5 {
+      font-weight: 600;
+      display: inline;
+      margin-right: 5px;
+    }
+</style>
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+</head>
+
+<body>
+
+    <div class="container mt-5 pt-5  ">
+        <div class="col-md-12">
+            <div class="invoice">
+                <div class="invoice-company text-inverse f-w-600">
+                    <span class="pull-right hidden-print">
+                        <a href="javascript:;" class="btn btn-sm btn-white m-b-10 p-l-5" id="exportPdf"><i
+                                class="fa fa-file t-plus-1 text-danger fa-fw fa-lg"></i> Export as PDF</a>
+                        <a href="javascript:;" onclick="window.print()" class="btn btn-sm btn-white m-b-10 p-l-5"><i
+                                class="fa fa-print t-plus-1 fa-fw fa-lg"></i> Print</a>
+                    </span>
+                    <h3  style="font-size: 25px; font-weight: 900;"><%= locals.data ? locals.data : "Custom" %> Sale Report</h3>
+                </div>
+                <br>
+                <% if(locals.info && info.From && info.To){ %>
+                From Date : <%= info.From %>
+                <br>
+                To Date : <%= info.To %>
+                <% } %>
+                <br><br> 
+                <div class="invoice-content">
+            
+                  <% if(locals.info){ %>
+                    <% if(locals.info.customReport && locals.info.customReport.length>0){ %>
+                      <table class="table-invoice" style="font-size: 14px; border-collapse: collapse; overflow-x: auto;">
+                        <h3  style="font-size: 25px; font-weight: bold;">Summary</h3>
+                        <div class="summary-container">
+                          <div class="summary-item">
+                            <h5>Revenue :</h5>
+                            <span style="font-weight: 900; color: green; font-size: 20px;">₹<%= locals.total.totalRevenue %>
+                                </span>
+                          </div>
+                          <div class="summary-item">
+                            <h5>Orders :</h5>
+                            <span style="font-weight: 700; font-size: 20px;">
+                              <%= locals.total.totalOrders %>
+                            </span>
+                          </div>
+                          <div class="summary-item">
+                            <h5>Coupon Applied :</h5>
+                            <span style="font-weight: 700; font-size: 20px;">
+                              <%= locals.total.totalCouponApplied %>
+                            </span>
+                          </div>
+                          <div class="summary-item">
+                            <h5>Coupon Discount :</h5>
+                            <span style="font-weight: 700; font-size: 20px;">
+                              <%= locals.total.totalCouponValue %>
+                            </span>
+                          </div>
+                          <div class="summary-item">
+                            <h5>Cancel or Return Orders :</h5>
+                            <span style="font-weight: 700; font-size: 20px;">
+                              <%= locals.total.totalCancelledOrders %>
+                            </span>
+                          </div>
+                        </div>
+                        <br>
+                        <h3  style="font-size: 25px; font-weight: 600;">Table Data</h3>
+                              <thead>
+                                <tr>
+                                  <th>No</th>
+                                  <th>Date</th>
+                                  <th>Orders</th>
+                                  <th>Revenue</th>
+                                  <th>Coupon</th>
+                                  <th>Discount</th>
+                                  <th>Cancel or Rtn Orders</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <% for(let i=0;i<info.customReport.length;i++){ %>
+            
+                                  <tr style="font-size: 20px;">
+                                    <td>
+                                      <%= i+1 %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].date %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].totalOrders %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].totalRevenue %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].couponAppliedCount %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].totalCouponValue %>
+                                    </td>
+                                    <td>
+                                      <%= info.customReport[i].cancelledOrdersCount %>
+                                    </td>
+                                  </tr>
+                                  <% } %>
+                              </tbody>
+                      </table>
+                      <% }else{ %>
+                        <h4 style="font-weight: 900;">No Detials Found</h4>
+                        <% } %>
+                        <% } %>
+            
+                </div>
+            
+            
+                <div class="invoice-note">
+                    * Cara Online Shopping Site<br>
+                </div>
+            
+            
+                <div class="invoice-footer">
+                    <p class="text-center">
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-globe"></i> caraonlineshoppingsite.com</span>
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-phone-volume"></i> T:91-1234567890</span>
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-envelope"></i> <a href="/cdn-cgi/l/email-protection"
+                                class="cf_email"
+                                data-cfemail="94e6e0fdf1f9e4e7d4f3f9f5fdf8baf7fbf9">caraonlineshoppingsite@gmail.com</a></span>
+                                
+                    </p>
+                   
+                </div>
+                <br><br><br>
+                </div>
+           </div>
+    </div>
+
+
+    </div>
+    </div>
+</body>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#exportPdf').on('click', function () {
+            var options = {
+                margin: 2,
+                filename: 'sale-report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            var element = document.querySelector('.invoice');
+            html2pdf(element, options);
+        });
+    });
+</script>
