@@ -131,7 +131,7 @@
         </h3>
         <div>
           <% if(locals.info && locals.info.customReport && locals.info.customReport.length>0){ %>
-            <a id="downloadPdf" class="btn btn-outline-success  ms-4" onclick="downloadData()">Dowload As
+            <a id="downloadPdf" class="btn btn-outline-success  ms-4" >Dowload As
               Pdf</a>
             <a id="downloadExcel" class="btn btn-outline-success  ms-4">Dowload As Excel</a>
             <% } %>
@@ -267,26 +267,26 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
 
-    function downloadData() {
-      const data = '<%=  JSON.stringify(locals.info); %>'
-      const from = '<%=  locals.info ? info.From : false; %>'
-      const to = '<%= locals.info ? info.To : false; %>'
-      const total = '<%= JSON.stringify(locals.total); %>'
-      const data1 = '<%=   locals.data; %>'
-      const encodedData = encodeURIComponent(data);
-      const encodedTotal = encodeURIComponent(total);
-      window.location.href = `/admin/downloadSale?data=${encodedData}&from=${from}&to=${to}&data1=${data1}&total=${encodedTotal}`;
-    }
+    // function downloadData() {
+    //   const data = '<%=  JSON.stringify(locals.info); %>'
+    //   const from = '<%=  locals.info ? info.From : false; %>'
+    //   const to = '<%= locals.info ? info.To : false; %>'
+    //   const total = '<%= JSON.stringify(locals.total); %>'
+    //   const data1 = '<%=   locals.data; %>'
+    //   const encodedData = encodeURIComponent(data);
+    //   const encodedTotal = encodeURIComponent(total);
+    //   window.location.href = `/admin/downloadSale?data=${encodedData}&from=${from}&to=${to}&data1=${data1}&total=${encodedTotal}`;
+    // }
 
 
     window.onload = function () {
 
-      // const downloadPdf = document.getElementById('downloadPdf')
-      //   .addEventListener('click', () => {
+      const downloadPdf = document.getElementById('downloadPdf')
+        .addEventListener('click', () => {
 
-      //     generatePdf();
+          generatePdf();
 
-      //   });
+        });
 
       const downloadExcel = document.getElementById('downloadExcel')
         .addEventListener('click', () => {
