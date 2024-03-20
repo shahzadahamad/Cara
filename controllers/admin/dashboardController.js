@@ -3,7 +3,6 @@ const admin = require("../../models/adminModel");
 const Order = require("../../models/orderModel");
 const User = require("../../models/userModel");
 const Product = require("../../models/productsModel");
-const he = require('he');
 const mongoose = require("mongoose");
 
 const top10ProductsCategoryAndBrand = async (req, res) => {
@@ -886,42 +885,9 @@ const verifyCustomSalesReport = async (req, res) => {
   }
 };
 
-// download
-// const downloadSale = async (req, res) => {
-//   try {
-//     const { data, from, to, data1,total } = req.query;
-//     const decodedData = he.decode(data);
-//     const parsedData = JSON.parse(decodedData);
-//     const decodedTotal = he.decode(total);
-//     const parsedTotal = JSON.parse(decodedTotal);
-//     if(from,to){
-//      return  res.render("saleReport", {
-//         info: parsedData,
-//         total: parsedTotal,
-//         from,
-//         to,
-//         status: false,
-//       });
-//     }
-
-//     if(data1){
-//       return res.render("saleReport", {
-//         info: parsedData,
-//         total: parsedTotal,
-//         data: data1,
-//         status: true,
-//       });
-//     }
-
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
-
 module.exports = {
   loadDashboard,
   verifyDashboard,
   loadCustomSalesReport,
   verifyCustomSalesReport,
-  // downloadSale,
 };
