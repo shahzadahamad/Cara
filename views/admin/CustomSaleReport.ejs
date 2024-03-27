@@ -163,7 +163,7 @@
                 <div class="summary-container">
                   <div class="summary-item">
                     <h5>Revenue :</h5>
-                    <span style="font-weight: 900; color: green; font-size: 20px;">₹<%= locals.total.totalRevenue %>
+                    <span style="font-weight: 900; color: green; font-size: 20px;">₹<%= locals.total.totalRevenue===0 ? '-' : locals.total.totalRevenue %>
                     </span>
                   </div>
                   <div class="summary-item">
@@ -175,19 +175,19 @@
                   <div class="summary-item">
                     <h5>Coupon Applied :</h5>
                     <span style="font-weight: 700; font-size: 20px;">
-                      <%= locals.total.totalCouponApplied %>
+                      <%= locals.total.totalCouponApplied===0 ? '-' : locals.total.totalCouponApplied %>
                     </span>
                   </div>
                   <div class="summary-item">
                     <h5>Coupon Discount :</h5>
                     <span style="font-weight: 700; font-size: 20px;">
-                      <%= locals.total.totalCouponValue %>
+                      <%= locals.total.totalCouponValue===0 ? '-' : locals.total.totalCouponValue %>
                     </span>
                   </div>
                   <div class="summary-item">
                     <h5>Cancel or Return Orders :</h5>
                     <span style="font-weight: 700; font-size: 20px;">
-                      <%= locals.total.totalCancelledOrders %>
+                      <%= locals.total.totalCancelledOrders===0 ? '-' : locals.total.totalCancelledOrders %>
                     </span>
                   </div>
                 </div>
@@ -212,22 +212,22 @@
                         <%= i+1 %>
                       </td>
                       <td>
-                        <%= info.customReport[i].date %>
+                        <%= info.customReport[i].date  %>
                       </td>
                       <td>
-                        <%= info.customReport[i].totalOrders %>
+                        <%= info.customReport[i].totalOrders  %>
                       </td>
                       <td>
-                        <%= info.customReport[i].totalRevenue %>
+                        <%= info.customReport[i].totalRevenue===0 ? '-' : info.customReport[i].totalRevenue  %>
                       </td>
                       <td>
-                        <%= info.customReport[i].couponAppliedCount %>
+                        <%= info.customReport[i].couponAppliedCount===0 ? '-' : info.customReport[i].couponAppliedCount %>
                       </td>
                       <td>
-                        <%= info.customReport[i].totalCouponValue %>
+                        <%= info.customReport[i].totalCouponValue===0 ? '-' : info.customReport[i].totalCouponValue  %>
                       </td>
                       <td>
-                        <%= info.customReport[i].cancelledOrdersCount %>
+                        <%= info.customReport[i].cancelledOrdersCount===0 ? '-' : info.customReport[i].cancelledOrdersCount  %>
                       </td>
                     </tr>
                     <% } %>
@@ -238,16 +238,16 @@
                       <%= locals.total.totalOrders %>
                     </td>
                     <td>
-                      <%= locals.total.totalRevenue %>
+                      <%= locals.total.totalRevenue===0 ? '-' : locals.total.totalRevenue %>
                     </td>
                     <td>
-                      <%= locals.total.totalCouponApplied %>
+                      <%= locals.total.totalCouponApplied===0 ? '-' : locals.total.totalCouponApplied %>
                     </td>
                     <td>
-                      <%= locals.total.totalCouponValue %>
+                      <%= locals.total.totalCouponValue===0 ? '-' : locals.total.totalCouponValue %>
                     </td>
                     <td>
-                      <%= locals.total.totalCancelledOrders %>
+                      <%= locals.total.totalCancelledOrders===0 ? '-' : locals.total.totalCancelledOrders %>
                     </td>
                   </tr>
                 </tfoot>
@@ -266,18 +266,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-
-    // function downloadData() {
-    //   const data = '<%=  JSON.stringify(locals.info); %>'
-    //   const from = '<%=  locals.info ? info.From : false; %>'
-    //   const to = '<%= locals.info ? info.To : false; %>'
-    //   const total = '<%= JSON.stringify(locals.total); %>'
-    //   const data1 = '<%=   locals.data; %>'
-    //   const encodedData = encodeURIComponent(data);
-    //   const encodedTotal = encodeURIComponent(total);
-    //   window.location.href = `/admin/downloadSale?data=${encodedData}&from=${from}&to=${to}&data1=${data1}&total=${encodedTotal}`;
-    // }
-
 
     window.onload = function () {
 
