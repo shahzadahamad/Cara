@@ -2,7 +2,7 @@ const user = require("../../models/userModel");
 const refferal = require("../../models/refferalModel");
 const Wallet = require("../../models/walletModel");
 const userOTPVerification = require("../../models/userOTPVerificationModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const nodeMailer = require("nodemailer");
 const validator = require("validator");
 
