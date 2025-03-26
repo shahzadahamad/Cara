@@ -44,12 +44,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // userRoutes
 const userRouter = require("./routes/userRoute");
-userRouter.set('views', __dirname + 'views/user');
+userRouter.set('views', 'views/user');
 app.use("/", userRouter);
 
 // adminRoutes
 const adminRouter = require("./routes/adminRoute");
-adminRouter.set('views', __dirname + 'views/admin');
+adminRouter.set('views', 'views/admin');
 app.use("/admin", adminRouter);
 
 app.set('views','views/error');
