@@ -44,15 +44,15 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // userRoutes
 const userRouter = require("./routes/userRoute");
-userRouter.set('views', __dirname + '/views/user');
+userRouter.set('views', path.join(__dirname, "/views/user"));
 app.use("/", userRouter);
 
 // adminRoutes
 const adminRouter = require("./routes/adminRoute");
-adminRouter.set('views', __dirname + '/views/admin');
+adminRouter.set('views', path.join(__dirname, "/views/admin"));
 app.use("/admin", adminRouter);
 
-app.set('views','views/error');
+app.set('views', path.join(__dirname, "/views/error"));
 
 //admin error page
 app.use('/admin',(req, res, next) => {
