@@ -1,12 +1,12 @@
-# 🌱 Environment Setup Guide
+# Environment Setup Guide
 
 This file explains the required environment variables for running the project.
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
-Create a `.env.local` file in the root directory and add the following variables:
+Create a `.env` file in the root directory and add the following variables:
 
 ```env
 # MongoDB connection string
